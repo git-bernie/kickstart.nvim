@@ -49,9 +49,16 @@ return {
         map('n', '<leader>hp', gitsigns.preview_hunk, { desc = 'git [p]review hunk' })
         map('n', '<leader>hb', gitsigns.blame_line, { desc = 'git [b]lame line' })
         map('n', '<leader>hd', gitsigns.diffthis, { desc = 'git [d]iff against index' })
+        map('n', '<leader>hN', function()
+          gitsigns.nav_hunk 'next'
+        end, { desc = '[H]unk [N]ext (gitsigns.nav_hunk Use ]c instead.' })
+        map('n', '<leader>hP', function()
+          gitsigns.nav_hunk 'prev'
+        end, { desc = '[H]unk [P]revious (gitsigns.nav_hunk. Use [c instead' })
         map('n', '<leader>hD', function()
           gitsigns.diffthis '@'
         end, { desc = 'git [D]iff against last commit' })
+
         -- Toggles
         map('n', '<leader>tb', gitsigns.toggle_current_line_blame, { desc = '[T]oggle git show [b]lame line' })
         map('n', '<leader>tD', gitsigns.toggle_deleted, { desc = '[T]oggle git show [D]eleted' })

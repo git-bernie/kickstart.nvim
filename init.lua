@@ -192,8 +192,11 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 
 -- [[ Bernie's Keymaps ]]
 -- cabbrev evv e ~/.vimrc
-vim.keymap.set('ca', 'evv', 'e ~/.vimrc')
+vim.keymap.set('ca', 'evv', 'e ~/.vimrc.27Aug24', { desc = 'Edit .vimrc' })
+vim.keymap.set('n', '<Space>gv', '<cmd>Gvdiffsplit<CR>', { desc = '[G][V]diffsplit Open a vertical diffsplit' })
 
+vim.keymap.set('n', '<Space>cd', '<cmd>cd %:p:h<CR>', { desc = '[C]hange [D]irectory to the current file' })
+vim.keymap.set('n', '<Space>lcd', '<cmd>lcd %:p:h<CR>', { desc = '[L]ocal [C]hange [D]irectory to the current file' })
 --- Let me have "oo" and "OO" do what I want
 -- Problem: oo and OO slow down "o" and "O" so find a better mapping
 -- map ]<Space> o<esc>
@@ -431,6 +434,7 @@ require('lazy').setup {
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+      vim.keymap.set('n', '<leader>yb', builtin.buffers, { desc = 'Wh[Y] Find existing buffers', silent = false })
       vim.keymap.set('n', '<leader>gb', builtin.git_branches, { desc = '[G]it [B]ranches' })
 
       vim.keymap.set('n', '<leader>yg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
@@ -851,19 +855,21 @@ require('lazy').setup {
       }
     end,
   },
-
   { -- You can easily change to a different colorscheme.
     -- Change the name of the colorscheme plugin below, and then
     -- change the command in the config to whatever the name of that colorscheme is.
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'folke/tokyonight.nvim',
+    -- 'folke/tokyonight.nvim',
+    -- 'ellisonleao/gruvbox.nvim',
+    'lifepillar/vim-gruvbox8',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      -- vim.cmd.colorscheme 'tokyonight-night'
+      vim.cmd.colorscheme 'gruvbox8'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
