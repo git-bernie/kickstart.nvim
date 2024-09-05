@@ -267,6 +267,7 @@ end
 --local json = vim.fn.json_decode(current_line)
 --local output = vim.fn.systemlist { 'jq', '-S' }, { input = json, capture_output = true, text = true }
 
+-- [[ Bernie's buffer-scoped things ]]
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -501,6 +502,7 @@ require('lazy').setup {
       vim.keymap.set('n', '<leader>yg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>yh', builtin.command_history, { desc = '[S]earch [C]command [H]istory' })
       vim.keymap.set('n', '<leader>yo', builtin.current_buffer_tags, { desc = '[Y]o [O]utline (Buffer Tags)' })
+      vim.keymap.set('n', '<leader>ys', ':Telescope find_files search_dirs=~', { desc = '[Y]o [S]earch search_dirs=~' })
       vim.keymap.set('n', '<A-p>', function()
         builtin.find_files { desc = '[F]ind [F]iles', hidden = true, no_ignore = true }
       end, {})
