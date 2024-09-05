@@ -190,6 +190,13 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+-- terminal bindings - these seem to already be there
+-- vim.keymap.set('t', '<C-h>', '<C-\\><C-N><C-w>h', { desc = 'Move focus to the left window' })
+-- tmap <C-h> <C-\><C-N><C-h>
+-- tmap <C-l> <C-\><C-N><C-l>
+-- tmap <C-j> <C-\><C-N><C-j>
+-- tmap <C-k> <C-\><C-N><C-k>
+
 -- [[ Bernie's Keymaps ]]
 -- cabbrev evv e ~/.vimrc
 vim.keymap.set('ca', 'evv', 'e ~/.vimrc.27Aug24', { desc = 'Edit .vimrc' })
@@ -201,10 +208,64 @@ vim.keymap.set('n', '<Space>lcd', '<cmd>lcd %:p:h<CR>', { desc = '[L]ocal [C]han
 -- Problem: oo and OO slow down "o" and "O" so find a better mapping
 -- map ]<Space> o<esc>
 -- map ]<Space> o<esc>
-vim.keymap.set('n', '[<Space>', 'O<esc>', { desc = 'Add a line above and return to normal mode' })
-vim.keymap.set('n', ']<Space>', 'o<esc>', { desc = 'Add a line below and return to normal mode' })
+vim.keymap.set('n', '[<Leader>', 'O<esc>', { desc = 'Add a line above and return to normal mode' })
+vim.keymap.set('n', ']<Leader>', 'o<esc>', { desc = 'Add a line below and return to normal mode' })
 
 vim.keymap.set('v', '<Leader>1f', vim.lsp.buf.format, {})
+vim.keymap.set('c', '<C-a>', '<Home>', { silent = false })
+vim.keymap.set('c', '<C-b>', '<Left>', { silent = false })
+vim.keymap.set('c', '<C-e>', '<End>', { silent = false })
+vim.keymap.set('c', '<C-h>', '<Backspace>', { silent = false })
+-- C-d usually does something else less necessary?
+vim.keymap.set('c', '<C-d>', '<Delete>', { silent = false })
+--  telescope.command_history() will do this now
+vim.keymap.set('c', '<C-f>', '<Right>', { silent = false })
+
+vim.keymap.set('n', '<leader>tn', function()
+  local set = vim.opt_local
+
+  if set.number:get() and set.relativenumber:get() then
+    set.relativenumber = false
+    set.number = false
+  else
+    set.number = true
+    set.relativenumber = true
+  end
+end, { desc = '[T]oggle [N]umber and relative number' })
+
+vim.keymap.set('n', '<leader>yd', function()
+  local unixtime = vim.fn.expand '<cword>'
+
+  -- local num = nil
+  -- find the sequential numbers at start of string or end of string
+  local _, _, num = string.find(unixtime, '^([%d]+)')
+
+  if num == nil or num == '' then
+    _, _, num = string.find(unixtime, '([%d]+)$')
+  end
+
+  if num == nil or num == '' then
+    _, _, num = string.find(unixtime, '([%d]+)')
+  end
+
+  local get_date = function(val)
+    return os.date('%c', val)
+  end
+
+  if pcall(get_date, num) then
+    print('num is ' .. tostring(num) .. ' ' .. os.date('%c', num))
+  else
+    print(string.format('Invalid unixtime %s', num))
+  end
+end, { desc = '[Y] [D]ate from unixtime cword' })
+
+if (vim.fn.executable 'jq') == 1 then
+  vim.keymap.set('n', '<leader>yj', '<cmd>. ! jq -S<cr>', { desc = '[Y] [J]SON pretty print' })
+  vim.keymap.set('v', '<leader>yj', "<cmd>:'<,'>' ! jq -S<cr>", { desc = '[Y] [J]SON pretty print' })
+end
+--local current_line = vim.api.nvim_get_current_line()
+--local json = vim.fn.json_decode(current_line)
+--local output = vim.fn.systemlist { 'jq', '-S' }, { input = json, capture_output = true, text = true }
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -427,17 +488,23 @@ require('lazy').setup {
       end, {})
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sc', builtin.current_buffer_tags, { desc = '[S]earch [C]urrent Buffer Tags' })
-      vim.keymap.set('n', '<leader>yo', builtin.current_buffer_tags, { desc = '[Y]o [O]utline (Buffer Tags)' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
-      vim.keymap.set('n', '<leader>yb', builtin.buffers, { desc = 'Wh[Y] Find existing buffers', silent = false })
-      vim.keymap.set('n', '<leader>gb', builtin.git_branches, { desc = '[G]it [B]ranches' })
 
+      -- Some additional Telescope keymaps I like to preserve for muscle memory
+      vim.keymap.set('n', '<leader>gb', builtin.git_branches, { desc = '[G]it [B]ranches' })
+      vim.keymap.set('n', '<leader>yb', builtin.buffers, { desc = 'Wh[Y] Find existing buffers', silent = false })
       vim.keymap.set('n', '<leader>yg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+      vim.keymap.set('n', '<leader>yh', builtin.command_history, { desc = '[S]earch [C]command [H]istory' })
+      vim.keymap.set('n', '<leader>yo', builtin.current_buffer_tags, { desc = '[Y]o [O]utline (Buffer Tags)' })
+      vim.keymap.set('n', '<A-p>', function()
+        builtin.find_files { desc = '[F]ind [F]iles', hidden = true, no_ignore = true }
+      end, {})
+      vim.keymap.set('n', '<C-p>', builtin.find_files, { desc = '[S]earch [F]iles' })
 
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
@@ -736,6 +803,7 @@ require('lazy').setup {
         -- I added below then removed as did not seem to help
         -- php = { 'pint', 'prettierd', 'php_cs_fixer' },
         blade = { 'blade-formatter' },
+        markdown = { 'prettierd', 'cbfmt', 'markdown-toc', 'markdownlint' },
       },
     },
   },
@@ -869,7 +937,13 @@ require('lazy').setup {
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
       -- vim.cmd.colorscheme 'tokyonight-night'
-      vim.cmd.colorscheme 'gruvbox8'
+      --vim.cmd.colorscheme 'tokyonight-storm'
+      -- We will keep any tokyo* because of neo-tree working best with it
+      -- https://github.com/LazyVim/LazyVim/issues/2527
+      vim.cmd.colorscheme 'tokyonight'
+      --vim.cmd.colorscheme 'catppuccin-frappe'
+      --vim.cmd.colorscheme 'github-dark-tritanopia'
+      -- vim.cmd.colorscheme 'gruvbox8'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
