@@ -93,6 +93,9 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
+-- [[ Bernie's Setting Option to allow .nvimrc or .nvim.lua ]]
+vim.opt.exrc = true
+
 -- [[ Setting options ]]
 -- See `:help vim.opt`
 -- NOTE: You can change these options as you wish!
@@ -199,7 +202,6 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 
 -- [[ Bernie's Keymaps ]]
 -- cabbrev evv e ~/.vimrc
-vim.keymap.set('ca', 'evv', 'e ~/.vimrc.27Aug24', { desc = 'Edit .vimrc' })
 vim.keymap.set('n', '<Space>gv', '<cmd>Gvdiffsplit<CR>', { desc = '[G][V]diffsplit Open a vertical diffsplit' })
 
 vim.keymap.set('n', '<Space>cd', '<cmd>cd %:p:h<CR>', { desc = '[C]hange [D]irectory to the current file' })
@@ -211,19 +213,42 @@ vim.keymap.set('n', '<Space>lcd', '<cmd>lcd %:p:h<CR>', { desc = '[L]ocal [C]han
 vim.keymap.set('n', '[<Leader>', 'O<esc>', { desc = 'Add a line above and return to normal mode' })
 vim.keymap.set('n', ']<Leader>', 'o<esc>', { desc = 'Add a line below and return to normal mode' })
 
-vim.keymap.set('v', '<Leader>1f', vim.lsp.buf.format, {})
+vim.keymap.set('v', '<Leader>1f', vim.lsp.buf.format, { desc = '[1] visual line [F]ormat' })
+
+--  [[ Bernie's Command line mappings]]
 vim.keymap.set('c', '<C-a>', '<Home>', { silent = false })
 vim.keymap.set('c', '<C-b>', '<Left>', { silent = false })
 vim.keymap.set('c', '<C-e>', '<End>', { silent = false })
 vim.keymap.set('c', '<C-h>', '<Backspace>', { silent = false })
--- C-d usually does something else less necessary?
-vim.keymap.set('c', '<C-d>', '<Delete>', { silent = false })
+-- C-d usually does something else less necessary? Tab handles old C-d
+vim.keymap.set('c', '<C-d>', '<Delete>', { silent = false, desc = 'Delete in the commandline' })
 --  telescope.command_history() will do this now
 vim.keymap.set('c', '<C-f>', '<Right>', { silent = false })
+-- Insert Mode
+vim.keymap.set('i', '<C-f>', '<Right>', { silent = false })
+vim.keymap.set('i', '<C-b>', '<Left>', { silent = false })
+vim.keymap.set('i', '<C-d>', '<Delete>', { silent = false })
+vim.keymap.set('i', '<C-h>', '<Backspace>', { silent = false })
+vim.keymap.set('i', '<C-a>', '<Home>', { silent = false })
+vim.keymap.set('i', '<C-E>', '<End>', { silent = false })
+
+vim.keymap.set('n', ']j', '<cmd>cnext<CR>', { desc = ':cnext' })
+vim.keymap.set('n', '[j', '<cmd>cprevious<CR>', { desc = ':cprevious' })
+vim.keymap.set('n', '<A-j>', '<cmd>cnext<CR>', { desc = ':cnext' })
+vim.keymap.set('n', '<A-k>', '<cmd>cprevious<CR>', { desc = ':cprevious' })
+vim.keymap.set('n', 's', '<cmd>WhichKey<CR>', { desc = '[S]how Which Key mappings for cmd mode' })
+
+vim.keymap.set(
+  'n',
+  '<leader>fg',
+  ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>",
+  { desc = '[F]ind [G]rep using live_grep args (e.g "word" -tphp)' }
+)
+vim.keymap.set('c', 'Rg', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", { desc = 'Rg using live_grep args' })
 
 vim.keymap.set('n', '<leader>tn', function()
   local set = vim.opt_local
-
+  ---@diagnostic disable-next-line: undefined-field
   if set.number:get() and set.relativenumber:get() then
     set.relativenumber = false
     set.number = false
@@ -233,6 +258,7 @@ vim.keymap.set('n', '<leader>tn', function()
   end
 end, { desc = '[T]oggle [N]umber and relative number' })
 
+--  E.g. 1726513513
 vim.keymap.set('n', '<leader>yd', function()
   local unixtime = vim.fn.expand '<cword>'
 
@@ -267,7 +293,16 @@ end
 --local json = vim.fn.json_decode(current_line)
 --local output = vim.fn.systemlist { 'jq', '-S' }, { input = json, capture_output = true, text = true }
 
+-- https://stackoverflow.com/questions/4256697/vim-search-and-highlight-but-do-not-jump
+vim.keymap.set('n', '*', '*``', { noremap = true, silent = true, desc = 'Search, highlight, and stay on current search result' })
+
+-- [[ Bernie's proto-macros ]]
+vim.keymap.set('n', 'sasa', 'bhylep', { desc = 'Do search for wrapping character at beginning and past at end' })
+
+vim.keymap.set('ca', 'evv', 'e ~/.vimrc.27Aug24', { desc = 'Edit .vimrc' })
+--
 -- [[ Bernie's buffer-scoped things ]]
+--
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -330,6 +365,7 @@ require('lazy').setup {
         delete = { text = '_' },
         topdelete = { text = '‾' },
         changedelete = { text = '~' },
+        untracked = { text = '┆' },
       },
     },
   },
@@ -433,6 +469,15 @@ require('lazy').setup {
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
       { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
+
+      -- live-grep-args
+      {
+        'nvim-telescope/telescope-live-grep-args.nvim',
+
+        -- This will not install any breaking changes.
+        -- For major updates, this must be adjusted manually.
+        version = '^1.0.0',
+      },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -476,6 +521,7 @@ require('lazy').setup {
       -- Enable Telescope extensions if they are installed
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
+      pcall(require('telescope').load_extension, 'live_grep_args')
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
@@ -484,11 +530,10 @@ require('lazy').setup {
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
       -- A bad idea because C-p is used so much
       vim.keymap.set('n', '<leader>cp', builtin.find_files, { desc = '[S]earch [F]iles' })
-      vim.keymap.set('n', '<leader>ff', function()
-        builtin.find_files { desc = '[F]ind [F]iles', hidden = true, no_ignore = true }
-      end, {})
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
-      vim.keymap.set('n', '<leader>sc', builtin.current_buffer_tags, { desc = '[S]earch [C]urrent Buffer Tags' })
+      -- vim.keymap.set('n', '<leader>sc', builtin.current_buffer_tags, { desc = '[S]earch [C]urrent Buffer Tags' })
+      vim.keymap.set('n', '<leader>sc', builtin.lsp_document_symbols, { desc = '[S]earch [C]urrent Buffer Tags (lsp_document_symbols)' })
+      vim.keymap.set('n', '<leader>sm', builtin.man_pages, { desc = '[S]earch [M]an pages' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
@@ -498,15 +543,22 @@ require('lazy').setup {
 
       -- Some additional Telescope keymaps I like to preserve for muscle memory
       vim.keymap.set('n', '<leader>gb', builtin.git_branches, { desc = '[G]it [B]ranches' })
-      vim.keymap.set('n', '<leader>yb', builtin.buffers, { desc = 'Wh[Y] Find existing buffers', silent = false })
+      vim.keymap.set('n', '<leader>yb', builtin.buffers, { desc = '[Y]o Find existing buffers', silent = false })
       vim.keymap.set('n', '<leader>yg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>yh', builtin.command_history, { desc = '[S]earch [C]command [H]istory' })
-      vim.keymap.set('n', '<leader>yo', builtin.current_buffer_tags, { desc = '[Y]o [O]utline (Buffer Tags)' })
-      vim.keymap.set('n', '<leader>ys', ':Telescope find_files search_dirs=~', { desc = '[Y]o [S]earch search_dirs=~' })
+      vim.keymap.set('n', '<leader>s:', builtin.command_history, { desc = '[S]earch [:]Command [H]istory' })
+      --vim.keymap.set('n', '<leader>yo', builtin.current_buffer_tags, { desc = '[Y]o [O]utline (Buffer Tags)' })
+      vim.keymap.set('n', '<leader>yo', builtin.lsp_document_symbols, { desc = '[Y]o [O]utline (lsp_document_symbols)' })
+      -- I would like to make '<leader>ys' in lua but I don't know how to make the prompt stay open.
+      vim.keymap.set('n', '<leader>ys', ':Telescope find_files hidden=true no_ignore=true search_dirs=~', { desc = '[Y]o [S]earch search_dirs=~' })
       vim.keymap.set('n', '<A-p>', function()
-        builtin.find_files { desc = '[F]ind [F]iles', hidden = true, no_ignore = true }
+        builtin.find_files { desc = '[F]ind [F]iles (hidden, no_ignore)', hidden = true, no_ignore = true }
       end, {})
-      vim.keymap.set('n', '<C-p>', builtin.find_files, { desc = '[S]earch [F]iles' })
+      -- C-p habit. Sometimes removing <C-p> because neo-tree uses it as regular up/down; but j/k works fine.
+      vim.keymap.set('n', '<C-p>', builtin.find_files, { desc = '[S]earch [F]iles (use <leader>sf)' })
+      vim.keymap.set('n', '<leader>yy', function()
+        builtin.find_files { desc = '[F]ind [Y]er Fles', hidden = true, no_ignore = true }
+      end, {})
 
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
@@ -610,6 +662,9 @@ require('lazy').setup {
           --  This is where a variable was first declared, or where a function is defined, etc.
           --  To jump back, press <C-t>.
           map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+          -- map('gV', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition', { 'v' })
+
+          map('gV', '<cmd>vertical wincmd ]<cr>', '[G]oto Definition [V]ertical Split')
 
           -- Find references for the word under your cursor.
           map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
@@ -769,7 +824,8 @@ require('lazy').setup {
     cmd = { 'ConformInfo' },
     keys = {
       {
-        '<leader>f',
+        '<leader>yf',
+        --'<leader>f',
         function()
           require('conform').format { async = true, lsp_format = 'fallback' }
         end,
@@ -783,7 +839,10 @@ require('lazy').setup {
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
+        -- I don't want to save on php because I will lose easy Git blame
+        -- results on all files. Otherwise I would.
+        -- FIXME Disable this only on the loanconnect project.
+        local disable_filetypes = { c = true, cpp = true, php = true, javascript = true }
         local lsp_format_opt
         if disable_filetypes[vim.bo[bufnr].filetype] then
           lsp_format_opt = 'never'
@@ -801,11 +860,25 @@ require('lazy').setup {
         -- python = { "isort", "black" },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
+        javascript = { 'prettierd', 'prettier', stop_after_first = true },
         -- I added below then removed as did not seem to help
-        -- php = { 'pint', 'prettierd', 'php_cs_fixer' },
+        --php = { 'pint', 'php-cs-fixer', stop_after_first = false },
+        --php = { 'pint', 'php-cs-fixer', 'phpcbf', stop_after_first = false },
+        --php = { 'php-cs-fixer', 'pint', 'phpcbf', stop_after_first = true },
         blade = { 'blade-formatter' },
-        markdown = { 'prettierd', 'cbfmt', 'markdown-toc', 'markdownlint' },
+        markdown = { 'cbfmt', 'markdown-toc', 'markdownlint', stop_after_first = false },
+        sql = { 'sqlfmt' },
+      },
+      formatters = {
+        ['php-cs-fixer'] = {
+          command = 'php-cs-fixer',
+          args = {
+            'fix',
+            '--rules=@PSR12', -- other presets availabled
+            '$FILENAME',
+          },
+          stdin = false,
+        },
       },
     },
   },
@@ -871,7 +944,7 @@ require('lazy').setup {
           ['<C-p>'] = cmp.mapping.select_prev_item(),
 
           -- Scroll the documentation window [b]ack / [f]orward
-          ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+          ['<C-b>'] = cmp.mapping.scroll_docs(-5),
           ['<C-f>'] = cmp.mapping.scroll_docs(4),
 
           -- Accept ([y]es) the completion.
@@ -942,10 +1015,11 @@ require('lazy').setup {
       --vim.cmd.colorscheme 'tokyonight-storm'
       -- We will keep any tokyo* because of neo-tree working best with it
       -- https://github.com/LazyVim/LazyVim/issues/2527
-      vim.cmd.colorscheme 'tokyonight'
+      --vim.cmd.colorscheme 'tokyonight'
+      vim.cmd.colorscheme 'tokyonight-storm'
       --vim.cmd.colorscheme 'catppuccin-frappe'
       --vim.cmd.colorscheme 'github-dark-tritanopia'
-      -- vim.cmd.colorscheme 'gruvbox8'
+      --vim.cmd.colorscheme 'gruvbox8'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
@@ -975,8 +1049,8 @@ require('lazy').setup {
       -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
       -- - sd'   - [S]urround [D]elete [']quotes
       -- - sr)'  - [S]urround [R]eplace [)] [']
-      -- Disabled because I want s for leap/sneak
-      -- require('mini.surround').setup()
+      -- Enabled - now leap/sneak uses 'gs'
+      require('mini.surround').setup()
 
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
@@ -992,6 +1066,8 @@ require('lazy').setup {
       statusline.section_location = function()
         return '%2l:%-2v'
       end
+
+      require('mini.sessions').setup()
 
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim
