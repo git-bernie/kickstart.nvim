@@ -588,6 +588,11 @@ require('lazy').setup {
         builtin.find_files { desc = '[F]ind [Y]er Fles', hidden = true, no_ignore = true }
       end, {})
 
+      vim.keymap.set('n', '<leader>gc', function()
+        builtin.git_bcommits {
+          prompt_title = '[G]it Buffer [C]ommits',
+        }
+      end, {})
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
         -- You can pass additional configuration to Telescope to change the theme, layout, etc.
