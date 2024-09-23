@@ -4,4 +4,7 @@ test.sh
 nvim
 
 spell/
+*~
+Session.vim
+db_ui_queries/
 # lazy-lock.json

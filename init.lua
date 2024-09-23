@@ -101,6 +101,25 @@ vim.opt.exrc = true
 -- NOTE: You can change these options as you wish!
 --  For more options, you can see `:help option-list`
 
+-- Always too little too late
+vim.opt.backup = true
+
+-- Append backup files with timestamp
+--https://toddknutson.bio/posts/how-to-enable-neovim-undo-backup-and-swap-files-when-switching-linux-groups/
+vim.api.nvim_create_autocmd('BufWritePre', {
+  callback = function()
+    local extension = '~' .. vim.fn.strftime '%Y-%m-%d-%H%M%S'
+    vim.o.backupext = extension
+  end,
+})
+
+if vim.fn.isdirectory(vim.env.HOME .. '/.backupdir') == 0 then
+  vim.fn.mkdir(vim.env.HOME .. '/.backupdir')
+end
+vim.opt.backupdir = { vim.env.HOME .. '/.backupdir', vim.fn.expand '~/tmp' }
+
+vim.opt.backupskip = { '*.csv' }
+
 -- Make line numbers default
 vim.opt.number = true
 -- You can also add relative line numbers, to help with jumping.
@@ -125,6 +144,10 @@ end)
 vim.opt.breakindent = true
 
 -- Save undo history
+if vim.fn.isdirectory(vim.env.HOME .. '/.undodir') == 0 then
+  vim.fn.mkdir(vim.env.HOME .. '/.undodir')
+end
+vim.opt.undodir = vim.env.HOME .. '/.undodir'
 vim.opt.undofile = true
 
 -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
@@ -1051,6 +1074,8 @@ require('lazy').setup {
       -- - sr)'  - [S]urround [R]eplace [)] [']
       -- Enabled - now leap/sneak uses 'gs'
       require('mini.surround').setup()
+
+      -- require('mini.starter').setup()
 
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
