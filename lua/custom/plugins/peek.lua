@@ -1,3 +1,4 @@
+-- Markdown preview plugin for Neovim
 return {
   'toppair/peek.nvim',
   enabled = false,
