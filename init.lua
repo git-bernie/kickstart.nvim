@@ -281,7 +281,7 @@ vim.keymap.set('n', '<leader>tn', function()
   end
 end, { desc = '[T]oggle [N]umber and relative number' })
 
---  E.g. 1726513513
+--  E.g. 1726513513, 1726513523
 vim.keymap.set('n', '<leader>yd', function()
   local unixtime = vim.fn.expand '<cword>'
 
@@ -317,12 +317,17 @@ end
 --local output = vim.fn.systemlist { 'jq', '-S' }, { input = json, capture_output = true, text = true }
 
 -- https://stackoverflow.com/questions/4256697/vim-search-and-highlight-but-do-not-jump
-vim.keymap.set('n', '*', '*``', { noremap = true, silent = true, desc = 'Search, highlight, and stay on current search result' })
+vim.keymap.set('n', '*', '*``', { noremap = true, silent = true, desc = '(*) Search, highlight, and stay on current search result' })
+
+vim.keymap.set('n', '#', '#``', { noremap = true, silent = true, desc = '(#) Search, highlight, and stay on current search result' })
 
 -- [[ Bernie's proto-macros ]]
 vim.keymap.set('n', 'sasa', 'bhylep', { desc = 'Do search for wrapping character at beginning and past at end' })
 
 vim.keymap.set('ca', 'evv', 'e ~/.vimrc.27Aug24', { desc = 'Edit .vimrc' })
+
+vim.keymap.set('c', 'et', '<cmd>:bot split | term<CR>', { desc = 'Open [T]erminal Below' })
+vim.keymap.set('c', 'etv', '<cmd>:vert split | term<CR>', { desc = 'Open [T]erminal Vert' })
 --
 -- [[ Bernie's buffer-scoped things ]]
 --
@@ -1102,7 +1107,19 @@ require('lazy').setup {
         return '%2l:%-2v'
       end
 
+      require('mini.git').setup()
+
+      -- require('mini.diff').setup()
+
       require('mini.sessions').setup()
+
+      require('mini.ai').setup()
+
+      require('mini.map').setup()
+
+      require('mini.splitjoin').setup()
+
+      require('mini.jump').setup()
 
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim
