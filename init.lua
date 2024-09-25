@@ -151,7 +151,7 @@ vim.opt.breakindent = true
 if vim.fn.isdirectory(vim.env.HOME .. '/.undodir') == 0 then
   if vim.fn.mkdir(vim.env.HOME .. '/.undodir') ~= true then
     print 'Could not create undodir'
-    vim.fn.mkdir(vim.fn.expand '~/tmp/.undodir', 'p')
+    vim.fn.mkdir(vim.fn.expand '~/tmp/.undodir')
   end
 end
 vim.opt.undodir = vim.env.HOME .. '/.undodir'
@@ -232,6 +232,8 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 
 -- [[ Bernie's Keymaps ]]
 -- cabbrev evv e ~/.vimrc
+--[[
+
 vim.keymap.set('n', '<Space>gv', '<cmd>Gvdiffsplit<CR>', { desc = '[G][V]diffsplit Open a vertical diffsplit' })
 
 vim.keymap.set('n', '<Space>cd', '<cmd>cd %:p:h<CR>', { desc = '[C]hange [D]irectory to the current file' })
@@ -245,37 +247,36 @@ vim.keymap.set('n', ']<Leader>', 'o<esc>', { desc = 'Add a line below and return
 
 vim.keymap.set('v', '<Leader>1f', vim.lsp.buf.format, { desc = '[1] visual line [F]ormat' })
 
---  [[ Bernie's Command line mappings]]
-vim.keymap.set('c', '<C-a>', '<Home>', { silent = false })
-vim.keymap.set('c', '<C-b>', '<Left>', { silent = false })
-vim.keymap.set('c', '<C-e>', '<End>', { silent = false })
-vim.keymap.set('c', '<C-h>', '<Backspace>', { silent = false })
--- C-d usually does something else less necessary? Tab handles old C-d
-vim.keymap.set('c', '<C-d>', '<Delete>', { silent = false, desc = 'Delete in the commandline' })
+vim.keymap.set('c', '<c-a>', '<home>', { silent = false })
+vim.keymap.set('c', '<c-b>', '<left>', { silent = false })
+vim.keymap.set('c', '<c-e>', '<end>', { silent = false })
+vim.keymap.set('c', '<c-h>', '<backspace>', { silent = false })
+-- c-d usually does something else less necessary? tab handles old c-d
+vim.keymap.set('c', '<c-d>', '<delete>', { silent = false, desc = 'delete in the commandline' })
 --  telescope.command_history() will do this now
-vim.keymap.set('c', '<C-f>', '<Right>', { silent = false })
--- Insert Mode
-vim.keymap.set('i', '<C-f>', '<Right>', { silent = false })
-vim.keymap.set('i', '<C-b>', '<Left>', { silent = false })
-vim.keymap.set('i', '<C-d>', '<Delete>', { silent = false })
-vim.keymap.set('i', '<C-h>', '<Backspace>', { silent = false })
-vim.keymap.set('i', '<C-a>', '<Home>', { silent = false })
-vim.keymap.set('i', '<C-E>', '<End>', { silent = false })
+vim.keymap.set('c', '<c-f>', '<right>', { silent = false })
+-- insert mode
+vim.keymap.set('i', '<c-f>', '<right>', { silent = false })
+vim.keymap.set('i', '<c-b>', '<left>', { silent = false })
+vim.keymap.set('i', '<c-d>', '<delete>', { silent = false })
+vim.keymap.set('i', '<c-h>', '<backspace>', { silent = false })
+vim.keymap.set('i', '<c-a>', '<home>', { silent = false })
+vim.keymap.set('i', '<c-e>', '<end>', { silent = false })
 
-vim.keymap.set('n', ']j', '<cmd>cnext<CR>', { desc = ':cnext' })
-vim.keymap.set('n', '[j', '<cmd>cprevious<CR>', { desc = ':cprevious' })
-vim.keymap.set('n', '<A-j>', '<cmd>cnext<CR>', { desc = ':cnext' })
-vim.keymap.set('n', '<A-k>', '<cmd>cprevious<CR>', { desc = ':cprevious' })
-vim.keymap.set('n', 's', '<cmd>WhichKey<CR>', { desc = '[S]how Which Key mappings for cmd mode' })
-vim.keymap.set('i', 'jk', '<Esc>', { desc = '[jk] to escape' })
+vim.keymap.set('n', ']j', '<cmd>cnext<cr>', { desc = ':cnext' })
+vim.keymap.set('n', '[j', '<cmd>cprevious<cr>', { desc = ':cprevious' })
+vim.keymap.set('n', '<a-j>', '<cmd>cnext<cr>', { desc = ':cnext' })
+vim.keymap.set('n', '<a-k>', '<cmd>cprevious<cr>', { desc = ':cprevious' })
+vim.keymap.set('n', 's', '<cmd>whichkey<cr>', { desc = '[s]how which key mappings for cmd mode' })
+vim.keymap.set('i', 'jk', '<esc>', { desc = '[jk] to escape' })
 
 vim.keymap.set(
   'n',
   '<leader>fg',
-  ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>",
-  { desc = '[F]ind [G]rep using live_grep args (e.g "word" -tphp)' }
+  ":lua require('telescope').extensions.live_grep_args.live_grep_args()<cr>",
+  { desc = '[f]ind [g]rep using live_grep args (e.g "word" -tphp)' }
 )
-vim.keymap.set('c', 'Rg', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>", { desc = 'Rg using live_grep args' })
+vim.keymap.set('c', 'rg', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<cr>", { desc = 'rg using live_grep args' })
 
 vim.keymap.set('n', '<leader>tn', function()
   local set = vim.opt_local
@@ -287,9 +288,9 @@ vim.keymap.set('n', '<leader>tn', function()
     set.number = true
     set.relativenumber = true
   end
-end, { desc = '[T]oggle [N]umber and relative number' })
+end, { desc = '[t]oggle [n]umber and relative number' })
 
---  E.g. 1726513513, 1726513523
+--  e.g. 1726513513, 1726513523
 vim.keymap.set('n', '<leader>yd', function()
   local unixtime = vim.fn.expand '<cword>'
 
@@ -312,23 +313,24 @@ vim.keymap.set('n', '<leader>yd', function()
   if pcall(get_date, num) then
     print('num is ' .. tostring(num) .. ' ' .. os.date('%c', num))
   else
-    print(string.format('Invalid unixtime %s', num))
+    print(string.format('invalid unixtime %s', num))
   end
-end, { desc = '[Y] [D]ate from unixtime cword' })
+end, { desc = '[y] [d]ate from unixtime cword' })
 
 if (vim.fn.executable 'jq') == 1 then
-  vim.keymap.set('n', '<leader>yj', '<cmd>. ! jq -S<cr>', { desc = '[Y] [J]SON pretty print' })
-  vim.keymap.set('v', '<leader>yj', "<cmd>:'<,'>' ! jq -S<cr>", { desc = '[Y] [J]SON pretty print' })
+  vim.keymap.set('n', '<leader>yj', '<cmd>. ! jq -s<cr>', { desc = '[y] [j]son pretty print' })
+  vim.keymap.set('v', '<leader>yj', "<cmd>:'<,'>' ! jq -s<cr>", { desc = '[y] [j]son pretty print' })
 end
 --local current_line = vim.api.nvim_get_current_line()
 --local json = vim.fn.json_decode(current_line)
---local output = vim.fn.systemlist { 'jq', '-S' }, { input = json, capture_output = true, text = true }
+--local output = vim.fn.systemlist { 'jq', '-s' }, { input = json, capture_output = true, text = true }
 
 -- https://stackoverflow.com/questions/4256697/vim-search-and-highlight-but-do-not-jump
-vim.keymap.set('n', '*', '*``', { noremap = true, silent = true, desc = '(*) Search, highlight, and stay on current search result' })
+vim.keymap.set('n', '*', '*``', { noremap = true, silent = true, desc = '(*) search, highlight, and stay on current search result' })
 
-vim.keymap.set('n', '#', '#``', { noremap = true, silent = true, desc = '(#) Search, highlight, and stay on current search result' })
+vim.keymap.set('n', '#', '#``', { noremap = true, silent = true, desc = '(#) search, highlight, and stay on current search result' })
 
+ ]]
 -- [[ Bernie's proto-macros ]]
 vim.keymap.set('n', 'sasa', 'bhylep', { desc = 'Do search for wrapping character at beginning and past at end' })
 vim.keymap.set('ca', 'evv', 'e ~/.vimrc.27Aug24', { desc = 'Edit .vimrc' })
@@ -1206,5 +1208,7 @@ require('lazy').setup {
   },
 }
 
+-- Keep my keymaps here to keep init.lua small.
+require 'lua.custom.keymaps.keymaps'
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
