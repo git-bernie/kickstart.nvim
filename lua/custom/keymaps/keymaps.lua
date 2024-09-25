@@ -1,7 +1,7 @@
 --[ Bernie's Keymaps ]]
 -- https://www.reddit.com/r/neovim/comments/15ey6iu/any_reason_vimkeymapset_will_not_work_in/
-print 'wtf why is this not running'
-print 'now what'
+-- NOTE: In init.lua: require 'lua.custom.keymaps.keymaps'
+--
 vim.keymap.set('n', '<Space>xx', ':lua print("Hello, world!")<CR>', { desc = 'Print "Hello, world!' })
 -- cabbrev evv e ~/.vimrc
 
