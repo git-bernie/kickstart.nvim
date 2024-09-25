@@ -17,11 +17,4 @@ return {
   config = function()
     require('leap.user').set_repeat_keys(';', ',')
   end,
-
-  --[[config = function()
-    --require('leap').create_default_mappings()
-    vim.keymap.set({ 'n', 'x', 'o' }, 's', '<Plug>(leap-forward)', { desc = '[s]neak (Leap)', noremap = true })
-    vim.keymap.set({ 'n', 'x', 'o' }, 'S', '<Plug>(leap-backward)', { desc = '[S]neak (Leap) backwards', noremap = true })
-    --vim.keymap.set({ 'n', 'x', 'o' }, 'gs', '<Plug>(leap-from-window)')
-  end,]]
 }

@@ -114,9 +114,13 @@ vim.api.nvim_create_autocmd('BufWritePre', {
 })
 
 if vim.fn.isdirectory(vim.env.HOME .. '/.backupdir') == 0 then
-  vim.fn.mkdir(vim.env.HOME .. '/.backupdir')
+  -- vim.fn.mkdir(vim.env.HOME .. '/.backupdir')
+  if vim.fn.mkdir(vim.env.HOME .. '/.backupdir') ~= true then
+    print 'Could not create backupdir'
+    vim.fn.mkdir(vim.fn.expand '~/tmp')
+  end
 end
-vim.opt.backupdir = { vim.env.HOME .. '/.backupdir', vim.fn.expand '~/tmp' }
+vim.opt.backupdir = { vim.env.HOME .. '/.backupdir', vim.fn.expand '~/tmp', '/tmp/' }
 
 vim.opt.backupskip = { '*.csv' }
 
@@ -145,7 +149,10 @@ vim.opt.breakindent = true
 
 -- Save undo history
 if vim.fn.isdirectory(vim.env.HOME .. '/.undodir') == 0 then
-  vim.fn.mkdir(vim.env.HOME .. '/.undodir')
+  if vim.fn.mkdir(vim.env.HOME .. '/.undodir') ~= true then
+    print 'Could not create undodir'
+    vim.fn.mkdir(vim.fn.expand '~/tmp/.undodir', 'p')
+  end
 end
 vim.opt.undodir = vim.env.HOME .. '/.undodir'
 vim.opt.undofile = true
@@ -260,6 +267,7 @@ vim.keymap.set('n', '[j', '<cmd>cprevious<CR>', { desc = ':cprevious' })
 vim.keymap.set('n', '<A-j>', '<cmd>cnext<CR>', { desc = ':cnext' })
 vim.keymap.set('n', '<A-k>', '<cmd>cprevious<CR>', { desc = ':cprevious' })
 vim.keymap.set('n', 's', '<cmd>WhichKey<CR>', { desc = '[S]how Which Key mappings for cmd mode' })
+vim.keymap.set('i', 'jk', '<Esc>', { desc = '[jk] to escape' })
 
 vim.keymap.set(
   'n',
@@ -323,12 +331,14 @@ vim.keymap.set('n', '#', '#``', { noremap = true, silent = true, desc = '(#) Sea
 
 -- [[ Bernie's proto-macros ]]
 vim.keymap.set('n', 'sasa', 'bhylep', { desc = 'Do search for wrapping character at beginning and past at end' })
-
 vim.keymap.set('ca', 'evv', 'e ~/.vimrc.27Aug24', { desc = 'Edit .vimrc' })
+-- Problems with typing these in command mode....
+-- vim.keymap.set('c', 'Et', '<cmd>:bot split | term<CR>', { desc = 'Open [T]erminal Below' })
+-- vim.keymap.set('c', 'Etv', '<cmd>:vert split | term<CR>', { desc = 'Open [T]erminal Vert' })
 
-vim.keymap.set('c', 'et', '<cmd>:bot split | term<CR>', { desc = 'Open [T]erminal Below' })
-vim.keymap.set('c', 'etv', '<cmd>:vert split | term<CR>', { desc = 'Open [T]erminal Vert' })
---
+-- https://stackoverflow.com/questions/2921752/limiting-search-scope-for-code-in-vim
+-- v i { <ESC> /\%Vsearch-term
+
 -- [[ Bernie's buffer-scoped things ]]
 --
 -- [[ Basic Autocommands ]]
@@ -880,7 +890,7 @@ require('lazy').setup {
         -- I don't want to save on php because I will lose easy Git blame
         -- results on all files. Otherwise I would.
         -- FIXME Disable this only on the loanconnect project.
-        local disable_filetypes = { c = true, cpp = true, php = true, javascript = true }
+        local disable_filetypes = { c = true, cpp = true, php = false, javascript = true }
         local lsp_format_opt
         if disable_filetypes[vim.bo[bufnr].filetype] then
           lsp_format_opt = 'never'

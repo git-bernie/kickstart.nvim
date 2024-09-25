@@ -4,6 +4,11 @@ return {
   filetypes = { 'php', 'blade' },
   settings = {
     intelephense = {
+      files = {
+        associations = {
+          ['*.ctp'] = 'php',
+        },
+      },
       stubs = {
         'bcmath',
         'bz2',
