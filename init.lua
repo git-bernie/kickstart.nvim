@@ -1107,8 +1107,9 @@ require('lazy').setup {
   },
 }
 
--- Keep my keymaps here to keep init.lua small.
-require 'lua.custom.keymaps.keymaps'
--- vim.cmd('runtime! lua/custom/keymaps/*.lua')
+-- NOTE: Now I put them in after/plugin/keymaps.lua
+-- Keep my keymaps here to keep init.lua smaller.
+-- require 'lua.custom.keymaps.keymaps'
+
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et

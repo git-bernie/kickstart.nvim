@@ -1,8 +1,8 @@
 --[ Bernie's Keymaps ]]
--- https://www.reddit.com/r/neovim/comments/15ey6iu/any_reason_vimkeymapset_will_not_work_in/
--- NOTE: In init.lua: require 'lua.custom.keymaps.keymaps'
---
-vim.keymap.set('n', '<Space>xx', ':lua print("Hello, world!")<CR>', { desc = 'Print "Hello, world!' })
+-- htps://www.reddit.com/r/neovim/comments/15ey6iu/any_reason_vimkeymapset_will_not_work_in/
+-- print 'Loading after/keymap/keymaps.lua'
+
+vim.keymap.set('n', '<Space>xyy', ':lua print("Hello, world!")<CR>', { desc = 'Print "Hello, world!' })
 -- cabbrev evv e ~/.vimrc
 
 vim.keymap.set('n', '<Space>gv', '<cmd>Gvdiffsplit<CR>', { desc = '[G][V]diffsplit Open a vertical diffsplit' })
