@@ -1,0 +1,21 @@
+================================================================================
+*myhelp.txt*                                          {My own help notes}
+
+*gclog-stuff*
+>
+    Gclog --name-only Gets my list of files, but it isn't interactive.
+<
+>
+    The author of the plugin said that it is their long term goal to make the
+    commit objects look and behave like the summary window. However, until that
+    is implemented I can achieve a workflow similar to my request by
+
+    Opening the commit object but with foldmethod set to syntax. This will fold
+    the diffs and have each file on a separate line. Can also use [m and ]m to
+    move the cursor between files in the commit object.
+
+    Open files by pressing o instead of Enter, this will open them in a split and
+    not the current window.
+<
+
+ vim:tw=78:ts=8:ft=help:norl:

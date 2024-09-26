@@ -1026,11 +1026,13 @@ require('lazy').setup {
 
       require('mini.ai').setup()
 
-      require('mini.map').setup()
+      -- require('mini.map').setup()
 
       require('mini.splitjoin').setup()
 
       require('mini.jump').setup()
+
+      -- require('mini.visits').setup()
 
       -- ... and there is more!
       --  Check out: https://github.com/echasnovski/mini.nvim
