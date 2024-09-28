@@ -954,6 +954,7 @@ require('lazy').setup {
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
     -- 'folke/tokyonight.nvim',
     -- 'ellisonleao/gruvbox.nvim',
+    -- 'craftzdog/solarized-osaka',
     'lifepillar/vim-gruvbox8',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
@@ -966,6 +967,7 @@ require('lazy').setup {
       -- https://github.com/LazyVim/LazyVim/issues/2527
       --vim.cmd.colorscheme 'tokyonight'
       vim.cmd.colorscheme 'tokyonight-storm'
+      -- vim.cmd.colorscheme 'solarized-osaka-storm'
       --vim.cmd.colorscheme 'catppuccin-frappe'
       --vim.cmd.colorscheme 'github-dark-tritanopia'
       --vim.cmd.colorscheme 'gruvbox8'
@@ -1031,6 +1033,8 @@ require('lazy').setup {
       require('mini.splitjoin').setup()
 
       require('mini.jump').setup()
+
+      require('mini.animate').setup()
 
       -- require('mini.visits').setup()
 

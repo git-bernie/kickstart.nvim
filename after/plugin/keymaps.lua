@@ -2,7 +2,7 @@
 -- htps://www.reddit.com/r/neovim/comments/15ey6iu/any_reason_vimkeymapset_will_not_work_in/
 -- print 'Loading after/keymap/keymaps.lua'
 
-vim.keymap.set('n', '<Space>xyy', ':lua print("Hello, world!")<CR>', { desc = 'Print "Hello, world!' })
+-- vim.keymap.set('n', '<Space>xyy', ':lua print("Hello, world!")<CR>', { desc = 'Print "Hello, world!' })
 -- cabbrev evv e ~/.vimrc
 
 vim.keymap.set('n', '<Space>gv', '<cmd>Gvdiffsplit<CR>', { desc = '[G][V]diffsplit Open a vertical diffsplit' })
@@ -40,13 +40,21 @@ vim.keymap.set('n', '<a-k>', '<cmd>cprevious<cr>', { desc = ':cprevious' })
 vim.keymap.set('n', 's', '<cmd>whichkey<cr>', { desc = '[s]how which key mappings for cmd mode' })
 vim.keymap.set('i', 'jk', '<esc>', { desc = '[jk] to escape' })
 
+--  [[ normal mode: ripgrep with args ]]
 vim.keymap.set(
   'n',
   '<leader>fg',
-  ":lua require('telescope').extensions.live_grep_args.live_grep_args()<cr>",
-  { desc = '[f]ind [g]rep using live_grep args (e.g "word" -tphp)' }
+  ":lua require('telescope').extensions.live_grep_args.live_grep_args({prompt_title = '[F]ind [G]rep using live_grep_args (\"word\" -tpphp)'})<cr>",
+  {}
 )
-vim.keymap.set('c', 'rg', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<cr>", { desc = 'rg using live_grep args' })
+
+-- [[  commandline: ripgrep with args ]]
+vim.keymap.set(
+  'c',
+  'rg',
+  ":lua require('telescope').extensions.live_grep_args.live_grep_args({prompt_title = '[R]ip[G]rep using live_grep_args (\"word\" -tpphp)'})<cr>",
+  {}
+)
 
 vim.keymap.set('n', '<leader>tn', function()
   local set = vim.opt_local
