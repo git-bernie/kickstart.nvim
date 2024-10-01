@@ -1020,6 +1020,8 @@ require('lazy').setup {
         return '%2l:%-2v'
       end
 
+      require('mini.files').setup()
+
       require('mini.git').setup()
 
       -- require('mini.diff').setup()
