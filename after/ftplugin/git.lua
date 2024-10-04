@@ -1,0 +1,3 @@
+-- This letls git diffs be folded by default
+-- May have some side effects I will have to investigate...
+vim.opt_local.foldmethod = 'syntax'

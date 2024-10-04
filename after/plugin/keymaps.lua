@@ -37,7 +37,7 @@ vim.keymap.set('n', ']j', '<cmd>cnext<cr>', { desc = ':cnext' })
 vim.keymap.set('n', '[j', '<cmd>cprevious<cr>', { desc = ':cprevious' })
 vim.keymap.set('n', '<a-j>', '<cmd>cnext<cr>', { desc = ':cnext' })
 vim.keymap.set('n', '<a-k>', '<cmd>cprevious<cr>', { desc = ':cprevious' })
-vim.keymap.set('n', 's', '<cmd>whichkey<cr>', { desc = '[s]how which key mappings for cmd mode' })
+vim.keymap.set('n', 's', '<cmd>WhichKey<cr>', { desc = '[s]how which key mappings for cmd mode' })
 vim.keymap.set('i', 'jk', '<esc>', { desc = '[jk] to escape' })
 
 --  [[ normal mode: ripgrep with args ]]
@@ -107,3 +107,5 @@ end
 vim.keymap.set('n', '*', '*``', { noremap = true, silent = true, desc = '(*) search, highlight, and stay on current search result' })
 
 vim.keymap.set('n', '#', '#``', { noremap = true, silent = true, desc = '(#) search, highlight, and stay on current search result' })
+
+vim.keymap.set('n', '||', '<cmd>lua MiniFiles.open()<CR>', { desc = '[||] Open MiniFiles' })

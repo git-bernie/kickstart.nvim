@@ -943,6 +943,8 @@ require('lazy').setup {
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
+          -- { name = 'buffer' }, -- Moved these to plugins/dadbod.lua
+          -- { name = 'vim-dadbod-completion', priority = 700 },
         },
       }
     end,
@@ -1026,7 +1028,10 @@ require('lazy').setup {
 
       -- require('mini.diff').setup()
 
-      require('mini.sessions').setup()
+      require('mini.sessions').setup {
+        autowrite = true,
+        directory = '',
+      }
 
       require('mini.ai').setup()
 
