@@ -37,7 +37,9 @@ vim.keymap.set('n', ']j', '<cmd>cnext<cr>', { desc = ':cnext' })
 vim.keymap.set('n', '[j', '<cmd>cprevious<cr>', { desc = ':cprevious' })
 vim.keymap.set('n', '<a-j>', '<cmd>cnext<cr>', { desc = ':cnext' })
 vim.keymap.set('n', '<a-k>', '<cmd>cprevious<cr>', { desc = ':cprevious' })
-vim.keymap.set('n', 's', '<cmd>WhichKey<cr>', { desc = '[s]how which key mappings for cmd mode' })
+-- 's' causes lots of grief
+-- vim.keymap.set('n', 's', '<cmd>WhichKey<cr>', { desc = '[s]how which key mappings for cmd mode' })
+vim.keymap.set('n', '<Leader>ww', '<cmd>WhichKey<cr>', { desc = 'Sho[W] [W]hich key mappings for cmd mode' })
 vim.keymap.set('i', 'jk', '<esc>', { desc = '[jk] to escape' })
 
 --  [[ normal mode: ripgrep with args ]]
@@ -109,3 +111,14 @@ vim.keymap.set('n', '*', '*``', { noremap = true, silent = true, desc = '(*) sea
 vim.keymap.set('n', '#', '#``', { noremap = true, silent = true, desc = '(#) search, highlight, and stay on current search result' })
 
 vim.keymap.set('n', '||', '<cmd>lua MiniFiles.open()<CR>', { desc = '[||] Open MiniFiles' })
+
+--[[
+-- TODO:
+-- https://stackoverflow.com/questions/916875/yank-file-name-path-of-current-buffer-in-vim
+-- :let @" = expand("%")
+-- then paste with "p or :reg ?
+-- or better to clipboard:
+-- :let @+ = expand("%") or :let @+=@%
+--
+-- C-r "  "after/plugin/keymaps.lua""
+--]]
