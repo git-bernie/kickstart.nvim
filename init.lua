@@ -496,19 +496,19 @@ require('lazy').setup {
       -- I would like to make '<leader>ys' in lua but I don't know how to make the prompt stay open.
       vim.keymap.set('n', '<leader>ys', ':Telescope find_files hidden=true no_ignore=true search_dirs=~', { desc = '[Y]o [S]earch search_dirs=~' })
       vim.keymap.set('n', '<A-p>', function()
-        builtin.find_files { desc = '[F]ind [F]iles (hidden, no_ignore)', hidden = true, no_ignore = true }
+        builtin.find_files { prompt_title = '[F]ind [F]iles (hidden, no_ignore)', hidden = true, no_ignore = true }
       end, {})
       -- C-p habit. Sometimes removing <C-p> because neo-tree uses it as regular up/down; but j/k works fine.
       vim.keymap.set('n', '<C-p>', builtin.find_files, { desc = '[S]earch [F]iles (use <leader>sf)' })
       vim.keymap.set('n', '<leader>yy', function()
-        builtin.find_files { desc = '[F]ind [Y]er Fles', hidden = true, no_ignore = true }
+        builtin.find_files { prompt_title = 'F[Y]nd [Y]er Files (hidden, noignore)', hidden = true, no_ignore = true }
       end, {})
 
       vim.keymap.set('n', '<leader>gc', function()
         builtin.git_bcommits {
           prompt_title = '[G]it Buffer [C]ommits',
         }
-      end, {})
+      end, { desc = '[G]it [B]uffer [C]ommits' })
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
         -- You can pass additional configuration to Telescope to change the theme, layout, etc.

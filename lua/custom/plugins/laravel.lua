@@ -1,6 +1,8 @@
 return {
+  -- reporting errors on startup
+  -- Could not load module laravel.repositories.cache_views_repository
   'adalessa/laravel.nvim',
-  enabled = true,
+  enabled = false,
   dependencies = {
     'nvim-telescope/telescope.nvim',
     'tpope/vim-dotenv',

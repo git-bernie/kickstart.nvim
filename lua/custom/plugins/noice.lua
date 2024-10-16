@@ -48,4 +48,7 @@ return {
     --   If not available, we use `mini` as the fallback
     'rcarriga/nvim-notify',
   },
+  keys = {
+    { '<Leader>sl', '<cmd>NoiceLast<CR>', desc = '[S]elect Noice [L]ast', mode = 'n', silent = true, noremap = true },
+  },
 }
