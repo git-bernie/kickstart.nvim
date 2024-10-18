@@ -23,8 +23,8 @@ return {
   dependencies = { 'nvim-lua/plenary.nvim' },
   opts = {
     keywords = {
-      QQQ = { icon = ' ', color = 'hint', alt = { 'DEV', 'FYI', 'QQQ', 'QQ', 'qqq', 'ZZZ', 'STEP', 'STEPS' } },
-      HACK = { alt = { 'TBD' } },
+      QQQ = { icon = ' ', color = 'hint', alt = { 'DEV', 'FYI', 'QQQ', 'QQ', 'qqq', 'ZZZ', 'STEP', 'STEPS', 'COMMENT' } },
+      HACK = { alt = { 'TBD', 'WIP' } },
     },
   },
 }

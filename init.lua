@@ -461,6 +461,7 @@ require('lazy').setup {
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
       pcall(require('telescope').load_extension, 'live_grep_args')
+      pcall(require('telescope').load_extension, 'emoji')
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
@@ -946,6 +947,7 @@ require('lazy').setup {
           { name = 'path' },
           -- { name = 'buffer' }, -- Moved these to plugins/dadbod.lua
           -- { name = 'vim-dadbod-completion', priority = 700 },
+          { name = 'emoji' },
         },
       }
     end,
