@@ -51,12 +51,14 @@ vim.keymap.set(
 )
 
 -- [[  commandline: ripgrep with args ]]
-vim.keymap.set(
+-- NOTE: every time I press rg quickly in command mode, this would trigger the command.
+-- Not what I wanted.
+--[[ vim.keymap.set(
   'c',
   'rg',
   ":lua require('telescope').extensions.live_grep_args.live_grep_args({prompt_title = '[R]ip[G]rep using live_grep_args (\"word\" -tpphp)'})<cr>",
   {}
-)
+) ]]
 
 vim.keymap.set('n', '<leader>tn', function()
   local set = vim.opt_local

@@ -16,7 +16,7 @@ return {
   },
   opts = {
     -- default is false
-    enable_cmp_integration = true,
+    -- enable_cmp_integration = true,
     -- optional if your plugin installation directory
     -- is not vim.fn.stdpath("data") .. "/lazy/
     -- plugin_path = vim.fn.expand '$HOME/plugins/',
@@ -27,11 +27,11 @@ return {
     local ts = require('telescope').load_extension 'emoji'
     vim.keymap.set('n', '<leader>se', ts.emoji, { desc = '[S]earch [E]moji' })
 
-    require('cmp').setup {
+    --[[ require('cmp').setup {
       sources = {
         { name = 'emoji' }, -- Added plugin cmp-buffer
       },
-    }
+    } ]]
     -- pcall(require('telescope').load_extension, 'emoji')
   end,
 }

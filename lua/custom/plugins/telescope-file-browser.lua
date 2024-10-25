@@ -17,7 +17,17 @@ return {
     }, ]]
   -- },
   config = function()
-    vim.keymap.set('n', '<leader>ff', '<cmd>Telescope file_browser follow_symlinks=true<cr>', { desc = '[F]ile [F]ind', silent = true })
-    vim.keymap.set('n', '<leader>fd', '<cmd>Telescope file_browser path=%:p:h follow_symlinks=true<cr>', { desc = '[F]ile Browser to this [D]ir' })
+    vim.keymap.set(
+      'n',
+      '<leader>ff',
+      '<cmd>Telescope file_browser follow_symlinks=true prompt_path=true create_from_prompt=false<cr>',
+      { desc = '[F]ile [F]ind', silent = true }
+    )
+    vim.keymap.set(
+      'n',
+      '<leader>fd',
+      '<cmd>Telescope file_browser path=%:p:h follow_symlinks=true prompt_path=true create_from_prompt=false<cr>',
+      { desc = '[F]ile Browser to this [D]ir' }
+    )
   end,
 }

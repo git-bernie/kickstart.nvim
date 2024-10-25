@@ -1,0 +1,38 @@
+// <!-- markdownlint-disable-file MD012 added <!-- markdownlint-disable-file MD012 --> no-multiple-blanks
+// - markdownlint-disable-file MD012 added <!-- markdownlint-disable-file MD012 --> no-multiple-blanks
+// - markdownlint-disable-file MD013 added <!-- markdownlint-disable-file MD013 --> line-length
+// - markdownlint-disable-file MD024 added <!-- markdownlint-disable-file MD024 --> no-duplicate-heading
+// - markdownlint-disable-file MD028 added <!-- markdownlint-disable-file MD028 --> no-blanks-blockquote
+// - markdownlint-disable-file MD033 added <!-- markdownlint-disable-file MD033 --> no-inline-html
+// - markdownlint-disable-file MD034 added <!-- markdownlint-disable-file MD034 --> no-bare-urls
+// - <https://www.reddit.com/r/neovim/comments/19ceuoq/how_to_set_global_markdownlint_config_when_using/>
+// - <https://www.npmjs.com/package/markdownlint>
+// - `./gistfile1-emojis.md`
+// - Excellent :thumbsup: <https://github.com/DavidAnson/markdownlint#configuration>
+// - <https://www.reddit.com/r/neovim/comments/19ceuoq/how_to_set_global_markdownlint_config_when_using/>
+// - <https://www.npmjs.com/package/markdownlint>
+// - [Basic markdown syntax](https://www.markdownguide.org/basic-syntax/)
+// - [githup markdown emoji markup](https://gist.github.com/rxaviers/7360908)
+// - e.g. x: :white_check_mark: :question: ⁉️
+// - ✔️
+{
+    "no-duplicate-heading": { // MD024
+        "siblings_only" : true,
+        "allow_different_nesting": true
+    },
+    "no-multiple-blanks": false, // MD012
+    "MD012": false,
+    "no-blanks-blockquote": false, //MD028
+    "MD013": false,
+    "line_length": { // MD013
+        "line_length": 120,
+        "ignore_code_blocks": true,
+    }
+    "line-length": { // MD013
+        "line_length": 120,
+    }
+    "no-inline-html": false, // MD033
+    "no-bare-urls": false, // MD034
+    "fenced-code-language": false, // MD040
+    "blanks-around-fences": false, // MD031
+}

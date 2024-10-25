@@ -233,6 +233,8 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 -- [[ Bernie's proto-macros ]]
 vim.keymap.set('n', 'sasa', 'bhylep', { desc = 'Do search for wrapping character at beginning and past at end' })
 vim.keymap.set('ca', 'evv', 'e ~/.vimrc.27Aug24', { desc = 'Edit .vimrc' })
+-- original: 'rg --vimgrep -uu '
+vim.cmd [[ set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case\ -uu\ --search-zip\ ]]
 -- Problems with typing these in command mode....
 -- vim.keymap.set('c', 'Et', '<cmd>:bot split | term<CR>', { desc = 'Open [T]erminal Below' })
 -- vim.keymap.set('c', 'Etv', '<cmd>:vert split | term<CR>', { desc = 'Open [T]erminal Vert' })
@@ -461,7 +463,7 @@ require('lazy').setup {
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
       pcall(require('telescope').load_extension, 'live_grep_args')
-      pcall(require('telescope').load_extension, 'emoji')
+      -- pcall(require('telescope').load_extension, 'emoji')
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
@@ -717,7 +719,99 @@ require('lazy').setup {
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
         -- tsserver = {},
-        -- intelephense = {},
+        intelephense = { -- FIXME: No idea whether this is working or can work.
+          [capabilities] = capabilities,
+          config = function()
+            -- print 'i am here'
+          end,
+          settings = {
+            intelephense = {
+              files = {
+                maxSize = 16000000,
+              },
+              stubs = {
+                'bcmath',
+                'bz2',
+                'calendar',
+                'Core',
+                'ctype',
+                'curl',
+                'date',
+                'dba',
+                'dom',
+                'enchant',
+                'exif',
+                'fileinfo',
+                'filter',
+                'ftp',
+                'gd',
+                'gettext',
+                'gmp',
+                'hash',
+                'iconv',
+                'igbinary',
+                'imagick',
+                'imap',
+                'intl',
+                'json',
+                'ldap',
+                'libxml',
+                'mbstring',
+                'mcrypt',
+                'memcache',
+                'memcached',
+                'msgpack',
+                'mysqli',
+                'oci8',
+                'odbc',
+                'openssl',
+                'pcntl',
+                'pcre',
+                'PDO',
+                'PDO_ODBC',
+                'pdo_dblib',
+                'pdo_ibm',
+                'pdo_mysql',
+                'pdo_pgsql',
+                'pdo_snowflake',
+                'pdo_sqlite',
+                'pgsql',
+                'Phar',
+                'posix',
+                'pspell',
+                'readline',
+                'recode',
+                'Reflection',
+                'session',
+                'shmop',
+                'SimpleXML',
+                'snmp',
+                'soap',
+                'sockets',
+                'sodium',
+                'SPL',
+                'sqlite3',
+                'standard',
+                'superglobals',
+                'sysvmsg',
+                'sysvsem',
+                'sysvshm',
+                'tidy',
+                'tokenizer',
+                'wddx',
+                'xml',
+                'xmlreader',
+                'xmlrpc',
+                'xmlwriter',
+                'xsl',
+                'Zend OPcache',
+                'zip',
+                'zlib',
+              },
+            },
+          },
+          -- root_dir = function() return vim.loop.cwd() end,
+        },
 
         lua_ls = {
           -- cmd = {...},
@@ -748,7 +842,7 @@ require('lazy').setup {
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
-        'intelephense',
+        -- 'intelephense',
         'bash',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
@@ -760,7 +854,10 @@ require('lazy').setup {
             -- This handles overriding only values explicitly passed
             -- by the server configuration above. Useful when disabling
             -- certain features of an LSP (for example, turning off formatting for tsserver)
+
+            -- print('server_name: ' .. server_name)
             server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+            -- return require('lspconfig')[server_name].setup(server)
             require('lspconfig')[server_name].setup(server)
           end,
         },
@@ -777,7 +874,7 @@ require('lazy').setup {
         '<leader>yf',
         --'<leader>f',
         function()
-          require('conform').format { async = true, lsp_format = 'fallback' }
+          require('conform').format { async = true, lsp_format = 'fallback', lsp_fallback = true, timeout_ms = 500 }
         end,
         mode = '',
         desc = '[F]ormat buffer',
@@ -837,6 +934,7 @@ require('lazy').setup {
   { -- Autocompletion
     'hrsh7th/nvim-cmp',
     event = 'InsertEnter',
+    -- event = { 'InsertEnter', 'TextChanged' },
     dependencies = {
       -- Snippet Engine & its associated nvim-cmp source
       {
@@ -845,35 +943,41 @@ require('lazy').setup {
           -- Build Step is needed for regex support in snippets.
           -- This step is not supported in many windows environments.
           -- Remove the below condition to re-enable on windows.
-          if vim.fn.has 'win32' == 1 or vim.fn.executable 'make' == 0 then
-            return
-          end
+          -- if vim.fn.has 'win32' == 1 or vim.fn.executable 'make' == 0 then
+          --   return
+          -- end
           return 'make install_jsregexp'
         end)(),
         dependencies = {
           -- `friendly-snippets` contains a variety of premade snippets.
           --    See the README about individual language/framework/plugin snippets:
           --    https://github.com/rafamadriz/friendly-snippets
-          --[[ {
+          {
             'rafamadriz/friendly-snippets',
             config = function()
               require('luasnip.loaders.from_vscode').lazy_load()
             end,
-          }, ]]
+          },
         },
       },
-      'saadparwaiz1/cmp_luasnip',
 
       -- Adds other completion capabilities.
       --  nvim-cmp does not ship with all sources by default. They are split
       --  into multiple repos for maintenance purposes.
+      'saadparwaiz1/cmp_luasnip',
       'hrsh7th/cmp-nvim-lsp',
-      'hrsh7th/cmp-path',
+      'hrsh7th/cmp-buffer', -- source for text in buffer
+      -- 'hrsh7th/cmp-path',
+      'FelipeLema/cmp-async-path',
+      -- 'hrsh7th/cmp-cmdline',
+      -- 'hrsh7th/cmp-omni',
+      -- 'bmewburn/vscode-intelephense',
     },
     config = function()
       -- See `:help cmp`
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
+      require('luasnip.loaders.from_vscode').lazy_load()
       luasnip.config.setup {}
 
       cmp.setup {
@@ -882,17 +986,20 @@ require('lazy').setup {
             luasnip.lsp_expand(args.body)
           end,
         },
-        completion = { completeopt = 'menu,menuone,noinsert' },
+        completion = { 'InsertEnter,TextChanged', completeopt = 'menu,menuone,noinsert,noselect' },
+        -- completion = { completeopt = 'menu,menuone,popup,preview,noinsert,noselect' },
+        -- completion = { completeopt = 'menu,menuone,noinsert' },
 
         -- For an understanding of why these mappings were
         -- chosen, you will need to read `:help ins-completion`
         --
         -- No, but seriously. Please read `:help ins-completion`, it is really good!
+        -- print 'I am just about to start cmp.mapping....',
         mapping = cmp.mapping.preset.insert {
           -- Select the [n]ext item
-          ['<C-n>'] = cmp.mapping.select_next_item(),
+          ['<C-n>'] = cmp.mapping.select_next_item { behavior = cmp.SelectBehavior.Select },
           -- Select the [p]revious item
-          ['<C-p>'] = cmp.mapping.select_prev_item(),
+          ['<C-p>'] = cmp.mapping.select_prev_item { behavior = cmp.SelectBehavior.Select },
 
           -- Scroll the documentation window [b]ack / [f]orward
           ['<C-b>'] = cmp.mapping.scroll_docs(-5),
@@ -908,7 +1015,7 @@ require('lazy').setup {
           --['<CR>'] = cmp.mapping.confirm { select = true },
           --['<Tab>'] = cmp.mapping.select_next_item(),
           --['<S-Tab>'] = cmp.mapping.select_prev_item(),
-
+          --
           -- Manually trigger a completion from nvim-cmp.
           --  Generally you don't need this, because nvim-cmp will display
           --  completions whenever it has completion options available.
@@ -942,12 +1049,16 @@ require('lazy').setup {
             -- set group index to 0 to skip loading LuaLS completions as lazydev recommends it
             group_index = 0,
           },
-          { name = 'nvim_lsp' },
           { name = 'luasnip' },
-          { name = 'path' },
-          -- { name = 'buffer' }, -- Moved these to plugins/dadbod.lua
+
+          { name = 'nvim_lsp' },
+          -- { name = 'intelephense' }, -- FIXME: no idea if this should go here.
+          -- { name = 'omni' }, -- cmp-omni
+          { name = 'buffer' }, -- Moved these to plugins/dadbod.lua
+          -- { name = 'path' },
+          { name = 'async_path' },
           -- { name = 'vim-dadbod-completion', priority = 700 },
-          { name = 'emoji' },
+          -- { name = 'emoji' },
         },
       }
     end,
