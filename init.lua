@@ -180,6 +180,7 @@ vim.opt.splitbelow = true
 --  and `:help 'listchars'`
 vim.opt.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+-- vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣', eol = '↲' }
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
@@ -375,7 +376,20 @@ require('lazy').setup {
         { '<leader>s', group = '[S]earch' },
         { '<leader>w', group = '[W]orkspace' },
         { '<leader>t', group = '[T]oggle' },
+        { '<leader>g', group = '[G]it' },
+        { '<leader>y', group = '[Y]ours' },
+        { '<leader>f', group = '[F]ile' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+      },
+    },
+    -- See `:help which-key` for more information
+    keys = {
+      {
+        '<leader>?',
+        function()
+          require('which-key').show { global = false }
+        end,
+        desc = 'Buffer Local Keymaps (which-key)',
       },
     },
   },
@@ -779,6 +793,7 @@ require('lazy').setup {
                 'Phar',
                 'posix',
                 'pspell',
+                'random',
                 'readline',
                 'recode',
                 'Reflection',
@@ -1149,7 +1164,7 @@ require('lazy').setup {
 
       require('mini.ai').setup()
 
-      -- require('mini.map').setup()
+      require('mini.map').setup()
 
       require('mini.splitjoin').setup()
 

@@ -1,4 +1,10 @@
 -- Todo matches on any text that starts with one of your defined keywords (or alt) followed by a colon:
+-- NB: This default setting: highlights.comments_only = true, -- uses treesitter to match keywords in comments only
+
+-- Try :TodoTelescope cwd=~/projects/foobar
+-- Try :TodoQuickFix
+-- Try :TodoTelescope
+
 -- TODO:
 -- HACK:
 -- WARN:
@@ -12,19 +18,49 @@
 -- OPTIMIZE:
 -- FIX:
 -- DEV:
--- NOTE:
 -- TBD:
 -- qqq:
 -- QQQ:
 -- QQ:
 -- STEP:
+-- STEPS:
+-- COMMENT:
+-- EG:
+-- E.G.:
+-- EX:
+-- IE:
 return {
   'folke/todo-comments.nvim',
   dependencies = { 'nvim-lua/plenary.nvim' },
   opts = {
     keywords = {
-      QQQ = { icon = ' ', color = 'hint', alt = { 'DEV', 'FYI', 'QQQ', 'QQ', 'qqq', 'ZZZ', 'STEP', 'STEPS', 'COMMENT' } },
+      QQQ = {
+        icon = ' ',
+        color = 'hint',
+        alt = { 'DEV', 'QQQ', 'QQ', 'qqq', 'ZZZ' },
+      },
+      -- Add to 'HACK'
       HACK = { alt = { 'TBD', 'WIP' } },
+      -- Add to 'NOTE'
+      NOTE = { alt = { 'NB', 'INFO', 'FYI', 'STEP', 'STEPS', 'COMMENT', 'EG', 'E.G.', 'EX', 'IE', 'I.E.', 'PAGE' } },
+      -- Add to 'TODO'
+      TODO = { alt = { 'SQL' } },
     },
+    exclude = {},
   },
+
+  -- Jump to next keyword
+  vim.keymap.set('n', ']t', function()
+    require('todo-comments').jump_next()
+  end, { desc = 'Next todo comment' }),
+
+  -- Jump to previous keyword
+  vim.keymap.set('n', '[t', function()
+    require('todo-comments').jump_prev()
+  end, { desc = 'Previous todo comment' }),
+
+  --[[ -- You can also specify a list of valid jump keywords
+    vim.keymap.set("n", "]t", function()
+      require("todo-comments").jump_next({keywords = { "ERROR", "WARNING" }})
+    end, { desc = "Next error/warning todo comment" }), ]]
 }

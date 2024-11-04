@@ -100,8 +100,9 @@ vim.keymap.set('n', '<leader>yd', function()
 end, { desc = '[y] [d]ate from unixtime cword' })
 
 if (vim.fn.executable 'jq') == 1 then
-  vim.keymap.set('n', '<leader>yj', '<cmd>. ! jq -s<cr>', { desc = '[y] [j]son pretty print' })
-  vim.keymap.set('v', '<leader>yj', "<cmd>:'<,'>' ! jq -s<cr>", { desc = '[y] [j]son pretty print' })
+  -- E15: Invalid expression: "<80><fd>h. ! jq --sort-keys^M"
+  vim.keymap.set('n', '<leader>yj', '<cmd>. ! jq --sort-keys<cr>', { desc = '[y] [j]son pretty print' })
+  vim.keymap.set('v', '<leader>yj', "<cmd>'<,'> ! jq --sort-keys<cr>", { buffer = true, desc = '[y] [j]son pretty print' })
 end
 --local current_line = vim.api.nvim_get_current_line()
 --local json = vim.fn.json_decode(current_line)
@@ -113,7 +114,10 @@ vim.keymap.set('n', '*', '*``', { noremap = true, silent = true, desc = '(*) sea
 vim.keymap.set('n', '#', '#``', { noremap = true, silent = true, desc = '(#) search, highlight, and stay on current search result' })
 
 vim.keymap.set('n', '||', '<cmd>lua MiniFiles.open()<CR>', { desc = '[||] Open MiniFiles' })
+vim.keymap.set('n', '<C-w>V', '<cmd>vertical new<CR>', { desc = '[C-w] [V]ertical split new' })
 
+vim.keymap.set('n', 'gcp', ':norm yygccp<CR>', { silent = true, expr = false, desc = 'Copy and comment current line and paste below' })
+vim.keymap.set('n', 'gcP', ':norm yygccP<CR>', { silent = true, expr = false, desc = 'Copy and comment current line and paste above' })
 --[[
 -- TODO:
 -- https://stackoverflow.com/questions/916875/yank-file-name-path-of-current-buffer-in-vim

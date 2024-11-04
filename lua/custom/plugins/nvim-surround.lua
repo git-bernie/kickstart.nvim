@@ -1,3 +1,4 @@
+-- disabled: let's use mini.surround instead.
 return {
   'kylechui/nvim-surround',
   enabled = false, -- Enable this plugin
