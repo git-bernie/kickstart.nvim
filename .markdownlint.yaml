@@ -1,0 +1,46 @@
+---
+# {{{ Comments, examples, and resources for markdownlint configuration
+# vim: foldmethod=marker foldlevel=0 foldmarker={{{,}}}:
+# Examples
+# vim: nowrap:
+# yq -p json -o json .markdownlint.yaml > .markdownlint.json
+# yq -p yaml -o json .markdownlint.json
+# <!-- markdownlint-disable-file MD012 added <!-- markdownlint-disable-file MD012 --> no-multiple-blanks
+# - markdownlint-disable-file MD012 added <!-- markdownlint-disable-file MD012 --> no-multiple-blanks
+# - markdownlint-disable-file MD013 added <!-- markdownlint-disable-file MD013 --> line-length
+# - markdownlint-disable-file MD024 added <!-- markdownlint-disable-file MD024 --> no-duplicate-heading
+# - markdownlint-disable-file MD028 added <!-- markdownlint-disable-file MD028 --> no-blanks-blockquote
+# - markdownlint-disable-file MD033 added <!-- markdownlint-disable-file MD033 --> no-inline-html
+# - markdownlint-disable-file MD034 added <!-- markdownlint-disable-file MD034 --> no-bare-urls
+# - equivalent to: MD013 configured <!-- markdownlint-configure-file { "line-length": {"line_length": 120}} -->
+# - equivalent to: MD013 configured <!-- markdownlint-configure-file { "no-duplicate-heading": {"siblings_only": true}} -->
+# - use markdown-configure-file <!-- markdownlint-configure-file { options.config JSON }-->
+# - https://github.com/DavidAnson/markdownlint/blob/main/schema/.markdownlint.yaml
+# - <https:#www.reddit.com/r/neovim/comments/19ceuoq/how_to_set_global_markdownlint_config_when_using/>
+# - <https:#www.npmjs.com/package/markdownlint>
+# - [Basic markdown syntax](https:#www.markdownguide.org/basic-syntax/)
+# - [githup markdown emoji markup](https:#gist.github.com/rxaviers/7360908)
+# - `./gistfile1-emojis.md`
+# }}}
+heading-style: false # MD003
+no-trailing-spaces: false
+code-block-style: false
+no-duplicate-heading: # MD024
+  siblings_only: true
+no-multiple-blanks: false # MD012
+no-blanks-blockquote: false # MD028
+line-length: false # MD013
+  # line_length: 120
+  # code_blocks: false
+no-inline-html: false # MD033
+no-bare-urls: false # MD034
+blanks-around-headings: false # MD022
+blanks-around-tables: false # MD058
+fenced-code-language: false # MD040
+markdown-disable: true # 
+markdown-disable-file: true
+first-line-heading/first-line-h1: # MD041
+  level: 1
+  # front_matter_title: ^\s*title\s*[:=]
+  front_matter_title: .*
+heading-increment: false # MD001

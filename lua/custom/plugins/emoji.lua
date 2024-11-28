@@ -2,13 +2,17 @@
 👍
 🐪
  😉
+😇  
+
 ]]
 return {
   'allaman/emoji.nvim',
   enabled = true,
   version = '1.0.0', -- optionally pin to a tag
-  ft = { 'markdown', 'text', 'php' }, -- adjust to your needs
+  ft = { 'markdown', 'text', 'php', 'lua' }, -- adjust to your needs
   dependencies = {
+    -- util for handling paths
+    'nvim-lua/plenary.nvim',
     -- optional for nvim-cmp integration
     'hrsh7th/nvim-cmp',
     -- optional for telescope integration
@@ -16,7 +20,7 @@ return {
   },
   opts = {
     -- default is false
-    -- enable_cmp_integration = true,
+    enable_cmp_integration = true,
     -- optional if your plugin installation directory
     -- is not vim.fn.stdpath("data") .. "/lazy/
     -- plugin_path = vim.fn.expand '$HOME/plugins/',

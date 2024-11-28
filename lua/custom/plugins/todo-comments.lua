@@ -29,6 +29,7 @@
 -- E.G.:
 -- EX:
 -- IE:
+-- WIP:
 return {
   'folke/todo-comments.nvim',
   dependencies = { 'nvim-lua/plenary.nvim' },
@@ -40,7 +41,7 @@ return {
         alt = { 'DEV', 'QQQ', 'QQ', 'qqq', 'ZZZ' },
       },
       -- Add to 'HACK'
-      HACK = { alt = { 'TBD', 'WIP' } },
+      HACK = { alt = { 'TBD', 'WIP', 'WTF' } },
       -- Add to 'NOTE'
       NOTE = { alt = { 'NB', 'INFO', 'FYI', 'STEP', 'STEPS', 'COMMENT', 'EG', 'E.G.', 'EX', 'IE', 'I.E.', 'PAGE' } },
       -- Add to 'TODO'
@@ -49,13 +50,13 @@ return {
     exclude = {},
   },
 
-  -- Jump to next keyword
-  vim.keymap.set('n', ']t', function()
+  -- Jump to next keyword -- I changed this to use ]w instead of ]t which conflicts with 'jump to next matching tag'
+  vim.keymap.set('n', ']w', function()
     require('todo-comments').jump_next()
   end, { desc = 'Next todo comment' }),
 
   -- Jump to previous keyword
-  vim.keymap.set('n', '[t', function()
+  vim.keymap.set('n', '[w', function()
     require('todo-comments').jump_prev()
   end, { desc = 'Previous todo comment' }),
 

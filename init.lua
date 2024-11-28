@@ -90,6 +90,9 @@ P.S. You can delete this when you're done too. It's your config now! :)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+-- disable automatic conversion of emoji characters to full-width? Might resolve some issues with
+-- emoji-icon-theme and cmp?
+vim.g.emoji = 0
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
@@ -477,7 +480,7 @@ require('lazy').setup {
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
       pcall(require('telescope').load_extension, 'live_grep_args')
-      -- pcall(require('telescope').load_extension, 'emoji')
+      pcall(require('telescope').load_extension, 'emoji')
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
@@ -734,16 +737,31 @@ require('lazy').setup {
         -- But for many setups, the LSP (`tsserver`) will work just fine
         -- tsserver = {},
         intelephense = { -- FIXME: No idea whether this is working or can work.
-          [capabilities] = capabilities,
+          capabilities = capabilities,
           config = function()
             -- print 'i am here'
           end,
           settings = {
             intelephense = {
+              environment = {
+                phpVersion = '8.3.0', -- default 8.3.0, semver
+                includePaths = {
+                  'vendor/mailchimp',
+                  'vendor/laravel',
+                },
+              },
+              format = {
+                enable = true, -- default, but JIC
+              },
+              client = {
+                autoCloseDocCommentDoSuggest = true,
+                -- diagnosticsIgnoreErrorFeature = true, -- not a real setting, from coc-intelephense
+              },
               files = {
                 maxSize = 16000000,
               },
               stubs = {
+                -- {{{
                 'bcmath',
                 'bz2',
                 'calendar',
@@ -822,6 +840,40 @@ require('lazy').setup {
                 'Zend OPcache',
                 'zip',
                 'zlib',
+                -- }}}
+              },
+              phpdoc = {
+                propertyTemplate = {
+                  summary = '${SYMBOL_NAME} - ${SYMBOL_TYPE}',
+                  description = '',
+                  tags = {
+                    '@property ${SYMBOL_TYPE} ${SYMBOL_NAME}',
+                  },
+                },
+                functionTemplate = {
+                  summary = '${SYMBOL_NAME}() - ${SYMBOL_TYPE}',
+                  description = '',
+                  tags = {
+                    '@param ${SYMBOL_TYPE} ${SYMBOL_NAMESPACE} ${SYMBOL_NAME}',
+                    '@return ${SYMBOL_TYPE} ${SYMBOL_NAME}',
+                  },
+                },
+                classTemplate = {
+                  description = '${SYMBOL_TYPE} Class description',
+                  summary = '',
+                  tags = {
+                    '@package ${SYMBOL_NAME}',
+                    '@author',
+                    '@version',
+                    '@access public',
+                    '@see',
+                  },
+                },
+                varTemplate = { -- this does not exist, but would be nice if it did
+                  tags = {
+                    '@var ${SYMBOL_TYPE} ${SYMBOL_NAME}',
+                  },
+                },
               },
             },
           },
@@ -1035,6 +1087,7 @@ require('lazy').setup {
           --  Generally you don't need this, because nvim-cmp will display
           --  completions whenever it has completion options available.
           ['<C-Space>'] = cmp.mapping.complete {},
+          -- Set by nvim-cmp but here for completeness: ['<C-e>'] = cmp.mapping.abort(),
 
           -- Think of <c-l> as moving to the right of your snippet expansion.
           --  So if you have a snippet that's like:
@@ -1064,7 +1117,7 @@ require('lazy').setup {
             -- set group index to 0 to skip loading LuaLS completions as lazydev recommends it
             group_index = 0,
           },
-          { name = 'luasnip' },
+          { name = 'luasnip', priority = 40 },
 
           { name = 'nvim_lsp' },
           -- { name = 'intelephense' }, -- FIXME: no idea if this should go here.
@@ -1073,7 +1126,7 @@ require('lazy').setup {
           -- { name = 'path' },
           { name = 'async_path' },
           -- { name = 'vim-dadbod-completion', priority = 700 },
-          -- { name = 'emoji' },
+          { name = 'emoji' },
         },
       }
     end,
@@ -1112,8 +1165,27 @@ require('lazy').setup {
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
   {
     'nvim-lualine/lualine.nvim',
+    -- lazy = false,
+    event = 'VeryLazy',
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     options = { theme = 'gruvbox' },
+    --[[ sections = {
+      lualine_z = { 'branch', 'location', 'selectioncount' },
+    }, ]]
+    --[[ opts = function()
+      return {
+        section = {
+          lualine_z = { 'branch', 'location', 'selectioncount' },
+        },
+      }
+    end, ]]
+    opts = function()
+      return {
+        sections = {
+          lualine_z = { 'location', 'selectioncount', 'searchcount' },
+        },
+      }
+    end,
   },
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
@@ -1153,7 +1225,8 @@ require('lazy').setup {
 
       require('mini.files').setup()
 
-      require('mini.git').setup()
+      -- Adds some cool stuff in addition to fugitive.
+      -- require('mini.git').setup()
 
       -- require('mini.diff').setup()
 
@@ -1171,6 +1244,8 @@ require('lazy').setup {
       require('mini.jump').setup()
 
       require('mini.animate').setup()
+
+      require('mini.bufremove').setup()
 
       -- require('mini.visits').setup()
 
@@ -1254,4 +1329,4 @@ require('lazy').setup {
 -- require 'lua.custom.keymaps.keymaps'
 
 -- The line beneath this is called `modeline`. See `:help modeline`
--- vim: ts=2 sts=2 sw=2 et
+-- vim: ts=2 sts=2 sw=2 et fdm=marker fmr={{{,}}}

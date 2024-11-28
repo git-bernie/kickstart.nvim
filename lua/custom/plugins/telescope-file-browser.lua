@@ -21,7 +21,7 @@ return {
       'n',
       '<leader>ff',
       '<cmd>Telescope file_browser follow_symlinks=true prompt_path=true create_from_prompt=false<cr>',
-      { desc = '[F]ile [F]ind', silent = true }
+      { desc = '[F]ile [F]ind by Browser', silent = true }
     )
     vim.keymap.set(
       'n',

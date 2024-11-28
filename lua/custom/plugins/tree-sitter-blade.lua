@@ -1,3 +1,4 @@
+--[[ https://github.com/EmranMR/tree-sitter-blade/discussions/19#discussion-5400675 ]]
 return {
   'EmranMR/tree-sitter-blade',
   enabled = true,

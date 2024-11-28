@@ -39,7 +39,7 @@ vim.keymap.set('n', '<a-j>', '<cmd>cnext<cr>', { desc = ':cnext' })
 vim.keymap.set('n', '<a-k>', '<cmd>cprevious<cr>', { desc = ':cprevious' })
 -- 's' causes lots of grief
 -- vim.keymap.set('n', 's', '<cmd>WhichKey<cr>', { desc = '[s]how which key mappings for cmd mode' })
-vim.keymap.set('n', '<Leader>ww', '<cmd>WhichKey<cr>', { desc = 'Sho[W] [W]hich key mappings for cmd mode' })
+vim.keymap.set('n', '<Leader>wk', '<cmd>WhichKey<cr>', { desc = 'Sho[W] [W]hich key mappings for cmd mode' })
 vim.keymap.set('i', 'jk', '<esc>', { desc = '[jk] to escape' })
 
 --  [[ normal mode: ripgrep with args ]]
@@ -72,6 +72,7 @@ vim.keymap.set('n', '<leader>tn', function()
   end
 end, { desc = '[t]oggle [n]umber and relative number' })
 
+vim.keymap.set('n', '<leader>tm', '<cmd>MarkdownPreviewToggle<CR>', { desc = '[T]oggle [m]arkdown preview' })
 --  e.g. 1726513513, 1726513523
 vim.keymap.set('n', '<leader>yd', function()
   local unixtime = vim.fn.expand '<cword>'
@@ -104,6 +105,8 @@ if (vim.fn.executable 'jq') == 1 then
   vim.keymap.set('n', '<leader>yj', '<cmd>. ! jq --sort-keys<cr>', { desc = '[y] [j]son pretty print' })
   vim.keymap.set('v', '<leader>yj', "<cmd>'<,'> ! jq --sort-keys<cr>", { buffer = true, desc = '[y] [j]son pretty print' })
 end
+
+vim.keymap.set('n', '<leader>^', '<cmd>:vsplit<bar>bp<cr>', { noremap = true, desc = 'Vertical split and switch to previous buffer' })
 --local current_line = vim.api.nvim_get_current_line()
 --local json = vim.fn.json_decode(current_line)
 --local output = vim.fn.systemlist { 'jq', '-s' }, { input = json, capture_output = true, text = true }
@@ -118,13 +121,58 @@ vim.keymap.set('n', '<C-w>V', '<cmd>vertical new<CR>', { desc = '[C-w] [V]ertica
 
 vim.keymap.set('n', 'gcp', ':norm yygccp<CR>', { silent = true, expr = false, desc = 'Copy and comment current line and paste below' })
 vim.keymap.set('n', 'gcP', ':norm yygccP<CR>', { silent = true, expr = false, desc = 'Copy and comment current line and paste above' })
+
+vim.keymap.set('n', '<leader>st', '<cmd>split +term<CR>', { desc = '[s]plit [t]erminal' })
 --[[
 -- TODO:
 -- https://stackoverflow.com/questions/916875/yank-file-name-path-of-current-buffer-in-vim
 -- :let @" = expand("%")
--- then paste with "p or :reg ?
+-- then paste with ""p or :reg ?
 -- or better to clipboard:
 -- :let @+ = expand("%") or :let @+=@%
---
+-- after/plugin/keymaps.lua
 -- C-r "  "after/plugin/keymaps.lua""
 --]]
+
+-- https://www.reddit.com/r/neovim/comments/1858n12/custom_keymap_to_copy_current_filepath_to/
+local function copyFullPath()
+  local filepath = vim.fn.expand '%'
+  -- double quotes for spaces in path?
+  vim.fn.setreg('+', '"' .. filepath .. '"') -- write to clippoard
+end
+-- E.g. "after/plugin/keymaps.lua"
+vim.keymap.set('n', '<leader>cf', copyFullPath, { desc = '[c]opy [f]ull path' })
+
+--[=[
+--function Json_array_length()
+  local ts_utils = require 'nvim-treesitter.ts_utils'
+  local node = ts_utils.get_node_at_cursor(0)
+  local parser = vim.treesitter.get_parser()
+  if node:type() == 'array' then
+    local query = vim.treesitter.parse_query(parser:lang(), [[ (array (_) @ele) ]])
+    local element_count = 0
+    for id, captures, metadata in query:iter_matches(node) do
+      element_count = element_count + 1
+    end
+    print(element_count)
+  end
+end
+
+local opts = { noremap = true, silent = true }
+vim.keymap.set('n', '<leader>lr', '<cmd>lua Json_array_length()', opts) ]]
+--]=]
+
+-- vim.keymap.set('c', 'w!!', "<cmd>lua require'utils'.sudo_write()<CR>", { silent = true })
+
+-- Abbrevieations E.g.
+-- insert mode xbd inserts strftime "%b %d", i.e. Jan 01
+-- :ab[breviate] lists all abbreviations
+-- :ab x<CR> shows abbreviations starting with x...
+-- :verbose ab[breviate] xbd shows where it was defined (but says it was done by lua...)
+vim.cmd 'iab <expr> xabd (strftime("%a %b %d"))'
+vim.cmd 'iab <expr> xdate (strftime("%Y-%m-%d"))'
+vim.cmd 'iab <expr> xdt (strftime("%c"))'
+vim.cmd 'iab <expr> xdd (strftime("%a %d%b%Y"))'
+
+-- These are just typos or misspellings that I make often
+vim.cmd 'iab funciton function'

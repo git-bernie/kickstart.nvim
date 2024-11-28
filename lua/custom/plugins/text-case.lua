@@ -1,6 +1,10 @@
 --[[ An all in one plugin for converting text case in Neovim. It converts a piece of text 
 to an indicated string case and also is capable of bulk replacing texts without changing cases
 -- snake_case, camelCase, PascalCase, kebab-case, SCREAMING_SNAKE_CASE, Title Case, Sentence case, lowercase, UPPERCASE
+-- NOTE: which-key will be activated by 'ga' for more info
+-- gas: to snake_case
+-- gac: to camelCase
+-- ...and many more
 ]]
 return {
   'johmsalas/text-case.nvim',

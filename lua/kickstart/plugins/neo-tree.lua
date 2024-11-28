@@ -23,5 +23,16 @@ return {
         },
       },
     },
+    follow_current_file = true,
+    buffers = {
+      follow_current_file = {
+        enabled = true,
+      },
+    },
+  },
+  filesystem = {
+    follow_current_file = {
+      enabled = true,
+    },
   },
 }
