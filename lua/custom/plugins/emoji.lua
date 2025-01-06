@@ -7,7 +7,7 @@
 ]]
 return {
   'allaman/emoji.nvim',
-  enabled = true,
+  enabled = false,
   version = '1.0.0', -- optionally pin to a tag
   ft = { 'markdown', 'text', 'php', 'lua' }, -- adjust to your needs
   dependencies = {

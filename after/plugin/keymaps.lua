@@ -72,7 +72,7 @@ vim.keymap.set('n', '<leader>tn', function()
   end
 end, { desc = '[t]oggle [n]umber and relative number' })
 
-vim.keymap.set('n', '<leader>tm', '<cmd>MarkdownPreviewToggle<CR>', { desc = '[T]oggle [m]arkdown preview' })
+vim.keymap.set('n', '<leader>tm', '<cmd>MarkdownPreviewToggle<CR>', { desc = '[T]oggle [m]arkdown preview', silent = false })
 --  e.g. 1726513513, 1726513523
 vim.keymap.set('n', '<leader>yd', function()
   local unixtime = vim.fn.expand '<cword>'
@@ -122,7 +122,8 @@ vim.keymap.set('n', '<C-w>V', '<cmd>vertical new<CR>', { desc = '[C-w] [V]ertica
 vim.keymap.set('n', 'gcp', ':norm yygccp<CR>', { silent = true, expr = false, desc = 'Copy and comment current line and paste below' })
 vim.keymap.set('n', 'gcP', ':norm yygccP<CR>', { silent = true, expr = false, desc = 'Copy and comment current line and paste above' })
 
-vim.keymap.set('n', '<leader>st', '<cmd>split +term<CR>', { desc = '[s]plit [t]erminal' })
+vim.keymap.set('n', '<leader>st', '<cmd>split +term<CR>', { desc = '[S]plit [T]erminal (split)' })
+vim.keymap.set('n', '<leader>sv', '<cmd>vsplit +term<CR>', { desc = '[S]plit [v]ertical terminal (vsplit)' })
 --[[
 -- TODO:
 -- https://stackoverflow.com/questions/916875/yank-file-name-path-of-current-buffer-in-vim
@@ -142,7 +143,11 @@ local function copyFullPath()
 end
 -- E.g. "after/plugin/keymaps.lua"
 vim.keymap.set('n', '<leader>cf', copyFullPath, { desc = '[c]opy [f]ull path' })
-
+vim.keymap.set('n', 'sap', ':norm saiw}hxbP<CR>', { desc = 'Surround a php $var with {$var}, maybe', silent = false })
+vim.keymap.set('n', '<C-x><C-x>', '<cmd>redraw!<CR>', { desc = 'Redraw the screen' })
+vim.keymap.set('n', '<leader>ww', '<cmd>e ~/work/vimwiki/index.md<CR>', { desc = '[vv]im [w]iki' })
+-- vim.keymap.set('n', '<C-w><C-x>', '<cmd>redraw!<CR>', { desc = 'Redraw the screen' })
+-- $variable
 --[=[
 --function Json_array_length()
   local ts_utils = require 'nvim-treesitter.ts_utils'
@@ -170,9 +175,11 @@ vim.keymap.set('n', '<leader>lr', '<cmd>lua Json_array_length()', opts) ]]
 -- :ab x<CR> shows abbreviations starting with x...
 -- :verbose ab[breviate] xbd shows where it was defined (but says it was done by lua...)
 vim.cmd 'iab <expr> xabd (strftime("%a %b %d"))'
+vim.cmd 'iab <expr> xd (strftime("%a %b %d"))'
 vim.cmd 'iab <expr> xdate (strftime("%Y-%m-%d"))'
 vim.cmd 'iab <expr> xdt (strftime("%c"))'
 vim.cmd 'iab <expr> xdd (strftime("%a %d%b%Y"))'
 
 -- These are just typos or misspellings that I make often
 vim.cmd 'iab funciton function'
+vim.cmd 'iab teh the'

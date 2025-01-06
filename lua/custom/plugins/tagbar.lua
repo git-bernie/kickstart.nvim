@@ -1,5 +1,6 @@
 return {
   'preservim/tagbar',
+  enabled = false,
   config = function()
     vim.keymap.set('n', '<leader>tt', '<cmd>TagbarToggle<CR>', { desc = '[T]agbar[[T]oggle', silent = true, noremap = true })
     -- vim.g.tagbar_left = true
@@ -16,6 +17,11 @@ return {
         'f:functions',
         'm:methods',
       },
+    }
+    -- trying to get vimwiki.markdown ft to be treated like markdown.
+    vim.g.tagbar_type_vimwiki_markdown = {
+      ctagstype = { 'markdown' },
+      kinds = {},
     }
   end,
 }

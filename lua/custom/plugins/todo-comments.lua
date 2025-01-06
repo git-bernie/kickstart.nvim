@@ -43,7 +43,7 @@ return {
       -- Add to 'HACK'
       HACK = { alt = { 'TBD', 'WIP', 'WTF' } },
       -- Add to 'NOTE'
-      NOTE = { alt = { 'NB', 'INFO', 'FYI', 'STEP', 'STEPS', 'COMMENT', 'EG', 'E.G.', 'EX', 'IE', 'I.E.', 'PAGE' } },
+      NOTE = { alt = { 'NB', 'INFO', 'FYI', 'STEP', 'STEPS', 'COMMENT', 'EG', 'E.G.', 'EX', 'IE', 'I.E.', 'PAGE', 'EXPLANATION', 'OLD', 'NEW' } },
       -- Add to 'TODO'
       TODO = { alt = { 'SQL' } },
     },

@@ -1,5 +1,6 @@
 return {
   'ricardoramirezr/blade-nav.nvim',
+  enabled = false,
   dependencies = { -- totally optional
     'hrsh7th/nvim-cmp', -- if using nvim-cmp
     { 'ms-jpq/coq_nvim', branch = 'coq' }, -- if using coq
