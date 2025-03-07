@@ -24,6 +24,8 @@
 # }}}
 heading-style: false # MD003
 no-trailing-spaces: false
+no-trailing-punctuation: false # MD026/no-trailing-punctuation
+no-alt-text: false # MD034/no-alt-text Images should have alternate text
 code-block-style: false
 no-duplicate-heading: # MD024
   siblings_only: true
@@ -39,8 +41,9 @@ blanks-around-tables: false # MD058
 fenced-code-language: false # MD040
 markdown-disable: true # 
 markdown-disable-file: true
-first-line-heading/first-line-h1: # MD041
-  level: 1
-  # front_matter_title: ^\s*title\s*[:=]
-  front_matter_title: .*
+first-line-heading/first-line-h1: false # MD041 MD041/first-line-heading/first-line-h1
+ #  
+ # level: 1
+ # front_matter_title: ^\s*title\s*[:=]
+ # front_matter_title: .*
 heading-increment: false # MD001

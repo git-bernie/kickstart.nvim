@@ -1,6 +1,6 @@
 return {
   'garymjr/nvim-snippets',
-  enabled = false,
+  enabled = true,
   config = function()
     vim.g.completion_enable_snippet = 'snippets.nvim'
   end,

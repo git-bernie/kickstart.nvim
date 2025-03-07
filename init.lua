@@ -790,9 +790,16 @@ require('lazy').setup {
 
       vim.keymap.set('n', '<leader>gc', function()
         builtin.git_bcommits {
-          prompt_title = '[G]it Buffer [C]ommits',
+          prompt_title = '[G]it Buffer [c]ommits',
         }
-      end, { desc = '[G]it [B]uffer [C]ommits' })
+      end, { desc = '[G]it [B]uffer [c]ommits' })
+
+      vim.keymap.set('n', '<leader>gC', function()
+        builtin.git_commits {
+          prompt_title = '[G]it Directory [C]ommits',
+        }
+      end, { desc = '[G]it Directory [C]ommits' })
+
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
         -- You can pass additional configuration to Telescope to change the theme, layout, etc.
@@ -1179,11 +1186,17 @@ require('lazy').setup {
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
         -- 'intelephense',
-        'bash',
+        -- 'bash',
+        'bashls',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
+      -- See https://github.com/williamboman/mason-lspconfig.nvim
       require('mason-lspconfig').setup {
+        --@type string[]
+        ensure_installed = {}, -- added in 4feb2025 to quiet the diagnostic
+        --@type boolean
+        automatic_installation = false, -- added in 4feb2025 to quiet the diagnostic
         handlers = {
           function(server_name)
             local server = servers[server_name] or {}
@@ -1269,8 +1282,8 @@ require('lazy').setup {
 
   { -- Autocompletion
     'hrsh7th/nvim-cmp',
-    event = 'InsertEnter',
-    -- event = { 'InsertEnter', 'TextChanged' },
+    -- event = 'InsertEnter',
+    event = { 'InsertEnter', 'TextChanged' },
     dependencies = {
       -- Snippet Engine & its associated nvim-cmp source
       {
@@ -1288,12 +1301,14 @@ require('lazy').setup {
           -- `friendly-snippets` contains a variety of premade snippets.
           --    See the README about individual language/framework/plugin snippets:
           --    https://github.com/rafamadriz/friendly-snippets
-          {
-            'rafamadriz/friendly-snippets',
-            config = function()
-              require('luasnip.loaders.from_vscode').lazy_load()
-            end,
-          },
+          'rafamadriz/friendly-snippets',
+          config = function()
+            require('luasnip.loaders.from_vscode').lazy_load()
+            -- See https://github.com/ianchesal/dotfiles/commit/2e81e58f6958efcce20ed2398d481e338669ff00
+            -- NOTE: I cannot define my own snippets. Not sure why. Duplicated config for now.
+            -- require('luasnip.loaders.from_vscode').lazy_load { paths = vim.fn.stdpath 'config' .. 'lua/snippets/' }
+            require('luasnip.loaders.from_vscode').lazy_load { paths = vim.fn.stdpath 'config' .. '/lua/snippets/' }
+          end,
         },
       },
 
@@ -1306,14 +1321,18 @@ require('lazy').setup {
       'hrsh7th/cmp-path',
       -- 'FelipeLema/cmp-async-path',
       -- 'hrsh7th/cmp-cmdline',
-      -- 'hrsh7th/cmp-omni',
+      'hrsh7th/cmp-omni',
     },
     config = function()
-      -- See `:help cmp`
+      -- See `:help cmp` 2025-02-06 18:57 57
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
       require('luasnip.loaders.from_vscode').lazy_load()
-      luasnip.config.setup {}
+      -- See https://github.com/ianchesal/dotfiles/commit/2e81e58f6958efcce20ed2398d481e338669ff00
+      -- NOTE: I cannot define my own snippets. Not sure why. Duplicated config for now.
+      -- require('luasnip.loaders.from_vscode').lazy_load { paths = vim.fn.stdpath 'config' .. '/snippets/' }
+      -- require('luasnip.loaders.from_vscode').lazy_load { paths = vim.fn.stdpath 'config' .. '/lua/snippets/' }
+      -- luasnip.config.setup {}
 
       cmp.setup {
         snippet = {
@@ -1321,7 +1340,10 @@ require('lazy').setup {
             luasnip.lsp_expand(args.body)
           end,
         },
-        completion = { 'InsertEnter,TextChanged', completeopt = 'menu,menuone,noinsert,noselect' },
+        -- https://github.com/CopilotC-Nvim/CopilotChat.nvim?tab=readme-ov-file
+        -- If you are on neovim < 0.11.0, you also might want to add noinsert and popup to your completeopt to make the chat completion behave well.
+        completion = { 'InsertEnter,TextChanged', completeopt = 'menu,menuone,noinsert,noselect,popup' },
+        -- completion = { 'InsertEnter,TextChanged', completeopt = 'menu,menuone,noinsert,noselect' },
         -- completion = { completeopt = 'menu,menuone,popup,preview,noinsert,noselect' },
         -- completion = { completeopt = 'menu,menuone,noinsert' },
 
@@ -1340,7 +1362,6 @@ require('lazy').setup {
           ['<C-b>'] = cmp.mapping.scroll_docs(-5),
           ['<C-f>'] = cmp.mapping.scroll_docs(4),
 
-          -- Accept ([y]es) the completion.
           --  This will auto-import if your LSP supports it.
           --  This will expand snippets if the LSP sent a snippet.
           ['<C-y>'] = cmp.mapping.confirm { select = true },
@@ -1385,13 +1406,13 @@ require('lazy').setup {
             -- set group index to 0 to skip loading LuaLS completions as lazydev recommends it
             group_index = 0,
           },
-          { name = 'luasnip', priority = 40 },
+          -- { name = 'luasnip', priority = 40 },
+          { name = 'luasnip', priority = 30 },
 
           { name = 'nvim_lsp' },
-          -- { name = 'intelephense' }, -- FIXME: no idea if this should go here.
-          { name = 'path' },
+          { name = 'path', option = { label_trailing_slash = true, trailing_slash = true } },
           { name = 'buffer' }, -- Moved these to plugins/dadbod.lua
-          -- { name = 'omni' }, -- cmp-omni
+          { name = 'omni', option = { disable_omnifuncs = { 'v:lua.vim.lsp.omnifunc' } } }, -- cmp-omni
           --[[ {
             name = 'async_path',
             option = {

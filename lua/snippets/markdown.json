@@ -1,0 +1,13 @@
+{
+  "daily-new-item": {
+    "prefix": "daily",
+    "body": [
+      "",
+      "## Date (go `xd` to get date quickly)",
+      "### Jira",
+      "### Blockers",
+      "### Accomplishments",
+      ""
+    ]
+  }
+}

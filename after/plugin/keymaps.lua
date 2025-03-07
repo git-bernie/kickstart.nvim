@@ -104,6 +104,9 @@ if (vim.fn.executable 'jq') == 1 then
   -- E15: Invalid expression: "<80><fd>h. ! jq --sort-keys^M"
   vim.keymap.set('n', '<leader>yj', '<cmd>. ! jq --sort-keys<cr>', { desc = '[y] [j]son pretty print' })
   vim.keymap.set('v', '<leader>yj', "<cmd>'<,'> ! jq --sort-keys<cr>", { buffer = true, desc = '[y] [j]son pretty print' })
+  -- jl for  backwords compatibility
+  vim.keymap.set('n', '<leader>jl', '<cmd>. ! jq --sort-keys<cr>', { desc = '[y] [j]son pretty print' })
+  vim.keymap.set('v', '<leader>jl', "<cmd>'<,'> ! jq --sort-keys<cr>", { buffer = true, desc = '[y] [j]son pretty print' })
 end
 
 vim.keymap.set('n', '<leader>^', '<cmd>:vsplit<bar>bp<cr>', { noremap = true, desc = 'Vertical split and switch to previous buffer' })
@@ -124,6 +127,17 @@ vim.keymap.set('n', 'gcP', ':norm yygccP<CR>', { silent = true, expr = false, de
 
 vim.keymap.set('n', '<leader>st', '<cmd>split +term<CR>', { desc = '[S]plit [T]erminal (split)' })
 vim.keymap.set('n', '<leader>sv', '<cmd>vsplit +term<CR>', { desc = '[S]plit [v]ertical terminal (vsplit)' })
+
+vim.keymap.set('n', '<leader>tw', '<cmd>set wrap!<CR>', { desc = '[T]oggle [w]rap', silent = false })
+
+-- Keymaps for MiniMap which are strangely useful
+vim.keymap.set('n', '<Leader>mc', MiniMap.close, { desc = '[m]inimap [c]lose' })
+vim.keymap.set('n', '<Leader>mf', MiniMap.toggle_focus, { desc = '[m]inimap [f]ocus' })
+vim.keymap.set('n', '<Leader>mo', MiniMap.open, { desc = '[m]inimap [o]pen' })
+vim.keymap.set('n', '<Leader>mr', MiniMap.refresh, { desc = '[m]inimap [r]efresh' })
+vim.keymap.set('n', '<Leader>ms', MiniMap.toggle_side, { desc = '[m]inimap [s]ide' })
+vim.keymap.set('n', '<Leader>mt', MiniMap.toggle, { desc = '[m]inimap [t]oggle' })
+
 --[[
 -- TODO:
 -- https://stackoverflow.com/questions/916875/yank-file-name-path-of-current-buffer-in-vim
@@ -143,42 +157,22 @@ local function copyFullPath()
 end
 -- E.g. "after/plugin/keymaps.lua"
 vim.keymap.set('n', '<leader>cf', copyFullPath, { desc = '[c]opy [f]ull path' })
-vim.keymap.set('n', 'sap', ':norm saiw}hxbP<CR>', { desc = 'Surround a php $var with {$var}, maybe', silent = false })
-vim.keymap.set('n', '<C-x><C-x>', '<cmd>redraw!<CR>', { desc = 'Redraw the screen' })
-vim.keymap.set('n', '<leader>ww', '<cmd>e ~/work/vimwiki/index.md<CR>', { desc = '[vv]im [w]iki' })
--- vim.keymap.set('n', '<C-w><C-x>', '<cmd>redraw!<CR>', { desc = 'Redraw the screen' })
--- $variable
---[=[
---function Json_array_length()
-  local ts_utils = require 'nvim-treesitter.ts_utils'
-  local node = ts_utils.get_node_at_cursor(0)
-  local parser = vim.treesitter.get_parser()
-  if node:type() == 'array' then
-    local query = vim.treesitter.parse_query(parser:lang(), [[ (array (_) @ele) ]])
-    local element_count = 0
-    for id, captures, metadata in query:iter_matches(node) do
-      element_count = element_count + 1
-    end
-    print(element_count)
-  end
-end
+vim.keymap.set('n', 'sap', [[:norm sa<cmd>lua require'utils'.sudo_write()<CR>]], { silent = true })
 
-local opts = { noremap = true, silent = true }
-vim.keymap.set('n', '<leader>lr', '<cmd>lua Json_array_length()', opts) ]]
---]=]
-
--- vim.keymap.set('c', 'w!!', "<cmd>lua require'utils'.sudo_write()<CR>", { silent = true })
-
--- Abbrevieations E.g.
+-- https://vi.stackexchange.com/questions/39947/nvim-vim-o-cmdheight-0-looses-the-recording-a-macro-messages
+vim.cmd [[ autocmd RecordingEnter * set cmdheight=1 ]]
+vim.cmd [[ autocmd RecordingLeave * set cmdheight=0 ]]
+-- Abbreviations E.g.
 -- insert mode xbd inserts strftime "%b %d", i.e. Jan 01
 -- :ab[breviate] lists all abbreviations
 -- :ab x<CR> shows abbreviations starting with x...
 -- :verbose ab[breviate] xbd shows where it was defined (but says it was done by lua...)
 vim.cmd 'iab <expr> xabd (strftime("%a %b %d"))'
-vim.cmd 'iab <expr> xd (strftime("%a %b %d"))'
+-- vim.cmd 'iab <expr> xd (strftime("%a %b %d"))'
 vim.cmd 'iab <expr> xdate (strftime("%Y-%m-%d"))'
 vim.cmd 'iab <expr> xdt (strftime("%c"))'
 vim.cmd 'iab <expr> xdd (strftime("%a %d%b%Y"))'
+vim.cmd 'iab <expr> xd (strftime("%d%b%Y"))'
 
 -- These are just typos or misspellings that I make often
 vim.cmd 'iab funciton function'

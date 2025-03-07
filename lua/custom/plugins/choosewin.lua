@@ -4,5 +4,6 @@ return {
   enabled = true,
   config = function()
     vim.api.nvim_set_keymap('n', '-', '<cmd>ChooseWin<CR>', { desc = '[-]ChooseWin', silent = true, noremap = true })
+    vim.g.choosewin_overlay_enable = 1
   end,
 }

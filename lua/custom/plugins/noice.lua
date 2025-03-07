@@ -64,6 +64,6 @@ return {
     { '<Leader>sl', '<cmd>NoiceLast<CR>', desc = '[S]elect Noice [L]ast', mode = 'n', silent = true, noremap = true },
     { '<Leader>sll', '<cmd>NoiceHistory<CR>', desc = '[S]elect [L]ike [L]ast NoiceHistory', mode = 'n', silent = true, noremap = true },
     -- { '<Leader>LL', '<cmd>Noice dismiss<CR>', desc = 'Dismiss notification', mode = 'n', silent = true, noremap = true },
-    { '<Leader>LL', "<cmd>lua require('notify').dismiss()<CR>", desc = 'Dismiss notification', mode = 'n', silent = true, noremap = true },
+    { '<Leader>LL', "<cmd>lua require('notify').dismiss()<CR>", desc = 'Dismiss notification', mode = 'n', silent = false, noremap = true },
   },
 }
