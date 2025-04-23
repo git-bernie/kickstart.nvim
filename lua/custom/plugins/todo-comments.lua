@@ -41,7 +41,7 @@ return {
         alt = { 'DEV', 'QQQ', 'QQ', 'qqq', 'ZZZ' },
       },
       -- Add to 'HACK'
-      HACK = { alt = { 'TBD', 'WIP', 'WTF' } },
+      HACK = { alt = { 'TBD', 'WIP', 'WTF', 'DEPRECATED' } },
       -- Add to 'NOTE'
       NOTE = { alt = { 'NB', 'INFO', 'FYI', 'STEP', 'STEPS', 'COMMENT', 'EG', 'E.G.', 'EX', 'IE', 'I.E.', 'PAGE', 'EXPLANATION', 'OLD', 'NEW' } },
       -- Add to 'TODO'

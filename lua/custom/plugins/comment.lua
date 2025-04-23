@@ -2,6 +2,7 @@ return {
   'numToStr/Comment.nvim',
   enabled = true,
   opts = {
+    extra = { above = 'gcO', below = 'gco', eol = 'gcA' },
     -- add any options here
     -- Toggle current line or with count
     vim.keymap.set('n', '<leader>c<space>', function()

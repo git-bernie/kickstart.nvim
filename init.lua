@@ -206,7 +206,8 @@ vim.opt.inccommand = 'split'
 vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
-vim.opt.scrolloff = 10
+-- vim.opt.scrolloff = 10
+vim.opt.scrolloff = 6
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -644,7 +645,7 @@ require('lazy').setup {
         { '<leader>t', group = '[T]oggle' },
         { '<leader>g', group = '[G]it' },
         { '<leader>y', group = '[Y]ours' },
-        { '<leader>f', group = '[F]ile' },
+        { '<leader>f', group = '[F]ile or [F]zf' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
       },
     },
@@ -771,6 +772,7 @@ require('lazy').setup {
 
       -- Some additional Telescope keymaps I like to preserve for muscle memory
       vim.keymap.set('n', '<leader>gb', builtin.git_branches, { desc = '[G]it [B]ranches' })
+      vim.keymap.set('n', '<leader>gs', builtin.git_status, { desc = '[G]it [S]tatus' })
       -- vim.keymap.set('n', '<leader>yb', builtin.buffers, { desc = '[Y]o Find existing buffers', silent = false })
       vim.keymap.set('n', '<leader>yg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>yh', builtin.command_history, { desc = '[S]earch [C]command [H]istory' })
@@ -1032,9 +1034,12 @@ require('lazy').setup {
                   '*.blade.php',
                   '*.php',
                   '*.phtml',
+                  '*.ctp',
                 },
               },
               stubs = {
+                '_ide_helper.php',
+                '_ide_helper_models',
                 -- {{{
                 'bcmath',
                 'bz2',
@@ -1498,6 +1503,8 @@ require('lazy').setup {
       --  - ci'  - [C]hange [I]nside [']quote
       require('mini.ai').setup { n_lines = 500 }
 
+      require('mini.align').setup()
+
       -- Add/delete/replace surroundings (brackets, quotes, etc.)
       --
       -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
@@ -1562,7 +1569,7 @@ require('lazy').setup {
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'php' },
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'php', 'javascript' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {

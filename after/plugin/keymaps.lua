@@ -60,6 +60,7 @@ vim.keymap.set(
   {}
 ) ]]
 
+-- FIXME: set inv{option} to toggle instead?
 vim.keymap.set('n', '<leader>tn', function()
   local set = vim.opt_local
   ---@diagnostic disable-next-line: undefined-field
@@ -104,7 +105,15 @@ if (vim.fn.executable 'jq') == 1 then
   -- E15: Invalid expression: "<80><fd>h. ! jq --sort-keys^M"
   vim.keymap.set('n', '<leader>yj', '<cmd>. ! jq --sort-keys<cr>', { desc = '[y] [j]son pretty print' })
   vim.keymap.set('v', '<leader>yj', "<cmd>'<,'> ! jq --sort-keys<cr>", { buffer = true, desc = '[y] [j]son pretty print' })
+  -- Sometems it is best not sorted.
+  vim.keymap.set('n', '<leader>yk', '<cmd>. ! jq<cr>', { desc = '[y] [k] json pretty print, no sort' })
+  vim.keymap.set('v', '<leader>yk', "<cmd>'<,'> ! jq<cr>", { buffer = true, desc = '[y] [k] json pretty print, no sort' })
+
+  -- Rarely used but might be dug up in a pinch
+  -- vim.keymap.set('n', '<leader>yjc', '<cmd>. ! jq --compact-output<cr>', { desc = '[y] [j]son [c]ompact-output' })
+  -- vim.keymap.set('v', '<leader>yjc', "<cmd>'<,'> ! jq --compact-output<cr>", { buffer = true, desc = '[y] [j]son [c]ompact output' })
   -- jl for  backwords compatibility
+
   vim.keymap.set('n', '<leader>jl', '<cmd>. ! jq --sort-keys<cr>', { desc = '[y] [j]son pretty print' })
   vim.keymap.set('v', '<leader>jl', "<cmd>'<,'> ! jq --sort-keys<cr>", { buffer = true, desc = '[y] [j]son pretty print' })
 end
@@ -137,6 +146,14 @@ vim.keymap.set('n', '<Leader>mo', MiniMap.open, { desc = '[m]inimap [o]pen' })
 vim.keymap.set('n', '<Leader>mr', MiniMap.refresh, { desc = '[m]inimap [r]efresh' })
 vim.keymap.set('n', '<Leader>ms', MiniMap.toggle_side, { desc = '[m]inimap [s]ide' })
 vim.keymap.set('n', '<Leader>mt', MiniMap.toggle, { desc = '[m]inimap [t]oggle' })
+
+vim.keymap.set('n', '<leader>gt', [[<cmd>lua require('fzf-lua').git_tags()<cr>]], { desc = '[G]it [T]ags' })
+vim.keymap.set('n', '<leader>fs', [[<cmd>lua require('fzf-lua').git_status()<cr>]], { desc = '[F]zfLua [S]tatus' })
+vim.keymap.set('n', '<leader>fc', [[<cmd>lua require('fzf-lua').git_bcommits()<cr>]], { desc = '[F]zfLua Git Buffer [C]ommits' })
+vim.keymap.set('n', '<leader>fc', [[<cmd>lua require('fzf-lua').git_bcommits()<cr>]], { desc = '[F]zfLua Git Buffer [C]ommits' })
+--[[ FzfLua has so many interesting methods: also available grep_cWORD]]
+vim.keymap.set('n', '<leader>f/', [[<cmd>lua require('fzf-lua').grep_cword()<cr>]], { desc = '[F]zfLua [/]cword' })
+vim.keymap.set('n', '<leader>fz', [[<cmd>FzfLua<cr>]], { desc = ':[F][z]fLua' })
 
 --[[
 -- TODO:
