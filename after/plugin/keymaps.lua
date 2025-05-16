@@ -131,6 +131,7 @@ vim.keymap.set('n', '#', '#``', { noremap = true, silent = true, desc = '(#) sea
 
 vim.keymap.set('n', '||', '<cmd>lua MiniFiles.open()<CR>', { desc = '[||] Open MiniFiles' })
 vim.keymap.set('n', '<C-w>V', '<cmd>vertical new<CR>', { desc = '[C-w] [V]ertical split new' })
+vim.keymap.set('n', '<C-w>Q', 'ZQ<CR>', { desc = '[C-w] [Q]uit without saving!' })
 
 vim.keymap.set('n', 'gcp', ':norm yygccp<CR>', { silent = true, expr = false, desc = 'Copy and comment current line and paste below' })
 vim.keymap.set('n', 'gcP', ':norm yygccP<CR>', { silent = true, expr = false, desc = 'Copy and comment current line and paste above' })
