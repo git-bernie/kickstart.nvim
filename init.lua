@@ -328,7 +328,7 @@ require('lazy').setup {
     -- Set this to `true` to have all your plugins lazy-loaded by default.
     -- Only do this if you know what you are doing, as it can lead to unexpected behavior.
     lazy = false, -- should plugins be lazy-loaded?
-    -- It's recommended to leave version=false for now, since a lot the plugin that support versioning,
+    -- It's recommended to leave version=false for now, since a lot the plugin that support versionineck,
     -- have outdated releases, which may break your Neovim install.
     version = nil, -- always use the latest git commit
     -- version = "*", -- try installing the latest stable version for plugins that support semver
@@ -847,6 +847,7 @@ require('lazy').setup {
     dependencies = {
       -- Automatically install LSPs and related tools to stdpath for Neovim
       { 'williamboman/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants
+      -- 'williamboman/mason-lspconfig.nvim',
       'williamboman/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
@@ -855,7 +856,7 @@ require('lazy').setup {
       { 'j-hui/fidget.nvim', opts = {} },
 
       -- Allows extra capabilities provided by nvim-cmp
-      'hrsh7th/cmp-nvim-lsp',
+      -- 'hrsh7th/cmp-nvim-lsp',
     },
     config = function()
       -- Brief aside: **What is LSP?**
@@ -1202,6 +1203,7 @@ require('lazy').setup {
         ensure_installed = {}, -- added in 4feb2025 to quiet the diagnostic
         --@type boolean
         automatic_installation = false, -- added in 4feb2025 to quiet the diagnostic
+        automatic_enable = true,
         handlers = {
           function(server_name)
             local server = servers[server_name] or {}
@@ -1412,12 +1414,12 @@ require('lazy').setup {
             group_index = 0,
           },
           -- { name = 'luasnip', priority = 40 },
-          { name = 'luasnip', priority = 30 },
-
-          { name = 'nvim_lsp' },
-          { name = 'path', option = { label_trailing_slash = true, trailing_slash = true } },
-          { name = 'buffer' }, -- Moved these to plugins/dadbod.lua
-          { name = 'omni', option = { disable_omnifuncs = { 'v:lua.vim.lsp.omnifunc' } } }, -- cmp-omni
+          -- From blink-cmp: `lsp`, `buffer`, `snippets`, `path` and `omni` are built-in
+          -- { name = 'luasnip', priority = 30 },
+          -- { name = 'nvim_lsp' },
+          -- { name = 'path', option = { label_trailing_slash = true, trailing_slash = true } },
+          -- { name = 'buffer' }, -- Moved these to plugins/dadbod.lua
+          -- { name = 'omni', option = { disable_omnifuncs = { 'v:lua.vim.lsp.omnifunc' } } }, -- cmp-omni
           --[[ {
             name = 'async_path',
             option = {
