@@ -130,6 +130,26 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
   end,
 })
 
+vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
+  pattern = { '*.vue' },
+  callback = function()
+    vim.opt_local.foldmethod = 'expr'
+    vim.opt_local.foldlevelstart = 5
+    vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+    vim.opt.shiftwidth = 4
+  end,
+})
+
+vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
+  pattern = { '*.php', '*.ctp' },
+  callback = function()
+    vim.opt_local.foldmethod = 'expr'
+    vim.opt_local.foldlevelstart = 5
+    vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+    vim.opt.shiftwidth = 4
+    -- vim.opt.shiftwidth = 2
+  end,
+})
 if vim.fn.isdirectory(vim.env.HOME .. '/.backupdir') == 0 then
   -- vim.fn.mkdir(vim.env.HOME .. '/.backupdir')
   if vim.fn.mkdir(vim.env.HOME .. '/.backupdir') ~= true then
@@ -152,6 +172,10 @@ vim.opt.mouse = 'a'
 
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
+
+-- Check `:h clipboard-osc52` for more detail
+-- 2025-07-01
+-- vim.g.clipboard = 'osc52'
 
 -- Sync clipboard between OS and Neovim.
 --  Schedule the setting after `UiEnter` because it can increase startup-time.
@@ -253,7 +277,8 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 vim.keymap.set('n', 'sasa', 'bhylep', { desc = 'Do search for wrapping character at beginning and past at end' })
 vim.keymap.set('ca', 'evv', 'e ~/.vimrc.27Aug24', { desc = 'Edit .vimrc' })
 -- original: 'rg --vimgrep -uu '
-vim.cmd [[ set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case\ -uu\ --search-zip\ ]]
+-- QQQ:
+-- vim.cmd [[ set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case\ -uu\ --search-zip\ ]]
 -- Problems with typing these in command mode....
 -- vim.keymap.set('c', 'Et', '<cmd>:bot split | term<CR>', { desc = 'Open [T]erminal Below' })
 -- vim.keymap.set('c', 'Etv', '<cmd>:vert split | term<CR>', { desc = 'Open [T]erminal Vert' })
@@ -671,7 +696,9 @@ require('lazy').setup {
   { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
-    branch = '0.1.x',
+    -- branch = '0.1.x',
+    -- branch = '0.1.8',
+    tag = '0.1.8',
     dependencies = {
       'nvim-lua/plenary.nvim',
       { -- If encountering errors, see telescope-fzf-native README for installation instructions
@@ -846,14 +873,21 @@ require('lazy').setup {
     'neovim/nvim-lspconfig',
     dependencies = {
       -- Automatically install LSPs and related tools to stdpath for Neovim
-      { 'williamboman/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants
+      -- Mason must be loaded before its dependents so we need to set it up here.
+      -- NOTE: `opts = {}` is the same as calling `require('mason').setup({})`
+
+      -- { 'mason-org/mason.nvim', opts = {}, config = true }, -- NOTE: Must be loaded before dependants
+      { 'mason-org/mason.nvim', opts = {} }, -- NOTE: Must be loaded before dependants
       -- 'williamboman/mason-lspconfig.nvim',
-      'williamboman/mason-lspconfig.nvim',
+      'mason-org/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
       { 'j-hui/fidget.nvim', opts = {} },
+
+      -- Allows extra capabilities provided by blink.cmp
+      'saghen/blink.cmp',
 
       -- Allows extra capabilities provided by nvim-cmp
       -- 'hrsh7th/cmp-nvim-lsp',
@@ -905,21 +939,25 @@ require('lazy').setup {
           --  This is where a variable was first declared, or where a function is defined, etc.
           --  To jump back, press <C-t>.
           map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+          -- map('gd', vim.lsp.buf.definition, '[G]oto [D]efinition')
           -- map('gV', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition', { 'v' })
-
           map('gV', '<cmd>vertical wincmd ]<cr>', '[G]oto Definition [V]ertical Split')
 
           -- Find references for the word under your cursor.
           map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
+          -- map('gr', vim.lsp.buf.references, '[G]oto [R]eferences')
+          -- map('gr', vim.lsp.buf.references, '[G]oto [R]eferences')
 
           -- Jump to the implementation of the word under your cursor.
           --  Useful when your language has ways of declaring types without an actual implementation.
-          map('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
+          -- map('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
+          map('gI', vim.lsp.buf.implementation, '[G]oto [I]mplementation')
 
           -- Jump to the type of the word under your cursor.
           --  Useful when you're not sure what type a variable is and you want to see
           --  the definition of its *type*, not where it was *defined*.
-          map('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
+          -- map('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
+          map('<leader>D', vim.lsp.buf.type_definition, 'Type [D]efinition')
 
           -- Fuzzy find all the symbols in your current document.
           --  Symbols are things like variables, functions, types, etc.
@@ -941,13 +979,27 @@ require('lazy').setup {
           --  For example, in C this would take you to the header.
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
+          -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
+          ---@param client vim.lsp.Client
+          ---@param method vim.lsp.protocol.Method
+          ---@param bufnr? integer some lsp support methods only in specific files
+          ---@return boolean
+          local function client_supports_method(client, method, bufnr)
+            if vim.fn.has 'nvim-0.11' == 1 then
+              return client:supports_method(method, bufnr)
+            else
+              return client.supports_method(method, { bufnr = bufnr })
+            end
+          end
+
           -- The following two autocommands are used to highlight references of the
           -- word under your cursor when your cursor rests there for a little while.
           --    See `:help CursorHold` for information about when this is executed
           --
           -- When you move your cursor, the highlights will be cleared (the second autocommand).
           local client = vim.lsp.get_client_by_id(event.data.client_id)
-          if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
+
+          if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
             local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
             vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
               buffer = event.buf,
@@ -974,7 +1026,7 @@ require('lazy').setup {
           -- code, if the language server you are using supports them
           --
           -- This may be unwanted, since they displace some of your code
-          if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
+          if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
             map('<leader>th', function()
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
             end, '[T]oggle Inlay [H]ints')
@@ -982,12 +1034,46 @@ require('lazy').setup {
         end,
       })
 
+      -- Diagnostic Config
+      -- See :help vim.diagnostic.Opts
+      vim.diagnostic.config {
+        severity_sort = true,
+        float = { border = 'rounded', source = 'if_many' },
+        underline = { severity = vim.diagnostic.severity.ERROR },
+        signs = vim.g.have_nerd_font and {
+          text = {
+            [vim.diagnostic.severity.ERROR] = '󰅚 ',
+            [vim.diagnostic.severity.WARN] = '󰀪 ',
+            [vim.diagnostic.severity.INFO] = '󰋽 ',
+            [vim.diagnostic.severity.HINT] = '󰌶 ',
+          },
+        } or {},
+        virtual_text = {
+          source = 'if_many',
+          spacing = 2,
+          format = function(diagnostic)
+            local diagnostic_message = {
+              [vim.diagnostic.severity.ERROR] = diagnostic.message,
+              [vim.diagnostic.severity.WARN] = diagnostic.message,
+              [vim.diagnostic.severity.INFO] = diagnostic.message,
+              [vim.diagnostic.severity.HINT] = diagnostic.message,
+            }
+            return diagnostic_message[diagnostic.severity]
+          end,
+        },
+      }
+
       -- LSP servers and clients are able to communicate to each other what features they support.
       --  By default, Neovim doesn't support everything that is in the LSP specification.
       --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
       --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+
+      -- local capabilities = vim.lsp.protocol.make_client_capabilities()
+      -- capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+      --
+      --  When you add blink.cmp, luasnip, etc. Neovim now has *more* capabilities.
+      --  So, we create new capabilities with blink.cmp, and then broadcast that to the servers.
+      local capabilities = require('blink.cmp').get_lsp_capabilities()
 
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -1010,17 +1096,18 @@ require('lazy').setup {
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
         -- tsserver = {},
-        intelephense = { -- FIXME: No idea whether this is working or can work.
+
+        intelephense = { -- {{{ FIXME: No idea whether this is working or can work.
           capabilities = capabilities,
-          config = function()
-            -- print 'i am here'
-          end,
+          -- capabilities = {},
           init_options = {},
+
           settings = {
             intelephense = {
               environment = {
                 phpVersion = '8.3.0', -- default 8.3.0, semver
                 -- includePaths = { 'app', 'vendor/mailchimp', 'vendor/laravel', },
+                includePaths = { 'app', 'lib', 'lib/Cake/**' },
               },
               format = {
                 enable = true, -- default, but JIC
@@ -1030,7 +1117,7 @@ require('lazy').setup {
                 -- diagnosticsIgnoreErrorFeature = true, -- not a real setting, from coc-intelephense
               },
               files = {
-                maxSize = 16000000,
+                maxSize = 20000000,
                 associations = {
                   '*.blade.php',
                   '*.php',
@@ -1041,7 +1128,6 @@ require('lazy').setup {
               stubs = {
                 '_ide_helper.php',
                 '_ide_helper_models',
-                -- {{{
                 'bcmath',
                 'bz2',
                 'calendar',
@@ -1120,7 +1206,6 @@ require('lazy').setup {
                 'Zend OPcache',
                 'zip',
                 'zlib',
-                -- }}}
               },
               phpdoc = {
                 propertyTemplate = {
@@ -1160,9 +1245,9 @@ require('lazy').setup {
           },
           -- root_dir = function() return vim.loop.cwd() end,
           -- root_dir = function() return vim.loop.cwd() end,
-        },
+        }, -- }}}
 
-        lua_ls = {
+        lua_ls = { -- {{{
           -- cmd = {...},
           -- filetypes = { ...},
           -- capabilities = {},
@@ -1175,7 +1260,7 @@ require('lazy').setup {
               -- diagnostics = { disable = { 'missing-fields' } },
             },
           },
-        },
+        }, -- }}}
       }
 
       -- Ensure the servers and tools above are installed
@@ -1184,7 +1269,7 @@ require('lazy').setup {
       --    :Mason
       --
       --  You can press `g?` for help in this menu.
-      require('mason').setup()
+      -- require('mason').setup()
 
       -- You can add other tools here that you want Mason to install
       -- for you, so that they are available from within Neovim.
@@ -1199,13 +1284,16 @@ require('lazy').setup {
 
       -- See https://github.com/williamboman/mason-lspconfig.nvim
       require('mason-lspconfig').setup {
+        -- print 'I am in mason-lspconfig',
         --@type string[]
-        ensure_installed = {}, -- added in 4feb2025 to quiet the diagnostic
+        ensure_installed = { 'intelephense' }, -- added in 4feb2025 to quiet the diagnostic
         --@type boolean
-        automatic_installation = false, -- added in 4feb2025 to quiet the diagnostic
+        automatic_installation = true, -- added in 4feb2025 to quiet the diagnostic
         automatic_enable = true,
+        -- require('lspconfig')['intelephense'].setup(servers['intelephense']),
         handlers = {
           function(server_name)
+            -- print('I am calling server_name: ', server_name)
             local server = servers[server_name] or {}
             -- This handles overriding only values explicitly passed
             -- by the server configuration above. Useful when disabling
@@ -1268,6 +1356,7 @@ require('lazy').setup {
         --php = { 'pint', 'php-cs-fixer', stop_after_first = false },
         --php = { 'pint', 'php-cs-fixer', 'phpcbf', stop_after_first = false },
         --php = { 'php-cs-fixer', 'pint', 'phpcbf', stop_after_first = true },
+        php = { 'php-cs-fixer', 'pint', 'phpcbf', stop_after_first = false },
         blade = { 'blade-formatter' },
         markdown = { 'cbfmt', 'markdown-toc', 'markdownlint', stop_after_first = false },
         sql = { 'sqlfmt' },
@@ -1329,6 +1418,7 @@ require('lazy').setup {
       -- 'FelipeLema/cmp-async-path',
       -- 'hrsh7th/cmp-cmdline',
       'hrsh7th/cmp-omni',
+      -- 'SergioRibera/cmp-dotenv',
     },
     config = function()
       -- See `:help cmp` 2025-02-06 18:57 57
@@ -1438,10 +1528,10 @@ require('lazy').setup {
     -- change the command in the config to whatever the name of that colorscheme is.
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    -- 'folke/tokyonight.nvim',
+    'folke/tokyonight.nvim',
     -- 'ellisonleao/gruvbox.nvim',
     -- 'craftzdog/solarized-osaka',
-    'lifepillar/vim-gruvbox8',
+    -- 'lifepillar/vim-gruvbox8',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
       -- Load the colorscheme here.
@@ -1452,7 +1542,8 @@ require('lazy').setup {
       -- We will keep any tokyo* because of neo-tree working best with it
       -- https://github.com/LazyVim/LazyVim/issues/2527
       --vim.cmd.colorscheme 'tokyonight'
-      vim.cmd.colorscheme 'tokyonight-storm'
+      vim.cmd.colorscheme 'tokyonight-night'
+      -- vim.cmd.colorschem 'github_dark_default'
       -- vim.cmd.colorscheme 'solarized-osaka-storm'
       --vim.cmd.colorscheme 'catppuccin-frappe'
       --vim.cmd.colorscheme 'github-dark-tritanopia'
@@ -1462,7 +1553,6 @@ require('lazy').setup {
       vim.cmd.hi 'Comment gui=none'
     end,
   },
-
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
   {
@@ -1571,7 +1661,7 @@ require('lazy').setup {
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'php', 'javascript' },
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'php', 'javascript', 'vue' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -1590,6 +1680,18 @@ require('lazy').setup {
     --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
     --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
   },
+  --[[ {
+    'SergioRibera/cmp-dotenv',
+    sources = {
+      {
+        name = 'dotenv',
+        option = {
+          eval_on_confirm = flase,
+          show_content_on_docs = true,
+        },
+      },
+    },
+  }, ]]
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and

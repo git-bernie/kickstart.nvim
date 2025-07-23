@@ -11,4 +11,6 @@ return {
   { 'sainnhe/sonokai' }, -- sonokai theme
   { 'sainnhe/everforest' }, -- everforest theme
   { 'sainnhe/edge' }, -- edge theme
+  -- { 'folke/tokyonight.nvim', lazy = false, priority = 1000, opts = {} },
+  { 'folke/tokyonight.nvim', opts = { lazy = false, priority = 1000 } },
 }

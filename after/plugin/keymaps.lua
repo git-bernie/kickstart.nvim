@@ -16,7 +16,7 @@ vim.keymap.set('n', '<Space>lcd', '<cmd>lcd %:p:h<CR>', { desc = '[L]ocal [C]han
 --  [[ Normal mode mappings]]
 vim.keymap.set('n', '[<Leader>', 'O<esc>', { desc = 'Add a line above and return to normal mode' })
 vim.keymap.set('n', ']<Leader>', 'o<esc>', { desc = 'Add a line below and return to normal mode' })
-vim.keymap.set('v', '<Leader>1f', vim.lsp.buf.format, { desc = '[1] visual line [F]ormat' })
+-- vim.keymap.set('v', '<Leader>1f', vim.lsp.buf.format, { desc = '[1] visual line [F]ormat' })
 vim.keymap.set('c', '<c-a>', '<home>', { silent = false })
 vim.keymap.set('c', '<c-b>', '<left>', { silent = false })
 vim.keymap.set('c', '<c-e>', '<end>', { silent = false })
@@ -75,6 +75,7 @@ vim.keymap.set('n', '<leader>tn', function()
 end, { desc = '[t]oggle [n]umber and relative number' })
 
 vim.keymap.set('n', '<leader>tm', '<cmd>MarkdownPreviewToggle<CR>', { desc = '[T]oggle [m]arkdown preview', silent = false })
+vim.keymap.set('n', '<leader>tx', '<cmd>TSContext toggle<CR>', { desc = '[T]oggle TSConte[x]t', silent = false })
 --  e.g. 1726513513, 1726513523
 vim.keymap.set('n', '<leader>yd', function()
   local unixtime = vim.fn.expand '<cword>'
@@ -141,6 +142,9 @@ vim.keymap.set('n', '<leader>sv', '<cmd>vsplit +term<CR>', { desc = '[S]plit [v]
 
 vim.keymap.set('n', '<leader>tw', '<cmd>set wrap!<CR>', { desc = '[T]oggle [w]rap', silent = false })
 
+-- TODO: this is best put ins csvview.lua
+vim.keymap.set('n', '<leader>tv', '<cmd>CsvViewToggle<CR>', { desc = '[T]oggle Cs[v]ViewEnable', silent = false })
+
 -- Keymaps for MiniMap which are strangely useful
 vim.keymap.set('n', '<Leader>mc', MiniMap.close, { desc = '[m]inimap [c]lose' })
 vim.keymap.set('n', '<Leader>mf', MiniMap.toggle_focus, { desc = '[m]inimap [f]ocus' })
@@ -178,6 +182,35 @@ end
 vim.keymap.set('n', '<leader>cf', copyFullPath, { desc = '[c]opy [f]ull path' })
 vim.keymap.set('n', 'sap', [[:norm sa<cmd>lua require'utils'.sudo_write()<CR>]], { silent = true })
 
+vim.api.nvim_create_user_command('Format', function(args)
+  local range = nil
+  if args.count ~= -1 then
+    local end_line = vim.api.nvim_buf_get_lines(0, args.line2 - 1, args.line2, true)[1]
+    range = {
+      start = { args.line1, 0 },
+      ['end'] = { args.line2, end_line:len() },
+    }
+  end
+  require('conform').format { async = true, lsp_format = 'fallback', range = range }
+end, { range = true })
+
+-- vim.api.nvim_set_keymap('n', '-', [[<cmd>lua require('window-picker').pick_window()<CR>]], { desc = 'pick[-]window', silent = true, noremap = true })
+
+local picker = require 'window-picker'
+-- vim.keymap.set('n', ',w', function()
+vim.keymap.set('n', ',w', function()
+  local picked_window_id = picker.pick_window {
+    include_current_win = true,
+  } or vim.api.nvim_get_current_win()
+  vim.api.nvim_set_current_win(picked_window_id)
+end, { desc = 'Pick a window' })
+
+vim.keymap.set('n', '-', function()
+  local picked_window_id = picker.pick_window {
+    include_current_win = true,
+  } or vim.api.nvim_get_current_win()
+  vim.api.nvim_set_current_win(picked_window_id)
+end, { desc = 'Pick a window' })
 -- https://vi.stackexchange.com/questions/39947/nvim-vim-o-cmdheight-0-looses-the-recording-a-macro-messages
 vim.cmd [[ autocmd RecordingEnter * set cmdheight=1 ]]
 vim.cmd [[ autocmd RecordingLeave * set cmdheight=0 ]]

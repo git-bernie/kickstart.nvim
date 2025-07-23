@@ -1,10 +1,11 @@
-return {
+--[[ return {
   'ellisonleao/dotenv.nvim',
-  enabled = false,
+  enabled = true,
   enable_on_load = true,
   verbose = true,
-}
-
---[[ return {
-  'tpope/vim-dotenv',
+  file_name = { '.env', 'env-*' },
 } ]]
+
+return {
+  'tpope/vim-dotenv',
+}

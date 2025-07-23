@@ -8,6 +8,10 @@
 return {
   'nvim-treesitter/nvim-treesitter-context',
   enabled = true,
+  -- NOTE: It seems no longer to be enabled automatically?
+  opts = {
+    enable = true,
+  },
   config = function()
     vim.keymap.set('n', '[x', function()
       require('treesitter-context').go_to_context(vim.v.count1)

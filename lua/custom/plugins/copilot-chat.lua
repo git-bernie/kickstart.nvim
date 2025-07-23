@@ -1,14 +1,17 @@
 return {
   {
     'CopilotC-Nvim/CopilotChat.nvim',
+    enabled = false,
     dependencies = {
-      { 'github/copilot.vim' }, -- or zbirenbaum/copilot.lua
-      { 'nvim-lua/plenary.nvim', branch = 'master' }, -- for curl, log and async functions
+      -- Use only one Copilot provider. Uncomment the one you use:
+      -- { 'zbirenbaum/copilot.lua' },
+      { 'github/copilot.vim' },
+      { 'nvim-lua/plenary.nvim', branch = 'master' }, -- Required for curl, log, and async functions
     },
-    build = 'make tiktoken', -- Only on MacOS or Linux
+    build = (vim.fn.has 'macunix' == 1 or vim.fn.has 'unix' == 1) and 'make tiktoken' or nil,
     opts = {
-      -- See Configuration section for options
+      -- Add plugin options here or leave empty for defaults
     },
-    -- See Commands section for default commands if you want to lazy load on them
+    -- To lazy load, see :h CopilotChat for available commands
   },
 }

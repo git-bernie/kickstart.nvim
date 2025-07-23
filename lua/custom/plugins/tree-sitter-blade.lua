@@ -1,7 +1,7 @@
 --[[ https://github.com/EmranMR/tree-sitter-blade/discussions/19#discussion-5400675 ]]
 return {
   'EmranMR/tree-sitter-blade',
-  enabled = true,
+  enabled = false,
   config = function()
     ---@class parser_config
     local parser_config = require('nvim-treesitter.parsers').get_parser_configs()

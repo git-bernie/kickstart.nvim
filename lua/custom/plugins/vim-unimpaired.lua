@@ -3,6 +3,7 @@ This is a LUA port of tpopes famous vim-unimpaired plugin. unimpaired.nvim aims 
 ]]
 return {
   'tummetott/unimpaired.nvim',
+  enabled = false, -- set to true to enable the plugin
   event = 'VeryLazy',
   opts = {
     -- add options here if you wish to override the default settings

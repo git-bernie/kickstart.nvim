@@ -1,7 +1,12 @@
 return {
   'saghen/blink.cmp',
   -- optional: provides snippets for the snippet source
-  dependencies = { 'rafamadriz/friendly-snippets', 'moyiz/blink-emoji.nvim' },
+  dependencies = {
+    'rafamadriz/friendly-snippets',
+    'moyiz/blink-emoji.nvim',
+    'bydlw98/blink-cmp-env',
+    'fang2hou/blink-copilot',
+  },
 
   -- use a release tag to download pre-built binaries
   version = '1.*',
@@ -40,8 +45,34 @@ return {
     -- Default list of enabled providers defined so that you can extend it
     -- elsewhere in your config, without redefining it, due to `opts_extend`
     sources = {
-      default = { 'lazydev', 'lsp', 'path', 'snippets', 'buffer', 'emoji' },
+      default = { 'lazydev', 'lsp', 'path', 'snippets', 'buffer', 'emoji', 'env', 'copilot' },
       providers = {
+        copilot = {
+          -- https://github.com/fang2hou/blink-copilot
+          name = 'copilot',
+          module = 'blink-copilot',
+          score_offset = 100,
+          async = true,
+          opts = {
+            -- Local options override global ones
+            max_completions = 3, -- Override global max_completions
+
+            -- Final settings:
+            -- * max_completions = 3
+            -- * max_attempts = 2
+            -- * all other options are default
+          },
+        },
+        env = {
+          name = 'Env',
+          module = 'blink-cmp-env',
+          --- @type blink-cmp-env.Options
+          opts = {
+            item_kind = require('blink.cmp.types').CompletionItemKind.Variable,
+            show_braces = false,
+            show_documentation_window = true,
+          },
+        },
         emoji = {
           module = 'blink-emoji',
           name = 'Emoji',

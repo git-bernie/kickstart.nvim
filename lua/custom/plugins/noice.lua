@@ -25,6 +25,10 @@ return {
     lsp_doc_border = true, -- add a border to hover docs and signature help
   }, ]]
   opts = {
+    cmdline = {
+      view = 'cmdline_popup', -- change to `cmdline` to get classic cmd line
+      -- view = 'cmdline', -- change to `cmdline` to get classic cmd line
+    },
     -- add any options here
     lsp = {
       -- override markdown rendering so that **cmp** and other plugins use **Treesitter*falsfalsfalsfalseeee*
@@ -48,7 +52,8 @@ return {
     routes = {
       {
         view = 'notify',
-        filter = { event = 'msg_showmode' },
+        filter = { event = 'msg_showmode', kind = '', find = 'written' },
+        opts = { skip = true },
       },
     },
   },

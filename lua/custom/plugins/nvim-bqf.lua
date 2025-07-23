@@ -37,6 +37,9 @@ return {
   'kevinhwang91/nvim-bqf',
   opts = {
     ft = { 'qf' },
+    preview = {
+      auto_preview = false,
+    },
   },
 
   --[[ keys = {
