@@ -214,6 +214,7 @@ end, { desc = 'Pick a window' })
 -- https://vi.stackexchange.com/questions/39947/nvim-vim-o-cmdheight-0-looses-the-recording-a-macro-messages
 vim.cmd [[ autocmd RecordingEnter * set cmdheight=1 ]]
 vim.cmd [[ autocmd RecordingLeave * set cmdheight=0 ]]
+vim.cmd [[ autocmd BufWritePost *.php silent !./vendor/bin/pint %:p ]]
 -- Abbreviations E.g.
 -- insert mode xbd inserts strftime "%b %d", i.e. Jan 01
 -- :ab[breviate] lists all abbreviations

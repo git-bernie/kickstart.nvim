@@ -144,7 +144,7 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
   pattern = { '*.php', '*.ctp' },
   callback = function()
     vim.opt_local.foldmethod = 'expr'
-    vim.opt_local.foldlevelstart = 5
+    vim.opt_local.foldlevelstart = 99
     vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
     vim.opt.shiftwidth = 4
     -- vim.opt.shiftwidth = 2
@@ -298,7 +298,8 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
   callback = function()
-    vim.highlight.on_yank()
+    -- vim.highlight.on_yank()
+    vim.hl.on_yank()
   end,
 })
 
@@ -1341,7 +1342,8 @@ require('lazy').setup {
           lsp_format_opt = 'fallback'
         end
         return {
-          timeout_ms = 500,
+          -- timeout_ms = 500,
+          timeout_ms = 1500,
           lsp_format = lsp_format_opt,
         }
       end,
@@ -1356,7 +1358,7 @@ require('lazy').setup {
         --php = { 'pint', 'php-cs-fixer', stop_after_first = false },
         --php = { 'pint', 'php-cs-fixer', 'phpcbf', stop_after_first = false },
         --php = { 'php-cs-fixer', 'pint', 'phpcbf', stop_after_first = true },
-        php = { 'php-cs-fixer', 'pint', 'phpcbf', stop_after_first = false },
+        php = { 'php-cs-fixer', 'phpcbf', stop_after_first = false },
         blade = { 'blade-formatter' },
         markdown = { 'cbfmt', 'markdown-toc', 'markdownlint', stop_after_first = false },
         sql = { 'sqlfmt' },
