@@ -61,6 +61,47 @@ vim.keymap.set(
   {}
 ) ]]
 
+vim.keymap.set('n', '<leader>tW', function()
+  local set = vim.opt
+  -- local diffoptstable = set.diffopt:get()
+  local diffoptstable = set.diffopt:get()
+  local __ = vim.fn.printf
+
+  -- print('before ' .. vim.inspect(diffoptstable))
+  ---@diagnostic disable-next-line: undefined-field
+  -- if string.find(table, 'iwhiteall', 1, true) then
+  local found_at = nil
+  for i, value in ipairs(diffoptstable) do
+    if value == 'iwhiteall' then
+      -- print(__('%d found iwhiteall as a value', i))
+      found_at = i
+      break
+      -- table.remove(diffoptstable, i)
+    else
+      -- print 'did not find iwhiteall as a value)'
+      -- table.insert(diffoptstable, 'iwhiteall')
+    end
+  end
+
+  -- print('found_at is now ' .. (found_at or 'nil'))
+
+  if found_at == nil then
+    -- add
+    -- table.insert(diffoptstable, 'iwhiteall')
+    -- table.insert(vim.opt.diffopt, 'iwhiteall')
+    -- print 'Will try to insert iwhiteall...'
+    -- table.insert(vim.opt.diffopt, 'iwhiteall')
+    vim.opt.diffopt:append 'iwhiteall'
+  else
+    -- print(__('Will try to remove whiteall from position #%s', tostring(found_at)))
+    -- table.remove(vim.opt.diffopt, found_at)
+    -- table.remove(vim.opt.diffopt, found_at)
+    vim.opt.diffopt:remove 'iwhiteall'
+  end
+  -- print('afterwards: ' .. vim.inspect(vim.opt.diffopt:get()))
+  print(vim.inspect(vim.opt.diffopt:get()))
+end, { desc = '[T]oggle i[W]hiteall vim.opt.diffopt:append()/remove() iwhiteall' })
+
 -- FIXME: set inv{option} to toggle instead?
 vim.keymap.set('n', '<leader>tn', function()
   local set = vim.opt_local
@@ -153,14 +194,51 @@ vim.keymap.set('n', '<Leader>mr', MiniMap.refresh, { desc = '[m]inimap [r]efresh
 vim.keymap.set('n', '<Leader>ms', MiniMap.toggle_side, { desc = '[m]inimap [s]ide' })
 vim.keymap.set('n', '<Leader>mt', MiniMap.toggle, { desc = '[m]inimap [t]oggle' })
 
-vim.keymap.set('n', '<leader>gt', [[<cmd>lua require('fzf-lua').git_tags()<cr>]], { desc = '[G]it [T]ags' })
+-- vim.keymap.set('n', '<leader>gr', [[<cmd>:Git reflog --format='%C(yellow)%h%C(reset) %gs %C(green)%ad%C(reset)'<CR>]], { desc = '[G]it [r]eflog' })
+vim.keymap.set('n', '<leader>gR', [[<cmd>:Git reflog --date=iso<CR>]], { desc = '[G]it [r]eflog --date=iso' })
+vim.keymap.set(
+  'n',
+  '<leader>gr',
+  [[<cmd>:Git for-each-ref --sort=committerdate refs/heads/ --format='%(HEAD) %(align:35)%(color:yellow)%(refname:short)%(color:reset)%(end) - %(color:red)%(objectname:short)%(color:reset) - %(align:40)%(contents:subject)%(end) - %(authorname) (%(color:green)%(committerdate:relative)%(color:reset))'<CR>]],
+  { desc = '[G]it for-each-[r]eflog...' }
+)
+--[=[ vim.keymap.set(
+  'n',
+  '<leader>gr',
+  [[<cmd>:Git for-each-ref --sort=committerdate refs/heads/ --format='%(HEAD) %(align:35)%(color:yellow)%(refname:short)%(color:reset)%(end) - %(color:red)%(objectname:short)%(color:reset) - %(align:40)%(contents:subject)%(end) - %(authorname) (%(color:green)%(committerdate:relative)%(color:reset))'<CR>]],
+  { desc = '[G]it [r]eflog' }
+) ]=]
+vim.keymap.set('n', '<leader>fb', [[<cmd>lua require('fzf-lua').git_branches()<cr>]], { desc = '[G]it [b]ags (FzfLua)' })
+vim.keymap.set('n', '<leader>gt', [[<cmd>lua require('fzf-lua').git_tags()<cr>]], { desc = '[G]it [T]ags (FzfLua)' })
 vim.keymap.set('n', '<leader>fs', [[<cmd>lua require('fzf-lua').git_status()<cr>]], { desc = '[F]zfLua [S]tatus' })
 vim.keymap.set('n', '<leader>fc', [[<cmd>lua require('fzf-lua').git_bcommits()<cr>]], { desc = '[F]zfLua Git Buffer [C]ommits' })
-vim.keymap.set('n', '<leader>fc', [[<cmd>lua require('fzf-lua').git_bcommits()<cr>]], { desc = '[F]zfLua Git Buffer [C]ommits' })
+vim.keymap.set('n', '<leader>fC', [[<cmd>lua require('fzf-lua').git_commits()<cr>]], { desc = '[F]zfLua Git (Directory) [C]ommits' })
 --[[ FzfLua has so many interesting methods: also available grep_cWORD]]
-vim.keymap.set('n', '<leader>f/', [[<cmd>lua require('fzf-lua').grep_cword()<cr>]], { desc = '[F]zfLua [/]cword' })
+vim.keymap.set('n', '<leader>fw', [[<cmd>lua require('fzf-lua').grep_cword()<cr>]], { desc = '[F]zfLua c[w]ord' })
+-- vim.keymap.set('n', '<leader>f/', [[<cmd>lua require('fzf-lua').grep_curbuf()<cr>]], { desc = '[F]zfLua [/] grep_curbuf' })
+vim.keymap.set('n', '<leader>/', [[<cmd>lua require('fzf-lua').grep_curbuf()<cr>]], { desc = 'FzfLua [/] grep_curbuf' })
+vim.keymap.set('n', '<leader>fl', [[<cmd>lua require('fzf-lua').grep({resume=true})<cr>]], { desc = '[F]zfLua [l] grep last (resume=true)' })
 vim.keymap.set('n', '<leader>fz', [[<cmd>FzfLua<cr>]], { desc = ':[F][z]fLua' })
+vim.keymap.set('n', '<leader>fg', [[<cmd>lua require('fzf-lua').live_grep({hidden = false})<cr>]], { desc = '[F]zfLua live_[g]rep ( -- to specify globs)' })
+vim.keymap.set('n', '<leader>fd', [[<cmd>lua require('fzf-lua').diagnostics_document()<cr>]], { desc = '[F]zfLua live_[d]iagnostics_document)' })
+vim.keymap.set('n', '<leader>fD', [[<cmd>lua require('fzf-lua').diagnostics_workspace()<cr>]], { desc = '[F]zfLua live_[D]iagnostics_workspace)' })
+vim.keymap.set(
+  'n',
+  '<leader>fh',
+  [[<cmd>lua require('fzf-lua').live_grep({hidden = true})<cr>]],
+  { desc = '[F]zfLua live_[g]rep show [h]idden ( -- to specify globs)' }
+)
 
+require('fzf-lua').setup {
+  keymap = {
+    fzf = {
+      ['ctrl-q'] = 'select-all+accept',
+    },
+  },
+}
+vim.keymap.set({ 'n', 'v', 'i' }, '<C-x><C-f>', function()
+  require('fzf-lua').complete_path()
+end, { silent = true, desc = 'Fuzzy complete path' })
 --[[
 -- TODO:
 -- https://stackoverflow.com/questions/916875/yank-file-name-path-of-current-buffer-in-vim
@@ -180,7 +258,7 @@ local function copyFullPath()
 end
 -- E.g. "after/plugin/keymaps.lua"
 vim.keymap.set('n', '<leader>cf', copyFullPath, { desc = '[c]opy [f]ull path' })
-vim.keymap.set('n', 'sap', [[:norm sa<cmd>lua require'utils'.sudo_write()<CR>]], { silent = true })
+-- vim.keymap.set('n', 'sap', [[:norm sa<cmd>lua require'utils'.sudo_write()<CR>]], { silent = true })
 
 vim.api.nvim_create_user_command('Format', function(args)
   local range = nil
@@ -194,7 +272,13 @@ vim.api.nvim_create_user_command('Format', function(args)
   require('conform').format { async = true, lsp_format = 'fallback', range = range }
 end, { range = true })
 
+vim.keymap.set('n', '<leader>gg', [[:G<CR>]], { silent = false, desc = '[G]oto:[G]it' })
 -- vim.api.nvim_set_keymap('n', '-', [[<cmd>lua require('window-picker').pick_window()<CR>]], { desc = 'pick[-]window', silent = true, noremap = true })
+
+-- Noice
+vim.keymap.set('c', '<S-Enter>', function()
+  require('noice').redirect(vim.fn.getcmdline())
+end, { desc = 'Redirect Cmdline' })
 
 local picker = require 'window-picker'
 -- vim.keymap.set('n', ',w', function()

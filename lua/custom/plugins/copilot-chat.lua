@@ -1,7 +1,7 @@
 return {
   {
     'CopilotC-Nvim/CopilotChat.nvim',
-    enabled = false,
+    enabled = true,
     dependencies = {
       -- Use only one Copilot provider. Uncomment the one you use:
       -- { 'zbirenbaum/copilot.lua' },

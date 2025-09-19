@@ -9,6 +9,7 @@ return {
     save_labels = {},
   },
   keys = {
+    { 's', '<Plug>(leap-forward)', noremap = false, desc = '[s]neak (Leap)', mode = { 'n', 'x', 'o' } },
     { 'ss', '<Plug>(leap-forward)', noremap = false, desc = '[s]neak (Leap)', mode = { 'n', 'x', 'o' } },
     { 'gs', '<Plug>(leap-forward)', noremap = false, desc = '[s]neak (Leap)', mode = { 'n', 'x', 'o' } },
     { 'S', '<Plug>(leap-backward)', noremap = false, desc = '[S]neak (Leap) backwards', mode = { 'n', 'x', 'o' } },

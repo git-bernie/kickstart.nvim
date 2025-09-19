@@ -3,7 +3,8 @@ return {
   enabled = false, -- enabled via Mason
   config = function()
     print 'here here here'
-    require('lspconfig').intelephense.setup {
+    vim.lsp.config().intelephense.setup {
+      -- require('lspconfig').intelephense.setup { -- QQQ:
       settings = {
         intelephense = {
           files = {

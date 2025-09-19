@@ -34,18 +34,28 @@ return {
   'folke/todo-comments.nvim',
   dependencies = { 'nvim-lua/plenary.nvim' },
   opts = {
+    -- PROBLEM: there is a problem
     keywords = {
+      -- QQQ: this is qqq
       QQQ = {
         icon = ' ',
         color = 'hint',
         alt = { 'DEV', 'QQQ', 'QQ', 'qqq', 'ZZZ' },
       },
-      -- Add to 'HACK'
+      -- HACK: this a hack...
       HACK = { alt = { 'TBD', 'WIP', 'WTF', 'DEPRECATED' } },
       -- Add to 'NOTE'
-      NOTE = { alt = { 'NB', 'INFO', 'FYI', 'STEP', 'STEPS', 'COMMENT', 'EG', 'E.G.', 'EX', 'IE', 'I.E.', 'PAGE', 'EXPLANATION', 'OLD', 'NEW' } },
-      -- Add to 'TODO'
+      -- NOTE: etc.
+      NOTE = {
+        alt = { 'NB', 'INFO', 'FYI', 'STEP', 'STEPS', 'COMMENT', 'EG', 'E.G.', 'EX', 'IE', 'I.E.', 'PAGE', 'EXPLANATION', 'OLD', 'NEW', 'QUESTION', 'Q' },
+      },
+      -- PERF: this PERF, PERFORMANCE, OPTIMIZE, etc.
+      -- TEST: this is a test!
+      TEST = {},
+      -- TODO: color = info
       TODO = { alt = { 'SQL' } },
+      -- FIX: this is red!
+      FIX = { alt = { 'PROBLEM', 'OMG', 'HOLYSHIT', 'OHFRAKk' } },
     },
     exclude = {},
   },

@@ -89,7 +89,7 @@ P.S. You can delete this when you're done too. It's your config now! :)
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
-
+vim.opt.spelloptions = 'noplainbuffer,camel'
 -- disable automatic conversion of emoji characters to full-width? Might resolve some issues with
 -- emoji-icon-theme and cmp?
 vim.g.emoji = 0
@@ -98,6 +98,9 @@ vim.g.have_nerd_font = true
 
 -- [[ Bernie's Setting Option to allow .nvimrc or .nvim.lua ]]
 vim.opt.exrc = true
+
+vim.opt.diffopt:append 'iwhiteall' -- iwhite, iwhiteall ignore all whitespace
+-- vim.opt.diffopt:remove 'iwhiteall' -- iwhite, iwhiteall ignore all whitespace
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -125,8 +128,10 @@ vim.api.nvim_create_autocmd({ 'WinEnter', 'BufEnter', 'WinResized' }, {
 vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
   pattern = { '*.json', '*.jsonc' },
   callback = function()
-    vim.opt_local.foldmethod = 'indent'
-    vim.opt_local.foldlevelstart = 3
+    -- vim.opt_local.foldmethod = 'indent'
+    vim.opt_local.foldmethod = 'expr'
+    vim.opt_local.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+    vim.opt_local.foldlevelstart = 99
   end,
 })
 
@@ -134,22 +139,34 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
   pattern = { '*.vue' },
   callback = function()
     vim.opt_local.foldmethod = 'expr'
-    vim.opt_local.foldlevelstart = 5
-    vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-    vim.opt.shiftwidth = 4
+    vim.opt_local.foldlevelstart = 99
+    vim.opt_local.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+    vim.opt_local.shiftwidth = 2
+  end,
+})
+
+vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
+  pattern = { '*.xml' },
+  callback = function()
+    vim.opt_local.foldmethod = 'expr'
+    vim.opt_local.foldlevelstart = 99
+    vim.opt_local.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
   end,
 })
 
 vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
   pattern = { '*.php', '*.ctp' },
   callback = function()
-    vim.opt_local.foldmethod = 'expr'
+    -- vim.opt_local.foldmethod = 'expr'
+    -- vim.opt_local.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+    vim.opt_local.foldmethod = 'indent'
+    vim.opt_local.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
     vim.opt_local.foldlevelstart = 99
-    vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-    vim.opt.shiftwidth = 4
+    vim.opt_local.shiftwidth = 4
     -- vim.opt.shiftwidth = 2
   end,
 })
+
 if vim.fn.isdirectory(vim.env.HOME .. '/.backupdir') == 0 then
   -- vim.fn.mkdir(vim.env.HOME .. '/.backupdir')
   if vim.fn.mkdir(vim.env.HOME .. '/.backupdir') ~= true then
@@ -700,6 +717,7 @@ require('lazy').setup {
     -- branch = '0.1.x',
     -- branch = '0.1.8',
     tag = '0.1.8',
+    file_ignore_patterns = { 'node_modules', '.git/', 'dist/', 'build/', '_ide_helper_models.php' },
     dependencies = {
       'nvim-lua/plenary.nvim',
       { -- If encountering errors, see telescope-fzf-native README for installation instructions
@@ -788,8 +806,10 @@ require('lazy').setup {
       vim.keymap.set('n', '<leader>sm', builtin.man_pages, { desc = '[S]earch [M]an pages' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+      vim.keymap.set('n', '<leader>sH', builtin.live_grep, { desc = '[S]earch by grep [H]idden' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
+      vim.keymap.set('n', '<leader>so', builtin.vim_options, { desc = '[S]earch vim_[o]ptions' })
 
       -- vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader>s.', function()
@@ -831,16 +851,19 @@ require('lazy').setup {
       end, { desc = '[G]it Directory [C]ommits' })
 
       -- Slightly advanced example of overriding default behavior and theme
-      vim.keymap.set('n', '<leader>/', function()
-        -- You can pass additional configuration to Telescope to change the theme, layout, etc.
-        builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-          winblend = 10,
-          previewer = false,
-        })
-      end, { desc = '[/] Fuzzily search in current buffer' })
+      -- ME: I prefer fzf's version
+      --[[
+         [ vim.keymap.set('n', '<leader>/', function()
+         [   -- You can pass additional configuration to Telescope to change the theme, layout, etc.
+         [   builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
+         [     winblend = 10,
+         [     previewer = false,
+         [   })
+         [ end, { desc = '[/] Fuzzily search in current buffer' })
+         ]]
 
       -- It's also possible to pass additional configuration options.
-      --  See `:help telescope.builtin.live_grep()` for information about particular keys
+      --  ]See `:help telescope.builtin.live_grep()` for information about particular keys
       vim.keymap.set('n', '<leader>s/', function()
         builtin.live_grep {
           grep_open_files = true,
@@ -1303,7 +1326,9 @@ require('lazy').setup {
             -- print('server_name: ' .. server_name)
             server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
             -- return require('lspconfig')[server_name].setup(server)
-            require('lspconfig')[server_name].setup(server)
+            -- require('lspconfig')[server_name].setup(server)
+            -- vim.lsp.config(server_name).setup(server) -- QQQ:
+            vim.lsp.enable(server_name) -- QQQ:updated Friday, September 19, 2025 to fix 0.11 etc.
           end,
         },
       }
@@ -1319,7 +1344,7 @@ require('lazy').setup {
         '<leader>yf',
         --'<leader>f',
         function()
-          require('conform').format { async = true, lsp_format = 'fallback', lsp_fallback = true, timeout_ms = 500 }
+          require('conform').format { async = true, lsp_format = 'fallback', lsp_fallback = true, timeout_ms = 2000 }
         end,
         mode = '',
         desc = '[F]ormat buffer',
@@ -1343,7 +1368,7 @@ require('lazy').setup {
         end
         return {
           -- timeout_ms = 500,
-          timeout_ms = 1500,
+          timeout_ms = 500,
           lsp_format = lsp_format_opt,
         }
       end,
@@ -1358,10 +1383,13 @@ require('lazy').setup {
         --php = { 'pint', 'php-cs-fixer', stop_after_first = false },
         --php = { 'pint', 'php-cs-fixer', 'phpcbf', stop_after_first = false },
         --php = { 'php-cs-fixer', 'pint', 'phpcbf', stop_after_first = true },
-        php = { 'php-cs-fixer', 'phpcbf', stop_after_first = false },
+        -- php = { 'php-cs-fixer', 'phpcbf', stop_after_first = true, timeout_ms = 500 },
+        -- php = { 'php-cs-fixer', stop_after_first = true, timeout_ms = 500 },
         blade = { 'blade-formatter' },
         markdown = { 'cbfmt', 'markdown-toc', 'markdownlint', stop_after_first = false },
         sql = { 'sqlfmt' },
+        -- php = { 'pretty-php', 'duster', 'php-cs-fixer' },
+        php = { 'pretty-php', 'duster' },
         -- yaml = { 'ymlfmt', stop_after_first = false },
       },
       formatters = {

@@ -32,6 +32,9 @@ return {
     use_libuv_file_watcher = true,
     close_if_last_window = true, -- misspelled in lua/kickstart/plugins/neo-tree.lua
     filesystem = {
+      hijack_netrw_behavior = 'open_default',
+      -- "open_current",
+      -- "disabled",
       window = {
         mappings = {
           ['\\'] = 'close_window',
