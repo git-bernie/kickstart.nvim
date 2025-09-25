@@ -90,6 +90,9 @@ P.S. You can delete this when you're done too. It's your config now! :)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.opt.spelloptions = 'noplainbuffer,camel'
+
+vim.g.sql_type_default = 'mysql'
+
 -- disable automatic conversion of emoji characters to full-width? Might resolve some issues with
 -- emoji-icon-theme and cmp?
 vim.g.emoji = 0
@@ -833,7 +836,10 @@ require('lazy').setup {
         builtin.find_files { prompt_title = '[F]ind [F]iles (hidden, no_ignore)', hidden = true, no_ignore = true, follow = true }
       end, {})
       -- C-p habit. Sometimes removing <C-p> because neo-tree uses it as regular up/down; but j/k works fine.
-      vim.keymap.set('n', '<C-p>', builtin.find_files, { desc = '[S]earch [F]iles (use <leader>sf)' })
+      -- vim.keymap.set('n', '<C-p>', builtin.find_files { follow = true }, { desc = '[S]earch [F]iles (use <leader>sf)' })
+      vim.keymap.set('n', '<C-p>', function()
+        builtin.find_files { follow = true }
+      end, { desc = '[S]earch [F]iles (use <leader>sf)' })
       --[[ vim.keymap.set('n', '<leader>yy', function()
         builtin.find_files { prompt_title = 'F[Y]nd [Y]er Files (hidden, noignore)', hidden = true, no_ignore = true }
       end, {}) ]]
@@ -1387,7 +1393,7 @@ require('lazy').setup {
         -- php = { 'php-cs-fixer', stop_after_first = true, timeout_ms = 500 },
         blade = { 'blade-formatter' },
         markdown = { 'cbfmt', 'markdown-toc', 'markdownlint', stop_after_first = false },
-        sql = { 'sqlfmt' },
+        sql = { 'sqlfmt', 'sqruff' },
         -- php = { 'pretty-php', 'duster', 'php-cs-fixer' },
         php = { 'pretty-php', 'duster' },
         -- yaml = { 'ymlfmt', stop_after_first = false },
@@ -1691,7 +1697,29 @@ require('lazy').setup {
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'php', 'javascript', 'vue' },
+      -- ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'php', 'javascript', 'vue' },
+      ensure_installed = {
+        'bash',
+        'c',
+        'diff',
+        'html',
+        'lua',
+        'luadoc',
+        'markdown',
+        'markdown_inline',
+        'query',
+        'vim',
+        'vimdoc',
+        'php',
+        'javascript',
+        'vue',
+        -- 'latex',
+        'norg',
+        'scss',
+        'svelte',
+        'tsx',
+        'typst',
+      },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
