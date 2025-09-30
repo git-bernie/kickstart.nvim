@@ -2,6 +2,12 @@
 cmdline and the popupmenu. 
 
 For config help, see: https://github.com/folke/noice.nvim/wiki/Configuration-Recipes
+
+Noice can be super annoying particularly because I have not figured out 
+how to consistently see the result of :! /bin/bash etc. type comands.
+
+`g<` is super useful. Also <leader>ty disables Noice.
+
 ]]
 return {
   'folke/noice.nvim',
@@ -26,8 +32,41 @@ return {
   }, ]]
   opts = {
     cmdline = {
+      --[[
+      --
+  --------------------------------------------------------------------------------
+  View             Backend    Description
+  ---------------- ---------- ----------------------------------------------------
+  notify           notify     nvim-notify with level=nil, replace=false,
+                              merge=false
+
+  split            split      horizontal split
+
+  vsplit           split      vertical split
+
+  popup            popup      simple popup
+
+  mini             mini       minimal view, by default bottom right, right-aligned
+
+  cmdline          popup      bottom line, similar to the classic cmdline
+
+  cmdline_popup    popup      fancy cmdline popup, with different styles according
+                              to the cmdline mode
+
+  cmdline_output   split      split used by config.presets.cmdline_output_to_split
+
+  messages         split      split used for :messages
+
+  confirm          popup      popup used for confirm events
+
+  hover            popup      popup used for lsp signature help and hover
+
+  popupmenu        nui.menu   special view with the options used to render the
+                              popupmenu when backend is nui
+      --]]
       view = 'cmdline_popup', -- change to `cmdline` to get classic cmd line
       -- view = 'cmdline', -- change to `cmdline` to get classic cmd line
+      -- view = 'cmdline_output',
     },
     -- add any options here
     lsp = {
@@ -55,6 +94,15 @@ return {
         filter = { event = 'msg_showmode', kind = '', find = 'written' },
         opts = { skip = true },
       },
+      -- Route shell command output (identified by `msg_show` and a minimum height) to a split view.
+      {
+        view = 'split',
+        filter = {
+          event = 'msg_show',
+          -- min_height = 10, -- Adjust this value as needed
+          min_height = 1, -- Adjust this value as needed
+        },
+      },
     },
   },
   dependencies = {
@@ -70,5 +118,7 @@ return {
     { '<Leader>sll', '<cmd>NoiceHistory<CR>', desc = '[S]elect [L]ike [L]ast NoiceHistory', mode = 'n', silent = true, noremap = true },
     -- { '<Leader>LL', '<cmd>Noice dismiss<CR>', desc = 'Dismiss notification', mode = 'n', silent = true, noremap = true },
     { '<Leader>LL', "<cmd>lua require('notify').dismiss()<CR>", desc = 'Dismiss notification', mode = 'n', silent = false, noremap = true },
+    { '<Leader>ty', '<cmd>Noice disable<CR>', desc = '[T]oggle (?) AnNo[y]ance Disable', mode = 'n', silent = false, noremap = true },
+    { '<Leader>tyy', '<cmd>Noice enable<CR>', desc = '[T]oggle (?) AnNo[y]ance Enable', mode = 'n', silent = false, noremap = true },
   },
 }
