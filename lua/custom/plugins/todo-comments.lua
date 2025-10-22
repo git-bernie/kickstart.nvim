@@ -55,7 +55,7 @@ return {
       -- TODO: color = info
       TODO = { alt = { 'SQL' } },
       -- FIX: this is red!
-      FIX = { alt = { 'PROBLEM', 'OMG', 'HOLYSHIT', 'OHFRAKk' } },
+      FIX = { alt = { 'PROBLEM', 'OMG', 'HOLYSHIT', 'OHFRAK', 'BUG', 'FIXME', 'BS' } },
     },
     exclude = {},
   },

@@ -166,6 +166,9 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
     vim.opt_local.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
     vim.opt_local.foldlevelstart = 99
     vim.opt_local.shiftwidth = 4
+    vim.opt_local.foldlevel = 3
+    vim.opt_local.expandtab = true
+    vim.opt_local.tabstop = 4
     -- vim.opt.shiftwidth = 2
   end,
 })
@@ -685,14 +688,15 @@ require('lazy').setup {
       spec = {
         { '<leader>c', group = '[C]ode', mode = { 'n', 'x' } },
         { '<leader>d', group = '[D]ocument' },
+        { '<leader>f', group = '[F]ile or [F]zf' },
+        { '<leader>g', group = '[G]it' },
+        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { '<leader>n', group = '[N]oice' },
         { '<leader>r', group = '[R]ename' },
         { '<leader>s', group = '[S]earch' },
-        { '<leader>w', group = '[W]orkspace' },
         { '<leader>t', group = '[T]oggle' },
-        { '<leader>g', group = '[G]it' },
+        { '<leader>w', group = '[W]orkspace' },
         { '<leader>y', group = '[Y]ours' },
-        { '<leader>f', group = '[F]ile or [F]zf' },
-        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
       },
     },
     -- See `:help which-key` for more information
@@ -1374,7 +1378,7 @@ require('lazy').setup {
         end
         return {
           -- timeout_ms = 500,
-          timeout_ms = 500,
+          timeout_ms = 2500,
           lsp_format = lsp_format_opt,
         }
       end,
@@ -1395,7 +1399,7 @@ require('lazy').setup {
         markdown = { 'cbfmt', 'markdown-toc', 'markdownlint', stop_after_first = false },
         sql = { 'sqlfmt', 'sqruff' },
         -- php = { 'pretty-php', 'duster', 'php-cs-fixer' },
-        php = { 'pretty-php', 'duster' },
+        php = { 'duster', 'php-cs-fixer' },
         -- yaml = { 'ymlfmt', stop_after_first = false },
       },
       formatters = {

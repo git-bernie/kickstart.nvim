@@ -118,6 +118,30 @@ end, { desc = '[t]oggle [n]umber and relative number' })
 vim.keymap.set('n', '<leader>tm', '<cmd>MarkdownPreviewToggle<CR>', { desc = '[T]oggle [m]arkdown preview', silent = false })
 vim.keymap.set('n', '<leader>tx', '<cmd>TSContext toggle<CR>', { desc = '[T]oggle TSConte[x]t', silent = false })
 --  e.g. 1726513513, 1726513523
+--
+-- Example v2 encoding "QjRpxuZGJKDxLUV1RFh8CPjYEf_t9y_8FYgc2DCXuVc"
+vim.api.nvim_create_user_command('DecodeV2', function(opts)
+  local start_line = opts.line1
+  local end_line = opts.line2
+  local selected_lines = vim.api.nvim_buf_get_lines(0, start_line - 1, end_line, false)
+
+  for _, line in ipairs(selected_lines) do
+    print(line)
+  end
+end, { range = true })
+
+vim.keymap.set('n', '<leader>v2', function()
+  local sqlite = require 'sqlite'
+  local db = sqlite.open '/home/bernie/Downloads-work/id_encodedids.db'
+  if not db then
+    print 'Error opening database'
+    return
+  else
+    print 'Opened the database'
+  end
+end)
+
+-- E.g. "LenderUpdate.1759824438.2ndLoan":
 vim.keymap.set('n', '<leader>yd', function()
   local unixtime = vim.fn.expand '<cword>'
 
@@ -138,11 +162,11 @@ vim.keymap.set('n', '<leader>yd', function()
   end
 
   if pcall(get_date, num) then
-    print('num is ' .. tostring(num) .. ' ' .. os.date('%c', num))
+    print('num is ' .. tostring(num) .. ' ' .. os.date('%c %z', num))
   else
     print(string.format('invalid unixtime %s', num))
   end
-end, { desc = '[y] [d]ate from unixtime cword' })
+end, { desc = '[Y]our [d]ate from unixtime cword' })
 
 if (vim.fn.executable 'jq') == 1 then
   -- E15: Invalid expression: "<80><fd>h. ! jq --sort-keys^M"
@@ -219,9 +243,14 @@ vim.keymap.set('n', '<leader>fw', [[<cmd>lua require('fzf-lua').grep_cword()<cr>
 vim.keymap.set('n', '<leader>/', [[<cmd>lua require('fzf-lua').grep_curbuf()<cr>]], { desc = 'FzfLua [/] grep_curbuf' })
 vim.keymap.set('n', '<leader>fl', [[<cmd>lua require('fzf-lua').grep({resume=true})<cr>]], { desc = '[F]zfLua [l] grep last (resume=true)' })
 vim.keymap.set('n', '<leader>fz', [[<cmd>FzfLua<cr>]], { desc = ':[F][z]fLua' })
+vim.keymap.set('n', '<leader>fF', [[<cmd>FzfLua files<cr>]], { desc = ':[f]zfLua [F]iles' })
+vim.keymap.set('n', '<leader>FF', [[<cmd>FzfLua files<cr>]], { desc = ':[f]zfLua [F]iles' })
 vim.keymap.set('n', '<leader>fg', [[<cmd>lua require('fzf-lua').live_grep({hidden = false})<cr>]], { desc = '[F]zfLua live_[g]rep ( -- to specify globs)' })
 vim.keymap.set('n', '<leader>fd', [[<cmd>lua require('fzf-lua').diagnostics_document()<cr>]], { desc = '[F]zfLua live_[d]iagnostics_document)' })
 vim.keymap.set('n', '<leader>fD', [[<cmd>lua require('fzf-lua').diagnostics_workspace()<cr>]], { desc = '[F]zfLua live_[D]iagnostics_workspace)' })
+vim.keymap.set('n', '<leader>fm', function()
+  require('telescope').extensions.media_files.media_files()
+end, { desc = 'Find media files' })
 vim.keymap.set(
   'n',
   '<leader>fh',

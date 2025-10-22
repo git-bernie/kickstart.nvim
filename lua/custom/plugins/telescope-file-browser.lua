@@ -20,13 +20,13 @@ return {
     vim.keymap.set(
       'n',
       '<leader>ff',
-      '<cmd>Telescope file_browser follow_symlinks=true prompt_path=true create_from_prompt=false<cr>',
+      '<cmd>Telescope file_browser follow_symlinks=true prompt_path=true create_from_prompt=false preview=true<cr>',
       { desc = '[F]ile [F]ind by Browser', silent = true }
     )
     vim.keymap.set(
       'n',
       '<leader>fd',
-      '<cmd>Telescope file_browser path=%:p:h follow_symlinks=true prompt_path=true create_from_prompt=false<cr>',
+      '<cmd>Telescope file_browser path=%:p:h follow_symlinks=true prompt_path=true create_from_prompt=false preview=true<cr>',
       { desc = '[F]ile Browser to this [D]ir' }
     )
   end,

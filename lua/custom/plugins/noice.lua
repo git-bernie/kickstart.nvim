@@ -99,8 +99,9 @@ return {
         view = 'split',
         filter = {
           event = 'msg_show',
-          -- min_height = 10, -- Adjust this value as needed
-          min_height = 1, -- Adjust this value as needed
+          min_height = 10, -- Adjust this value as needed
+          -- min_height = 1, -- 1 means always make a split.
+          -- min_height = 5, -- 5 means if >= 5 lines then make a split. Remember to use `g<`
         },
       },
     },
@@ -118,7 +119,11 @@ return {
     { '<Leader>sll', '<cmd>NoiceHistory<CR>', desc = '[S]elect [L]ike [L]ast NoiceHistory', mode = 'n', silent = true, noremap = true },
     -- { '<Leader>LL', '<cmd>Noice dismiss<CR>', desc = 'Dismiss notification', mode = 'n', silent = true, noremap = true },
     { '<Leader>LL', "<cmd>lua require('notify').dismiss()<CR>", desc = 'Dismiss notification', mode = 'n', silent = false, noremap = true },
-    { '<Leader>ty', '<cmd>Noice disable<CR>', desc = '[T]oggle (?) AnNo[y]ance Disable', mode = 'n', silent = false, noremap = true },
+    -- { '<Leader>ty', '<cmd>Noice disable<CR>', desc = '[T]oggle (?) AnNo[y]ance Disable', mode = 'n', silent = false, noremap = true },
     { '<Leader>tyy', '<cmd>Noice enable<CR>', desc = '[T]oggle (?) AnNo[y]ance Enable', mode = 'n', silent = false, noremap = true },
+    { '<Leader>nd', '<cmd>Noice dismiss<CR>', desc = '[N]oice [D]ismiss', mode = 'n', silent = false, noremap = true },
+    { '<Leader>ne', '<cmd>Noice enable<CR>', desc = '[N]oice enable', mode = 'n', silent = false, noremap = true },
+    { '<Leader>nx', '<cmd>Noice disable<CR>', desc = '[N]oice [D]isable', mode = 'n', silent = false, noremap = true },
+    { '<Leader>nh', '<cmd>Noice history<CR>', desc = '[N]oice [H]istory', mode = 'n', silent = true, noremap = true },
   },
 }

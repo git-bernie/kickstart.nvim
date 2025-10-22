@@ -1,3 +1,10 @@
+--[[ 
+:CsvViewEnable display_mode=highlight
+:CsvViewEnable display_mode=border
+
+Skip the first line, use second as header: 
+:CsvViewToggle header_lnum=2
+]]
 return {
   'hat0uma/csvview.nvim',
   ---@module "csvview"
@@ -16,6 +23,9 @@ return {
       jump_prev_field_end = { '<S-Tab>', mode = { 'n', 'v' } },
       jump_next_row = { '<Enter>', mode = { 'n', 'v' } },
       jump_prev_row = { '<S-Enter>', mode = { 'n', 'v' } },
+    },
+    view = {
+      display_mode = 'border',
     },
   },
   cmd = { 'CsvViewEnable', 'CsvViewDisable', 'CsvViewToggle' },
