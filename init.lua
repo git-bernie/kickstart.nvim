@@ -166,7 +166,7 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
     vim.opt_local.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
     vim.opt_local.foldlevelstart = 99
     vim.opt_local.shiftwidth = 4
-    vim.opt_local.foldlevel = 3
+    vim.opt_local.foldlevel = 5
     vim.opt_local.expandtab = true
     vim.opt_local.tabstop = 4
     -- vim.opt.shiftwidth = 2
@@ -1399,7 +1399,8 @@ require('lazy').setup {
         markdown = { 'cbfmt', 'markdown-toc', 'markdownlint', stop_after_first = false },
         sql = { 'sqlfmt', 'sqruff' },
         -- php = { 'pretty-php', 'duster', 'php-cs-fixer' },
-        php = { 'duster', 'php-cs-fixer' },
+        -- php = { 'duster', 'php-cs-fixer' },
+        php = { 'php-cs-fixer' },
         -- yaml = { 'ymlfmt', stop_after_first = false },
       },
       formatters = {
@@ -1599,7 +1600,7 @@ require('lazy').setup {
     'nvim-lualine/lualine.nvim',
     -- lazy = false,
     event = 'VeryLazy',
-    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    -- dependencies = { 'nvim-tree/nvim-web-devicons' },
     options = { theme = 'gruvbox' },
     --[[ sections = {
       lualine_z = { 'branch', 'location', 'selectioncount' },
