@@ -118,6 +118,16 @@ end, { desc = '[t]oggle [n]umber and relative number' })
 vim.keymap.set('n', '<leader>tm', '<cmd>MarkdownPreviewToggle<CR>', { desc = '[T]oggle [m]arkdown preview', silent = false })
 vim.keymap.set('n', '<leader>tx', '<cmd>TSContext toggle<CR>', { desc = '[T]oggle TSConte[x]t', silent = false })
 --  e.g. 1726513513, 1726513523
+
+-- Assuming we have yq available
+-- E.g. command! JsonToYaml %!yq -P
+-- command! JsonToYaml setf yaml
+vim.api.nvim_create_user_command('JsonToYaml', function()
+  -- Save current buffer content, convert, and replace
+  vim.cmd '%!yq -pjson -P'
+  -- vim.cmd 'setf yaml' -- Set filetype to yaml
+end, { desc = 'Convert current buffer from JSON to YAML' })
+
 --
 -- Example v2 encoding "QjRpxuZGJKDxLUV1RFh8CPjYEf_t9y_8FYgc2DCXuVc"
 vim.api.nvim_create_user_command('DecodeV2', function(opts)
@@ -170,6 +180,7 @@ end, { desc = '[Y]our [d]ate from unixtime cword' })
 
 if (vim.fn.executable 'jq') == 1 then
   -- E15: Invalid expression: "<80><fd>h. ! jq --sort-keys^M"
+  -- NOTE: By default jq produces 'pretty'. `jq -c` is --copmact-output
   vim.keymap.set('n', '<leader>yj', '<cmd>. ! jq --sort-keys<cr>', { desc = '[y] [j]son pretty print' })
   vim.keymap.set('v', '<leader>yj', "<cmd>'<,'> ! jq --sort-keys<cr>", { buffer = true, desc = '[y] [j]son pretty print' })
   -- Sometems it is best not sorted.
@@ -178,11 +189,20 @@ if (vim.fn.executable 'jq') == 1 then
 
   -- Rarely used but might be dug up in a pinch
   -- vim.keymap.set('n', '<leader>yjc', '<cmd>. ! jq --compact-output<cr>', { desc = '[y] [j]son [c]ompact-output' })
-  -- vim.keymap.set('v', '<leader>yjc', "<cmd>'<,'> ! jq --compact-output<cr>", { buffer = true, desc = '[y] [j]son [c]ompact output' })
+  -- vim.keymap.set('v', '<leader>yjc', "<cmd>'<,'> ! jq --compact-output<cr>", { buffer = true, desc = '[y] [j]son [c]ompact output' })g;
   -- jl for  backwords compatibility
 
   vim.keymap.set('n', '<leader>jl', '<cmd>. ! jq --sort-keys<cr>', { desc = '[y] [j]son pretty print' })
   vim.keymap.set('v', '<leader>jl', "<cmd>'<,'> ! jq --sort-keys<cr>", { buffer = true, desc = '[y] [j]son pretty print' })
+end
+
+-- Not as useful as jq but sometimes needed, if just to remember how to use yq
+if (vim.fn.executable 'yq') == 1 then
+  -- E15: Invalid expression: "<80><fd>h. ! jq --sort-keys^M "
+  -- NOTE: -p, --input-format string [auto|a|yaml|y|json|j|props|p|csv|c|tsv|t|xml|x|base64|uri|toml|lua|l|ini|i] parse format for input. (default "auto")
+  -- NOTE: -P is --prettyPrint
+  vim.keymap.set('n', '<leader>yq', "<cmd>. ! yq -pjson -P 'sort_keys(..)'<cr>", { desc = "[y] [q] -pjson -P 'sort_keys(..)' ..." })
+  vim.keymap.set('v', '<leader>yq', "<cmd>'<,'> ! yq -pjson -P 'sort_keys(..)'<cr>", { buffer = true, desc = "[y] [q] -pjson -P 'sort_keys(..)' ..." })
 end
 
 vim.keymap.set('n', '<leader>^', '<cmd>:vsplit<bar>bp<cr>', { noremap = true, desc = 'Vertical split and switch to previous buffer' })
