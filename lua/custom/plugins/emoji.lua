@@ -7,9 +7,9 @@
 ]]
 return {
   'allaman/emoji.nvim',
-  enabled = false,
+  enabled = true,
   version = '1.0.0', -- optionally pin to a tag
-  ft = { 'markdown', 'text', 'php', 'lua' }, -- adjust to your needs
+  ft = { 'markdown', 'text', 'php', 'lua', 'log' }, -- adjust to your needs
   dependencies = {
     -- util for handling paths
     'nvim-lua/plenary.nvim',
@@ -17,6 +17,8 @@ return {
     'hrsh7th/nvim-cmp',
     -- optional for telescope integration
     'nvim-telescope/telescope.nvim',
+    -- optional for fzf-lua integration via vim.ui.select
+    'ibhagwan/fzf-lua',
   },
   opts = {
     -- default is false

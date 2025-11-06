@@ -324,6 +324,11 @@ end, { range = true })
 vim.keymap.set('n', '<leader>gg', [[:G<CR>]], { silent = false, desc = '[G]oto:[G]it' })
 -- vim.api.nvim_set_keymap('n', '-', [[<cmd>lua require('window-picker').pick_window()<CR>]], { desc = 'pick[-]window', silent = true, noremap = true })
 
+-- TreeSJ
+vim.keymap.set('n', '<leader>tj', function()
+  require('treesj').toggle()
+end, { desc = '[T]oggle TreeS[J] split/join' })
+
 -- Noice
 vim.keymap.set('c', '<S-Enter>', function()
   require('noice').redirect(vim.fn.getcmdline())
@@ -411,3 +416,68 @@ vim.cmd 'iab <expr> xdt (strftime("%A %B %e, %Y %T %Z"))'
 -- These are just typos or misspellings that I make often
 vim.cmd 'iab funciton function'
 vim.cmd 'iab teh the'
+
+-- In your Neovim config (e.g., in a function or a separate module)
+local function lookup_user_by_id(db_path, encoded_id)
+  local sqlite = require 'sqlite'
+  local db = sqlite:open(db_path) -- Open the database file
+  if not db then
+    -- vim.api.nvim_err_writeln 'Failed to open database'
+    vim.api.nvim_echo({ string.format('Failed to open database %s', db_path) }, true, { err = true })
+    return nil
+  end
+
+  local function trim_quotes(s)
+    return (s:gsub('^([\'"])(.-)%1$', '%2'))
+  end
+
+  -- Use db:sql to execute a query and get results as a Lua table
+  -- The plugin handles parsing the results
+  -- local query = string.format('SELECT * FROM users WHERE id = %d', user_id)
+  -- local query = string.format('SELECT * FROM id_encodedids WHERE encoded_idv1 = "%s" or encoded_idv2 = "%s"', encoded_id, encoded_id)
+  print(string.format('looking for %s', encoded_id))
+
+  local query = 'SELECT * FROM id_encodedids WHERE encoded_idv1 = :encoded_id or encoded_idv2 = :encoded_id'
+  -- local query = 'SELECT coalesce(encoded_idv1, encoded_idv2) as found FROM id_encodedids WHERE encoded_idv1 = :encoded_id or encoded_idv2 = :encoded_id'
+  local result = db:eval(query, { encoded_id = encoded_id })
+
+  db:close() -- Close the database connection
+
+  if type(result) == 'table' and #result > 0 then
+    -- Assuming 'users' table has columns like 'id', 'name', 'email'
+    -- if result and #result > 0 then
+    -- Assuming 'users' table has columns like 'id', 'name', 'email'
+    return result[1] -- Returns the first matching row
+  else
+    return nil -- No user found
+  end
+end
+
+-- Example usage (e.g., mapped to a command)
+-- "mZwjmdZwe1S5uhHMdR9CVGqv3gQS1lzvOAd_r_pYRdY" 1000000000
+-- "1706b0559e4a8c8b7e1f486b590cbc5e8afef5d250a94c"
+vim.api.nvim_create_user_command('LookupUserID', function(args)
+  -- local id = tonumber(args.fargs[1])
+  local id = tostring(args.fargs[1])
+
+  local function trim_quotes(s)
+    return (s:gsub('^([\'"])(.-)%1$', '%2'))
+  end
+
+  id = trim_quotes(id)
+
+  if id then
+    vim.fn.setreg('y', tostring(id), 'c')
+    local user = lookup_user_by_id('/home/bernie/Downloads-work/id_encodedids.db', id)
+    -- local db = sqlite.open '/home/bernie/Downloads-work/id_encodedids.db'
+    if user then
+      -- print(string.format('Found user: ID: %s, Name: %s, Email: %s', user.id, user.name, user.email))
+      vim.fn.setreg('z', tostring(user.id), 'c')
+      print(string.format('Found user ID: %s (saved to "z)', user.id))
+    else
+      print(string.format('User with ID %s not found.', id))
+    end
+  else
+    print 'Invalid user ID provided.'
+  end
+end, { nargs = 1, complete = 'expression' })

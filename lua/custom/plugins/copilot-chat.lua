@@ -15,6 +15,7 @@ return {
     opts = function(_, opts)
       local file_glob_function = require 'custom.copilotchat_file_glob'
       opts.functions = vim.tbl_deep_extend('force', require 'CopilotChat.config.functions', file_glob_function)
+      opts.auto_insert_mode = true
       return opts
     end,
     -- To lazy load, see :h CopilotChat for available commands

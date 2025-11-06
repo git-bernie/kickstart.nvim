@@ -6,6 +6,8 @@ return {
     'moyiz/blink-emoji.nvim',
     'bydlw98/blink-cmp-env',
     'fang2hou/blink-copilot',
+    'allaman/emoji.nvim',
+    'saghen/blink.compat',
   },
 
   -- use a release tag to download pre-built binaries
@@ -36,10 +38,29 @@ return {
       -- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
       -- Adjusts spacing to ensure icons are aligned
       nerd_font_variant = 'mono',
+      -- sets the fallback highlight groups to nvim-cmp's highlight groups
+      -- useful for when your theme doesn't support blink.cmp
+      -- will be removed in a future release, assuming themes add support
+      use_nvim_cmp_as_default = false,
     },
 
     -- (Default) Only show the documentation popup when manually triggered
-    completion = { documentation = { auto_show = true } },
+    completion = {
+      list = { selection = { preselect = false } },
+      accept = {
+        -- experimental auto-brackets support
+        auto_brackets = {
+          enabled = true,
+        },
+      },
+      documentation = { auto_show = true },
+      menu = {
+        auto_show = function(ctx)
+          return vim.fn.getcmdtype() == ':'
+        end,
+      },
+      ghost_text = { enabled = true },
+    },
     signature = { enabled = true },
 
     -- Default list of enabled providers defined so that you can extend it
@@ -74,18 +95,26 @@ return {
           },
         },
         emoji = {
-          module = 'blink-emoji',
-          name = 'Emoji',
+          module = 'blink.compat.source',
+          name = 'emoji',
           score_offset = 15, -- Tune by preference
           opts = { insert = true }, -- Insert emoji (default) or complete its name
           should_show_items = function()
             return vim.tbl_contains(
               -- Enable emoji completion only for git commits and markdown.
               -- By default, enabled for all file-types.
-              { 'gitcommit', 'markdown', 'text', 'php', 'lua' },
+              { 'gitcommit', 'markdown', 'text', 'php', 'lua', 'log' },
               vim.o.filetype
             )
           end,
+          --[[ -- overwrite kind of suggestion
+          transform_items = function(ctx, items)
+            local kind = require('blink.cmp.types').CompletionItemKind.Text
+            for i = 1, #items do
+              items[i].kind = kind
+            end
+            return items
+          end, ]]
         },
         lazydev = {
           name = 'LazyDev',

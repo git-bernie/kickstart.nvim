@@ -169,7 +169,16 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
     vim.opt_local.foldlevel = 5
     vim.opt_local.expandtab = true
     vim.opt_local.tabstop = 4
+    vim.opt_local.iskeyword:append '-' -- lua vim.opt_local.iskeyword:remove '-'
     -- vim.opt.shiftwidth = 2
+  end,
+})
+
+vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
+  pattern = { '*.md', '*.log', '*.txt', '*.output', '*.[ct]sv' },
+  callback = function()
+    vim.opt_local.iskeyword:append '-' -- lua vim.opt_local.iskeyword:remove '-'
+    -- print [[+++ appended '-' to iskeyword!]]
   end,
 })
 
@@ -972,9 +981,13 @@ require('lazy').setup {
           -- Jump to the definition of the word under your cursor.
           --  This is where a variable was first declared, or where a function is defined, etc.
           --  To jump back, press <C-t>.
-          map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+          -- map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+          map('gd', function()
+            Snacks.picker.lsp_definitions()
+          end, '[G]oto [D]efinition (Snacks.picker.lsp_definitions()')
           -- map('gd', vim.lsp.buf.definition, '[G]oto [D]efinition')
           -- map('gV', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition', { 'v' })
+
           map('gV', '<cmd>vertical wincmd ]<cr>', '[G]oto Definition [V]ertical Split')
 
           -- Find references for the word under your cursor.
@@ -1388,7 +1401,8 @@ require('lazy').setup {
         -- python = { "isort", "black" },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
-        javascript = { 'prettierd', 'prettier', stop_after_first = true },
+        -- javascript = { 'prettierd', 'prettier', stop_after_first = true },
+        javascript = { 'prettierd', stop_after_first = true },
         -- I added below then removed as did not seem to help
         --php = { 'pint', 'php-cs-fixer', stop_after_first = false },
         --php = { 'pint', 'php-cs-fixer', 'phpcbf', stop_after_first = false },
@@ -1408,7 +1422,7 @@ require('lazy').setup {
           command = 'php-cs-fixer',
           args = {
             'fix',
-            '--rules=@PSR12', -- other presets availabled
+            '--rules=@PSR12', -- other presets available
             '$FILENAME',
           },
           stdin = false,
@@ -1681,7 +1695,7 @@ require('lazy').setup {
 
       require('mini.map').setup()
 
-      require('mini.splitjoin').setup()
+      -- require('mini.splitjoin').setup()
 
       require('mini.jump').setup()
 
