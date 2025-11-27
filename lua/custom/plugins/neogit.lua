@@ -10,4 +10,8 @@ return {
     'echasnovski/mini.pick', -- optional
     'folke/snacks.nvim', -- optional
   },
+  cmd = 'Neogit',
+  keys = {
+    { '<leader>ng', '<cmd>Neogit<cr>', desc = 'Show [N]eo[g]it UI' },
+  },
 }

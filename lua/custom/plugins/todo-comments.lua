@@ -34,6 +34,8 @@ return {
   'folke/todo-comments.nvim',
   dependencies = { 'nvim-lua/plenary.nvim' },
   opts = {
+    signs = true,
+    signs_priority = 8,
     -- PROBLEM: there is a problem
     keywords = {
       -- QQQ: this is qqq

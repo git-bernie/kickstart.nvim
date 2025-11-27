@@ -157,6 +157,13 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
   end,
 })
 
+vim.g.lazyvim_php_lsp = 'intelephense'
+
+-- set to `true` to follow the main branch
+-- you need to have a working rust toolchain to build the plugin
+-- in this case.
+vim.g.lazyvim_blink_main = true
+
 vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
   pattern = { '*.php', '*.ctp' },
   callback = function()
@@ -308,6 +315,17 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 -- [[ Bernie's proto-macros ]]
 vim.keymap.set('n', 'sasa', 'bhylep', { desc = 'Do search for wrapping character at beginning and past at end' })
 vim.keymap.set('ca', 'evv', 'e ~/.vimrc.27Aug24', { desc = 'Edit .vimrc' })
+
+-- Map buffer navigation to an alternative (e.g., <leader>bn and <leader>bp)
+-- This is so nvim-treesitter-textobjects can use ]b, ]B etc.
+-- Unmap the default buffer navigation keymaps
+vim.keymap.del('n', ']b')
+vim.keymap.del('n', '[b')
+vim.keymap.del('n', ']B')
+vim.keymap.del('n', '[B')
+vim.keymap.set('n', '<leader>bn', ':bnext<CR>', { desc = 'Next buffer' })
+vim.keymap.set('n', '<leader>bp', ':bprevious<CR>', { desc = 'Previous buffer' })
+
 -- original: 'rg --vimgrep -uu '
 -- QQQ:
 -- vim.cmd [[ set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case\ -uu\ --search-zip\ ]]
@@ -334,6 +352,18 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     vim.hl.on_yank()
   end,
 })
+
+-- Allow a local config to override general LSP setup
+local project_config_path = vim.fn.getcwd() .. '/.nvim.lua'
+if vim.fn.filereadable(project_config_path) == 1 then
+  local ok, err = pcall(vim.cmd, 'source ' .. project_config_path)
+  -- vim.cmd('source ' .. project_config_path)
+  if not ok then
+    vim.notify('Error loading .nvim.lua: ' .. err, vim.log.levels.ERROR)
+  else
+    vim.notify 'Found a local .nvim.lua in this project'
+  end
+end
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
@@ -906,7 +936,8 @@ require('lazy').setup {
     opts = {
       library = {
         -- Load luvit types when the `vim.uv` word is found
-        { path = 'luvit-meta/library', words = { 'vim%.uv' } },
+        -- { path = 'luvit-meta/library', words = { 'vim%.uv' } },
+        { path = '${3rd}/luv/library', words = { 'vim%.uv' } },
       },
     },
   },
@@ -930,7 +961,7 @@ require('lazy').setup {
       { 'j-hui/fidget.nvim', opts = {} },
 
       -- Allows extra capabilities provided by blink.cmp
-      'saghen/blink.cmp',
+      -- 'saghen/blink.cmp',
 
       -- Allows extra capabilities provided by nvim-cmp
       -- 'hrsh7th/cmp-nvim-lsp',
@@ -1085,6 +1116,7 @@ require('lazy').setup {
       -- See :help vim.diagnostic.Opts
       vim.diagnostic.config {
         severity_sort = true,
+        source = true,
         float = { border = 'rounded', source = 'if_many' },
         underline = { severity = vim.diagnostic.severity.ERROR },
         signs = vim.g.have_nerd_font and {
@@ -1096,7 +1128,8 @@ require('lazy').setup {
           },
         } or {},
         virtual_text = {
-          source = 'if_many',
+          -- source = 'if_many',
+          source = true,
           spacing = 2,
           format = function(diagnostic)
             local diagnostic_message = {
@@ -1117,10 +1150,16 @@ require('lazy').setup {
 
       -- local capabilities = vim.lsp.protocol.make_client_capabilities()
       -- capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
-      --
+
+      -- LSP servers and clients are able to communicate to each other what features they support.
+      --  By default, Neovim doesn't support everything that is in the LSP specification.
       --  When you add blink.cmp, luasnip, etc. Neovim now has *more* capabilities.
       --  So, we create new capabilities with blink.cmp, and then broadcast that to the servers.
       local capabilities = require('blink.cmp').get_lsp_capabilities()
+      --
+      --  When you add blink.cmp, luasnip, etc. Neovim now has *more* capabilities.
+      --  So, we create new capabilities with blink.cmp, and then broadcast that to the servers.
+      -- local capabilities = require('blink.cmp').get_lsp_capabilities() --- QQQ:
 
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -1131,6 +1170,7 @@ require('lazy').setup {
       --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
+      --
       local servers = {
         clangd = {},
         -- gopls = {},
@@ -1143,156 +1183,8 @@ require('lazy').setup {
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
         -- tsserver = {},
-
-        intelephense = { -- {{{ FIXME: No idea whether this is working or can work.
-          capabilities = capabilities,
-          -- capabilities = {},
-          init_options = {},
-
-          settings = {
-            intelephense = {
-              environment = {
-                phpVersion = '8.3.0', -- default 8.3.0, semver
-                -- includePaths = { 'app', 'vendor/mailchimp', 'vendor/laravel', },
-                includePaths = { 'app', 'lib', 'lib/Cake/**' },
-              },
-              format = {
-                enable = true, -- default, but JIC
-              },
-              client = {
-                autoCloseDocCommentDoSuggest = true,
-                -- diagnosticsIgnoreErrorFeature = true, -- not a real setting, from coc-intelephense
-              },
-              files = {
-                maxSize = 20000000,
-                associations = {
-                  '*.blade.php',
-                  '*.php',
-                  '*.phtml',
-                  '*.ctp',
-                },
-              },
-              stubs = {
-                '_ide_helper.php',
-                '_ide_helper_models',
-                'bcmath',
-                'bz2',
-                'calendar',
-                'Core',
-                'ctype',
-                'curl',
-                'date',
-                'dba',
-                'dom',
-                'enchant',
-                'exif',
-                'FFI',
-                'fileinfo',
-                'filter',
-                'ftp',
-                'gd',
-                'gettext',
-                'gmp',
-                'hash',
-                'iconv',
-                'igbinary',
-                'imagick',
-                'imap',
-                'intl',
-                'json',
-                'ldap',
-                'libxml',
-                'mbstring',
-                'memcached',
-                'msgpack',
-                'mysqli',
-                'mysqlnd',
-                'oci8',
-                'odbc',
-                'openssl',
-                'pcntl',
-                'pcre',
-                'PDO',
-                'PDO_ODBC',
-                'pdo_dblib',
-                'pdo_mysql',
-                'pdo_pgsql',
-                'pdo_snowflake',
-                'pdo_sqlite',
-                'pgsql',
-                'Phar',
-                'posix',
-                'pspell',
-                'random',
-                'readline',
-                'recode',
-                'redis',
-                'Reflection',
-                'session',
-                'shmop',
-                'SimpleXML',
-                'snmp',
-                'soap',
-                'sockets',
-                'sodium',
-                'SPL',
-                'sqlite3',
-                'standard',
-                'sysvmsg',
-                'sysvsem',
-                'sysvshm',
-                'tidy',
-                'tokenizer',
-                'xdebug',
-                'xml',
-                'xmlreader',
-                'xmlrpc',
-                'xmlwriter',
-                'xsl',
-                'yaml',
-                'Zend OPcache',
-                'zip',
-                'zlib',
-              },
-              phpdoc = {
-                propertyTemplate = {
-                  summary = '${SYMBOL_NAME} - ${SYMBOL_TYPE}',
-                  description = '',
-                  tags = {
-                    '@property ${SYMBOL_TYPE} ${SYMBOL_NAME}',
-                  },
-                },
-                functionTemplate = {
-                  summary = '${SYMBOL_NAME}() - ${SYMBOL_TYPE}',
-                  description = '',
-                  tags = {
-                    '@param ${SYMBOL_TYPE} ${SYMBOL_NAMESPACE} ${SYMBOL_NAME}',
-                    '@return ${SYMBOL_TYPE} ${SYMBOL_NAME}',
-                  },
-                },
-                classTemplate = {
-                  description = '${SYMBOL_TYPE} Class description',
-                  summary = '',
-                  tags = {
-                    '@package ${SYMBOL_NAME}',
-                    '@author',
-                    '@version',
-                    '@access public',
-                    '@see',
-                  },
-                },
-                varTemplate = { -- this does not exist, but would be nice if it did
-                  tags = {
-                    '@var ${SYMBOL_TYPE} ${SYMBOL_NAME}',
-                  },
-                },
-              },
-              -- root_dir = require('lspconfig').util.root_pattern('composer.json', '.git', 'package.json'),
-            },
-          },
-          -- root_dir = function() return vim.loop.cwd() end,
-          -- root_dir = function() return vim.loop.cwd() end,
-        }, -- }}}
+        -- intelephense = {}
+        html = {},
 
         lua_ls = { -- {{{
           -- cmd = {...},
@@ -1308,6 +1200,7 @@ require('lazy').setup {
             },
           },
         }, -- }}}
+        -- vue_ls = {},
       }
 
       -- Ensure the servers and tools above are installed
@@ -1333,7 +1226,8 @@ require('lazy').setup {
       require('mason-lspconfig').setup {
         -- print 'I am in mason-lspconfig',
         --@type string[]
-        ensure_installed = { 'intelephense' }, -- added in 4feb2025 to quiet the diagnostic
+        -- ensure_installed = { 'intelephense' }, -- added in 4feb2025 to quiet the diagnostic
+        ensure_installed = { 'vue_ls' }, -- added in 4feb2025 to quiet the diagnostic
         --@type boolean
         automatic_installation = true, -- added in 4feb2025 to quiet the diagnostic
         automatic_enable = true,
@@ -1346,7 +1240,8 @@ require('lazy').setup {
             -- by the server configuration above. Useful when disabling
             -- certain features of an LSP (for example, turning off formatting for tsserver)
 
-            -- print('server_name: ' .. server_name)
+            print('server_name: ' .. server_name)
+            print(server_name .. ' ' .. vim.inspect(capabilities))
             server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
             -- return require('lspconfig')[server_name].setup(server)
             -- require('lspconfig')[server_name].setup(server)
@@ -1357,7 +1252,25 @@ require('lazy').setup {
       }
     end,
   },
-
+  -- LInter ?
+  {
+    'mfussenegger/nvim-lint',
+    event = 'BufReadPost',
+    config = function()
+      require('lint').setup {
+        linters_by_ft = {
+          html = { 'htmlhint' }, -- Example linter
+          -- Add other file types and their linters here
+        },
+      }
+      -- Optional: Run linting on buffer modification or when an LSP attaches
+      vim.api.nvim_create_autocmd({ 'BufWritePost', 'BufReadPost', 'InsertLeave' }, {
+        callback = function()
+          require('lint').run()
+        end,
+      })
+    end,
+  },
   { -- Autoformat
     'stevearc/conform.nvim',
     event = { 'BufWritePre' },
@@ -1370,19 +1283,20 @@ require('lazy').setup {
           require('conform').format { async = true, lsp_format = 'fallback', lsp_fallback = true, timeout_ms = 2000 }
         end,
         mode = '',
-        desc = '[F]ormat buffer',
+        desc = '[F]ormat buffer (conform)',
       },
     },
     opts = {
       notify_on_error = false,
-      format_on_save = function(bufnr)
+      -- format_on_save = function(bufnr)
+      format_after_save = function(bufnr)
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
         -- I don't want to save on php because I will lose easy Git blame
         -- results on all files. Otherwise I would.
         -- FIXME Disable this only on the loanconnect project.
-        local disable_filetypes = { c = true, cpp = true, php = false, javascript = true }
+        local disable_filetypes = { c = true, cpp = true, php = true, javascript = true }
         local lsp_format_opt
         if disable_filetypes[vim.bo[bufnr].filetype] then
           lsp_format_opt = 'never'
@@ -1393,6 +1307,7 @@ require('lazy').setup {
           -- timeout_ms = 500,
           timeout_ms = 2500,
           lsp_format = lsp_format_opt,
+          --  Error  02:00:54 PM notify.error Conform format_on_save cannot use async=true. Use format_after_save instead.
         }
       end,
       formatters_by_ft = {
@@ -1411,10 +1326,15 @@ require('lazy').setup {
         -- php = { 'php-cs-fixer', stop_after_first = true, timeout_ms = 500 },
         blade = { 'blade-formatter' },
         markdown = { 'cbfmt', 'markdown-toc', 'markdownlint', stop_after_first = false },
-        sql = { 'sqlfmt', 'sqruff' },
+        -- sql = { 'sqlfmt', 'sqruff' },
+        sql = { 'sql_formatter' },
+        -- sql = { 'sqlfluff' }, --  use vim.diagnostic.enable(false, …)
         -- php = { 'pretty-php', 'duster', 'php-cs-fixer' },
         -- php = { 'duster', 'php-cs-fixer' },
+        -- php = { 'php-cs-fixer', 'prettierd' },
         php = { 'php-cs-fixer' },
+        html = { 'prettierd', 'htmhint' },
+
         -- yaml = { 'ymlfmt', stop_after_first = false },
       },
       formatters = {
@@ -1460,6 +1380,13 @@ require('lazy').setup {
             -- require('luasnip.loaders.from_vscode').lazy_load { paths = vim.fn.stdpath 'config' .. 'lua/snippets/' }
             require('luasnip.loaders.from_vscode').lazy_load { paths = vim.fn.stdpath 'config' .. '/lua/snippets/' }
           end,
+
+          {
+            'saghen/blink.compat',
+            optional = true, -- make optional so it's only enabled if any extras need it
+            opts = {},
+            version = not vim.g.lazyvim_blink_main and '*',
+          },
         },
       },
 
@@ -1558,6 +1485,11 @@ require('lazy').setup {
             -- set group index to 0 to skip loading LuaLS completions as lazydev recommends it
             group_index = 0,
           },
+          { name = 'nvim_lsp' },
+          { name = 'luasnip' },
+          { name = 'buffer' },
+          { name = 'path' },
+          { name = 'intelephense' },
           -- { name = 'luasnip', priority = 40 },
           -- From blink-cmp: `lsp`, `buffer`, `snippets`, `path` and `omni` are built-in
           -- { name = 'luasnip', priority = 30 },
@@ -1715,6 +1647,9 @@ require('lazy').setup {
     build = ':TSUpdate',
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter-textobjects',
+    },
     opts = {
       -- ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'php', 'javascript', 'vue' },
       ensure_installed = {
@@ -1735,6 +1670,7 @@ require('lazy').setup {
         -- 'latex',
         'norg',
         'scss',
+        'sql',
         'svelte',
         'tsx',
         'typst',
@@ -1749,7 +1685,42 @@ require('lazy').setup {
         additional_vim_regex_highlighting = { 'ruby' },
       },
       indent = { enable = true, disable = { 'ruby' } },
+      textobjects = {
+        select = {
+          enable = true,
+          -- You can map the '%' key to the treesitter function for matching
+          -- This example maps '%' to jump to the next matching node's start or end
+          -- and sets up some other useful mappings for context selection
+          keymaps = {
+            -- Map '%' to jump between the start/end of the current block/function
+            -- Note: This is a custom mapping, not a direct replacement of the default '%'
+            ['%'] = '@block.outer',
+          },
+        },
+        -- This is generally what you want for jumping between definitions or blocks
+        move = {
+          enable = true,
+          set_jumps = true, -- Adds jumps to the jump list
+          goto_next_start = {
+            [']]'] = '@function.outer',
+            [']b'] = '@block.outer',
+          },
+          goto_next_end = {
+            [']['] = '@function.outer',
+            [']B'] = '@block.outer',
+          },
+          goto_previous_start = {
+            ['[['] = '@function.outer',
+            ['[b'] = '@block.outer',
+          },
+          goto_previous_end = {
+            ['[]'] = '@function.outer',
+            ['[B'] = '@block.outer',
+          },
+        },
+      },
     },
+
     -- There are additional nvim-treesitter modules that you can use to interact
     -- with nvim-treesitter. You should go explore a few and see what interests you:
     --

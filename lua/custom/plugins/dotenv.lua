@@ -1,7 +1,7 @@
 --[[ Run Dotenv to load up manually ]]
 return {
   'ellisonleao/dotenv.nvim',
-  enabled = true,
+  enabled = false,
   opts = {
     enable_on_load = false,
     verbose = true,

@@ -1,4 +1,4 @@
-return {
+--[[ return {
   'github/copilot.vim',
   enabled = true,
   cmd = 'Copilot',
@@ -16,5 +16,17 @@ return {
       end,
     })
     vim.fn['copilot#OnFileType']()
+  end,
+} ]]
+
+return {
+  'zbirenbaum/copilot.lua',
+  dependencies = {
+    'copilotlsp-nvim/copilot-lsp', -- (optional) for NES functionality
+  },
+  cmd = 'Copilot',
+  event = 'InsertEnter', -- Lazy Loading
+  config = function()
+    require('copilot').setup {}
   end,
 }

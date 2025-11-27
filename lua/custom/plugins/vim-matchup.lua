@@ -7,6 +7,7 @@ highlighted along with the 'matchpairs' symbols such as `()`, `{}`, and `[]`.
 ]=]
 return {
   'andymass/vim-matchup',
+  enabled = false,
   opts = {
     include_match_words = true,
   },

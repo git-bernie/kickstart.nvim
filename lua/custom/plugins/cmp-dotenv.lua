@@ -1,6 +1,6 @@
 return {
   'SergioRibera/cmp-dotenv',
-  enabled = true,
+  enabled = false,
   opt = {
     sources = {
       { name = 'dotenv' },

@@ -47,15 +47,15 @@ return {
         end, { desc = 'reset git hunk' })
 
         -- normal mode
-        map('n', '<leader>hs', gitsigns.stage_hunk, { desc = 'git [s]tage hunk' })
-        map('n', '<leader>hr', gitsigns.reset_hunk, { desc = 'git [r]eset hunk' })
-        map('n', '<leader>hS', gitsigns.stage_buffer, { desc = 'git [S]tage buffer' })
+        map('n', '<leader>hs', gitsigns.stage_hunk, { desc = 'gitsigns [s]tage hunk' })
+        map('n', '<leader>hr', gitsigns.reset_hunk, { desc = 'gitsigns [r]eset hunk' })
+        map('n', '<leader>hS', gitsigns.stage_buffer, { desc = 'gitsigns [S]tage buffer' })
         -- map('n', '<leader>hu', gitsigns.undo_stage_hunk, { desc = 'git [u]ndo stage hunk' })
-        map('n', '<leader>hR', gitsigns.reset_buffer, { desc = 'git [R]eset buffer' })
-        map('n', '<leader>hp', gitsigns.preview_hunk, { desc = 'git [p]review hunk' })
-        map('n', '<leader>hB', gitsigns.blame, { desc = 'git [B]lame' })
-        map('n', '<leader>hb', gitsigns.blame_line, { desc = 'git [b]lame line' })
-        map('n', '<leader>hd', gitsigns.diffthis, { desc = 'git [d]iff against index' })
+        map('n', '<leader>hR', gitsigns.reset_buffer, { desc = 'gitsigns [R]eset buffer' })
+        map('n', '<leader>hp', gitsigns.preview_hunk, { desc = 'gitsigns [p]review hunk' })
+        map('n', '<leader>hB', gitsigns.blame, { desc = 'gitsigns [B]lame' })
+        map('n', '<leader>hb', gitsigns.blame_line, { desc = 'gitsigns [b]lame line' })
+        map('n', '<leader>hd', gitsigns.diffthis, { desc = 'gitsigns [d]iff against index' })
         --[[ map('n', '<leader>hN', function()
           gitsigns.nav_hunk { 'next' }
         end, { desc = '[H]unk [N]ext (gitsigns.nav_hunk Use ]c instead.' }) ]]
@@ -64,12 +64,13 @@ return {
         end, { desc = '[H]unk [P]revious (gitsigns.nav_hunk. Use [c instead' }) ]]
         map('n', '<leader>hD', function()
           gitsigns.diffthis '@'
-        end, { desc = 'git [D]iff against last commit' })
+        end, { desc = 'gitsigns [D]iff against last commit' })
 
         -- Toggles
-        map('n', '<leader>tb', gitsigns.toggle_current_line_blame, { desc = '[T]oggle git show [b]lame line' })
-        map('n', '<leader>tD', gitsigns.preview_hunk_inline, { desc = '[T]oggle git show [D]eleted' })
+        map('n', '<leader>tb', gitsigns.toggle_current_line_blame, { desc = '[T]oggle gitsigns show [b]lame line' })
+        map('n', '<leader>tD', gitsigns.preview_hunk_inline, { desc = '[T]oggle gitsigns show [D]eleted' })
         map('n', '<leader>ht', gitsigns.toggle_signs, { desc = 'gitsigns [h]unk [t]oggle' })
+        map('n', '<leader>tg', gitsigns.toggle_signs, { desc = '[t]oggle [g]itsigns' })
       end,
     },
   },

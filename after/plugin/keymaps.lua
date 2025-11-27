@@ -349,6 +349,17 @@ vim.keymap.set('n', '-', function()
   } or vim.api.nvim_get_current_win()
   vim.api.nvim_set_current_win(picked_window_id)
 end, { desc = 'Pick a window' })
+
+vim.api.nvim_set_keymap('n', '<leader>sx', '', {
+  noremap = true,
+  callback = function()
+    -- for _, client in ipairs(vim.lsp.buf_get_clients()) do
+    for _, client in ipairs(vim.lsp.get_clients()) do
+      require('workspace-diagnostics').populate_workspace_diagnostics(client, 0)
+    end
+  end,
+})
+
 -- https://vi.stackexchange.com/questions/39947/nvim-vim-o-cmdheight-0-looses-the-recording-a-macro-messages
 vim.cmd [[ autocmd RecordingEnter * set cmdheight=1 ]]
 vim.cmd [[ autocmd RecordingLeave * set cmdheight=0 ]]

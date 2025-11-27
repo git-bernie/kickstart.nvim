@@ -1,0 +1,5 @@
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100   162  100   162    0     0    562      0 --:--:-- --:--:-- --:--:--   562100   162  100   162    0     0    562      0 --:--:-- --:--:-- --:--:--   562
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+curl: (35) OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to 99.83.190.102:443 
