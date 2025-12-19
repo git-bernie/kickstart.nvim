@@ -6,7 +6,7 @@ For config help, see: https://github.com/folke/noice.nvim/wiki/Configuration-Rec
 Noice can be super annoying particularly because I have not figured out 
 how to consistently see the result of :! /bin/bash etc. type comands.
 
-`g<` is super useful. Also <leader>ty disables Noice.
+`NOTE: g<` is super useful. Also <leader>ty disables Noice.
 
 ]]
 return {
@@ -95,11 +95,12 @@ return {
         opts = { skip = true },
       },
       -- Route shell command output (identified by `msg_show` and a minimum height) to a split view.
-      {
+      { -- Alternately, :Noice disable
         view = 'split',
         filter = {
           event = 'msg_show',
-          min_height = 10, -- Adjust this value as needed
+          -- min_height = 1, -- Adjust this value as needed
+          min_height = 5, -- Adjust this value as needed
           -- min_height = 1, -- 1 means always make a split.
           -- min_height = 5, -- 5 means if >= 5 lines then make a split. Remember to use `g<`
         },

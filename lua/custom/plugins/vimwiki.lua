@@ -1,6 +1,6 @@
 return {
   'vimwiki/vimwiki',
-  enabled = true,
+  enabled = false,
   init = function() -- init not config() because it needs vimiwiki_list bfore loading
     vim.g.vimwiki_list = {
       {

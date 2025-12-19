@@ -4,7 +4,7 @@ return {
   config = function()
     -- print 'reading intelephense.lua'
     local php_version = '8.3.0' -- default
-    local include_paths = { 'app', 'lib', 'vendor' }
+    local include_paths = { 'app', 'lib', 'vendor', '${workspaceFolder}/php-stubs' }
 
     -- See and set in .nvim.lua in project root_dir.
     if type(vim.g.local_php_version) == 'string' and vim.g.local_php_version ~= '' then
@@ -74,6 +74,7 @@ return {
             },
           },
           stubs = {
+            'main',
             '_ide_helper.php',
             '_ide_helper_models',
             'bcmath',

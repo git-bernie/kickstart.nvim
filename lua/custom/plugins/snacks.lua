@@ -2,7 +2,8 @@ return {
   'folke/snacks.nvim',
   priority = 1000,
   lazy = false,
-  ---@type snacks.Config
+  ---@class snacks.Config
+  ---@field lazygit? snacks.lazygit.Config
   opts = {
     -- your configuration comes here
     -- or leave it empty to use the default settings
@@ -24,6 +25,7 @@ return {
     {
       '<leader>gl',
       function()
+        -- local Snacks = require 'snacks'
         Snacks.lazygit()
       end,
       desc = '[G]it [L]azygit',
