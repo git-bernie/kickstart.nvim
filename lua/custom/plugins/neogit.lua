@@ -24,4 +24,14 @@ return {
   keys = {
     { '<leader>ng', '<cmd>Neogit<cr>', desc = 'Show [N]eo[g]it UI' },
   },
+  config = function()
+    require('neogit').setup {
+      integrations = {
+        diffview = true,
+      },
+      -- tab (default), replace, split, split_above, split_above_all, split_below,
+      -- split_below_all, vsplit, floating, auto (vsplit if window would have 80 cols, otherwise split)
+      kind = 'split',
+    }
+  end,
 }
