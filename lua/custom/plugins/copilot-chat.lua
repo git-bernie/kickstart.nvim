@@ -35,7 +35,8 @@ return {
       -- See Configuration section for options
     },
     keys = {
-      { '<leader>co', '<cmd>CopilotChat<cr>', desc = '[C]opilot ChatGPT [O]pen' },
+      { '<leader>co', '<cmd>CopilotChat<cr>', desc = '[C]opilotChat [O]pen' },
+      { '<leader>ct', '<cmd>CopilotChatToggle<cr>', desc = '[C]opilotChat [T]oggle' },
     },
   },
 }

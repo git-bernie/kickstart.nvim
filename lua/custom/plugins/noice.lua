@@ -67,6 +67,69 @@ return {
       view = 'cmdline_popup', -- change to `cmdline` to get classic cmd line
       -- view = 'cmdline', -- change to `cmdline` to get classic cmd line
       -- view = 'cmdline_output',
+      -- view = 'popupmenu',
+      opts = {
+        position = {
+          row = '50%',
+          col = '50%',
+        },
+        size = {
+          -- width = 60,
+          width = 70,
+          height = 'auto',
+        },
+        border = {
+          style = 'rounded',
+          padding = { 0, 1 },
+        },
+        win_options = {
+          winhighlight = 'Normal:Normal,FloatBorder:FloatBorder,CursorLine:Visual,Search:None',
+        },
+      },
+    },
+    views = { -- The "notify" view handles general notifications
+      notify = {
+        position = {
+          -- row = 0, -- Position from the top (0 is the top edge)
+          row = '50%', -- Position from the top (0 is the top edge)
+          col = '50%', -- Position from the left (100% is the right edge)
+        },
+        size = {
+          width = 'auto',
+          height = 'auto',
+          max_width = 80, -- Optional: set a maximum width for readability
+        },
+        -- Optional: ensure messages stack downwards (top_down = true) or upwards (top_down = false)
+        -- If you want the latest message at the absolute top, set top_down = false
+        top_down = false,
+      },
+      -- You can also configure other views like cmdline_popup, etc.
+      cmdline_popup = {
+        position = {
+          row = '50%',
+          col = '50%',
+        },
+      },
+      popmenu = {
+        relative = 'editor',
+        position = {
+          row = '50%',
+          col = '50%',
+        },
+      },
+      popup = {
+        relative = 'editor',
+        position = {
+          row = '50%',
+          col = '50%',
+        },
+        win_options = {
+          winhighlight = {
+            Normal = 'NormalFloat',
+            FloatBorder = 'FloatBorder',
+          },
+        },
+      },
     },
     -- add any options here
     lsp = {
@@ -93,6 +156,9 @@ return {
         view = 'notify',
         filter = { event = 'msg_showmode', kind = '', find = 'written' },
         opts = { skip = true },
+        win_options = {
+          winhighlight = 'Normal:Normal,FloatBorder:FloatBorder,CursorLine:Visual,Search:None',
+        },
       },
       -- Route shell command output (identified by `msg_show` and a minimum height) to a split view.
       { -- Alternately, :Noice disable
@@ -116,15 +182,18 @@ return {
     'rcarriga/nvim-notify',
   },
   keys = {
-    { '<Leader>sl', '<cmd>NoiceLast<CR>', desc = '[S]elect Noice [L]ast', mode = 'n', silent = true, noremap = true },
-    { '<Leader>sll', '<cmd>NoiceHistory<CR>', desc = '[S]elect [L]ike [L]ast NoiceHistory', mode = 'n', silent = true, noremap = true },
+    -- { '<Leader>sl', '<cmd>NoiceLast<CR>', desc = '[S]elect Noice [L]ast', mode = 'n', silent = true, noremap = true },
+    -- { '<Leader>sll', '<cmd>NoiceHistory<CR>', desc = '[S]elect [L]ike [L]ast NoiceHistory', mode = 'n', silent = true, noremap = true },
     -- { '<Leader>LL', '<cmd>Noice dismiss<CR>', desc = 'Dismiss notification', mode = 'n', silent = true, noremap = true },
-    { '<Leader>LL', "<cmd>lua require('notify').dismiss()<CR>", desc = 'Dismiss notification', mode = 'n', silent = false, noremap = true },
     -- { '<Leader>ty', '<cmd>Noice disable<CR>', desc = '[T]oggle (?) AnNo[y]ance Disable', mode = 'n', silent = false, noremap = true },
-    { '<Leader>tyy', '<cmd>Noice enable<CR>', desc = '[T]oggle (?) AnNo[y]ance Enable', mode = 'n', silent = false, noremap = true },
-    { '<Leader>nd', '<cmd>Noice dismiss<CR>', desc = '[N]oice [D]ismiss', mode = 'n', silent = false, noremap = true },
-    { '<Leader>ne', '<cmd>Noice enable<CR>', desc = '[N]oice enable', mode = 'n', silent = false, noremap = true },
-    { '<Leader>nx', '<cmd>Noice disable<CR>', desc = '[N]oice [D]isable', mode = 'n', silent = false, noremap = true },
+    -- { '<Leader>tyy', '<cmd>Noice enable<CR>', desc = '[T]oggle (?) AnNo[y]ance Enable', mode = 'n', silent = false, noremap = true },
+    -- { '<Leader>n', '<cmd>Noice dismiss<CR>', desc = '[N]oice dismiss', mode = 'n', silent = false, noremap = true },
+    -- { '<Leader>nd', '<cmd>Noice dismiss<CR>', desc = '[N]oice [D]ismiss', mode = 'n', silent = false, noremap = true },
+    -- { '<Leader>ne', '<cmd>Noice enable<CR>', desc = '[N]oice enable', mode = 'n', silent = false, noremap = true },
+    -- { '<Leader>nx', '<cmd>Noice disable<CR>', desc = '[N]oice [X]Disable', mode = 'n', silent = false, noremap = true },
+    { '<esc>', '<cmd>Noice dismiss<CR>', desc = 'Noic[ESC] dismiss!!!', mode = 'n', silent = false, noremap = true },
+    { '<Leader>LL', "<cmd>lua require('notify').dismiss()<CR>", desc = 'Dismiss notification', mode = 'n', silent = false, noremap = true },
     { '<Leader>nh', '<cmd>Noice history<CR>', desc = '[N]oice [H]istory', mode = 'n', silent = true, noremap = true },
+    { '<Leader>nl', '<cmd>NoiceLast<CR>', desc = '[N]oice [L]ast', mode = 'n', silent = true, noremap = true },
   },
 }

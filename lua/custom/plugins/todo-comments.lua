@@ -5,38 +5,39 @@
 -- Try :TodoQuickFix
 -- Try :TodoTelescope
 
--- TODO:
--- HACK:
--- WARN:
--- WARNING:
--- PERF:
--- NOTE:
--- TEST:
--- FIXME:
--- ZZZ:
--- XXX:
--- OPTIMIZE:
--- FIX:
+-- COMMENT:
 -- DEV:
--- TBD:
--- qqq:
--- QQQ:
+-- E.G.:
+-- EG:
+-- EX:
+-- feat:
+-- fix:
+-- FIXME:
+-- HACK:
+-- IE:
+-- NOTE:
+-- OPTIMIZE:
+-- PERF:
 -- QQ:
+-- QQQ:
+-- qqq:
 -- STEP:
 -- STEPS:
--- COMMENT:
--- EG:
--- E.G.:
--- EX:
--- IE:
+-- TBD:
+-- TEST:
+-- TODO:
+-- WARN:
+-- WARNING:
 -- WIP:
+-- XXX:
+-- ZZZ:
+
 return {
   'folke/todo-comments.nvim',
   dependencies = { 'nvim-lua/plenary.nvim' },
   opts = {
     signs = true,
     signs_priority = 8,
-    -- PROBLEM: there is a problem
     keywords = {
       -- QQQ: this is qqq
       QQQ = {
@@ -49,8 +50,30 @@ return {
       -- Add to 'NOTE'
       -- NOTE: etc.
       NOTE = {
-        alt = { 'NB', 'INFO', 'FYI', 'STEP', 'STEPS', 'COMMENT', 'EG', 'E.G.', 'EX', 'IE', 'I.E.', 'PAGE', 'EXPLANATION', 'OLD', 'NEW', 'QUESTION', 'Q' },
+        alt = {
+          'COMMENT',
+          'E.G.',
+          'EG',
+          'EX',
+          'EXPLANATION',
+          'FYI',
+          'I.E.',
+          'IE',
+          'INFO',
+          'NB',
+          'NEW',
+          'OLD',
+          'PAGE',
+          'Q',
+          'QUESTION',
+          'STEP',
+          'STEPS',
+          'feat',
+          'fix',
+        },
       },
+      --fix(something): you fucker.
+      --FIX(something): you fucker.
       -- PERF: this PERF, PERFORMANCE, OPTIMIZE, etc.
       -- TEST: this is a test!
       TEST = {},

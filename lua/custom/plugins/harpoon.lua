@@ -65,6 +65,7 @@ return {
         require('harpoon'):list():add()
       end,
       desc = 'harpoon file add',
+      silent = false,
     },
     {
       '<leader>h',
@@ -73,6 +74,7 @@ return {
         harpoon.ui:toggle_quick_menu(harpoon:list())
       end,
       desc = 'harpoon quick menu',
+      silent = false,
     },
     {
       '<leader>1',
@@ -80,6 +82,7 @@ return {
         require('harpoon'):list():select(1)
       end,
       desc = 'harpoon to file 1',
+      silent = false,
     },
     {
       '<leader>2',
@@ -87,6 +90,7 @@ return {
         require('harpoon'):list():select(2)
       end,
       desc = 'harpoon to file 2',
+      silent = false,
     },
     {
       '<leader>3',
@@ -94,6 +98,7 @@ return {
         require('harpoon'):list():select(3)
       end,
       desc = 'harpoon to file 3',
+      silent = false,
     },
     {
       '<leader>4',
@@ -101,6 +106,7 @@ return {
         require('harpoon'):list():select(4)
       end,
       desc = 'harpoon to file 4',
+      silent = false,
     },
     {
       '<leader>5',
@@ -108,6 +114,7 @@ return {
         require('harpoon'):list():select(5)
       end,
       desc = 'harpoon to file 5',
+      silent = false,
     },
     -- Toggle previous & next buffers stored within Harpoon list
     -- vim.keymap.set("n", "<C-S-P>", function() harpoon:list():prev() end)
@@ -118,6 +125,7 @@ return {
         require('harpoon'):list():prev()
       end,
       desc = 'harpoon toggle previous buffer in list',
+      silent = false,
     },
     -- vim.keymap.set("n", "<C-S-N>", function() harpoon:list():next() end)
     {
@@ -127,6 +135,7 @@ return {
         require('harpoon'):list():next()
       end,
       desc = 'harpoon toggle next buffer in list',
+      silent = false,
     },
   },
   -- Toggle previous & next buffers stored within Harpoon list

@@ -47,7 +47,7 @@ vim.keymap.set('i', 'jk', '<esc>', { desc = '[jk] to escape' })
 vim.keymap.set(
   'n',
   '<leader>fg',
-  ":lua require('telescope').extensions.live_grep_args.live_grep_args({prompt_title = '[F]ind [G]rep using live_grep_args (\"word\" -tpphp)'})<cr>",
+  ":lua require('telescope').extensions.live_grep_args.live_grep_args({prompt_title = '[F]ind [G]rep using live_grep_args (\"word\" -- *.php)'})<cr>",
   {}
 )
 
@@ -103,7 +103,7 @@ vim.keymap.set('n', '<leader>tW', function()
 end, { desc = '[T]oggle i[W]hiteall vim.opt.diffopt:append()/remove() iwhiteall' })
 
 -- FIXME: set inv{option} to toggle instead?
-vim.keymap.set('n', '<leader>tn', function()
+vim.keymap.set('n', '<leader>tN', function()
   local set = vim.opt_local
   ---@diagnostic disable-next-line: undefined-field
   if set.number:get() and set.relativenumber:get() then
@@ -116,9 +116,15 @@ vim.keymap.set('n', '<leader>tn', function()
 end, { desc = '[t]oggle [n]umber and relative number' })
 
 vim.keymap.set('n', '<leader>tm', '<cmd>MarkdownPreviewToggle<CR>', { desc = '[T]oggle [m]arkdown preview', silent = false })
-vim.keymap.set('n', '<leader>tx', '<cmd>TSContext toggle<CR>', { desc = '[T]oggle TSConte[x]t', silent = false })
---  e.g. 1726513513, 1726513523
+-- See nvim-treesitter-context
+-- vim.keymap.set('n', '<leader>tx', '<cmd>TSContext toggle<CR>', { desc = '[T]oggle TSConte[x]t', silent = false })
+--
 
+-- See settings in init.lua for MiniSessions config
+-- ms already taken by minimap
+vim.keymap.set('n', '<leader>mk', function()
+  require('mini.sessions').write('Session.vim', { force = { write = true } })
+end, { desc = [[[M]a[k]e Session via MiniSessions.write('Session.vim')]], silent = false })
 -- Assuming we have yq available
 -- E.g. command! JsonToYaml %!yq -P
 -- command! JsonToYaml setf yaml
@@ -152,6 +158,7 @@ vim.keymap.set('n', '<leader>v2', function()
 end)
 
 -- E.g. "LenderUpdate.1759824438.2ndLoan":
+--  e.g. 1726513513, 1726513523
 vim.keymap.set('n', '<leader>yd', function()
   local unixtime = vim.fn.expand '<cword>'
 
@@ -172,7 +179,7 @@ vim.keymap.set('n', '<leader>yd', function()
   end
 
   if pcall(get_date, num) then
-    print('num is ' .. tostring(num) .. ' ' .. os.date('%c %z', num))
+    print('unxitime: ' .. tostring(num) .. ' ' .. os.date('%c %z', num))
   else
     print(string.format('invalid unixtime %s', num))
   end
@@ -334,6 +341,25 @@ vim.keymap.set('c', '<S-Enter>', function()
   require('noice').redirect(vim.fn.getcmdline())
 end, { desc = 'Redirect Cmdline' })
 
+-- Define a function to toggle Noice
+local function toggle_noice()
+  if vim.g.noice_enabled == nil or vim.g.noice_enabled == true then
+    vim.cmd 'Noice disable'
+    vim.g.noice_enabled = false
+    vim.notify('Noice disabled', vim.log.levels.INFO)
+  else
+    vim.cmd 'Noice enable'
+    vim.g.noice_enabled = true
+    vim.notify('Noice enabled', vim.log.levels.INFO)
+  end
+end
+
+-- More common than toggle line numbers see: tN
+vim.keymap.set('n', '<leader>tn', toggle_noice, { desc = 'Toggle Noice enable/disable', silent = false })
+
+-- Initialize the global variable to true when Noice is first loaded
+vim.g.noice_enabled = true
+
 local picker = require 'window-picker'
 -- vim.keymap.set('n', ',w', function()
 vim.keymap.set('n', ',w', function()
@@ -363,7 +389,11 @@ vim.api.nvim_set_keymap('n', '<leader>sx', '', {
 -- https://vi.stackexchange.com/questions/39947/nvim-vim-o-cmdheight-0-looses-the-recording-a-macro-messages
 vim.cmd [[ autocmd RecordingEnter * set cmdheight=1 ]]
 vim.cmd [[ autocmd RecordingLeave * set cmdheight=0 ]]
-vim.cmd [[ autocmd BufWritePost *.php silent !./vendor/bin/pint %:p ]]
+
+if IsLaravelInComposer() then
+  vim.cmd [[ autocmd BufWritePost *.php silent !./vendor/bin/pint %:p ]]
+end
+
 -- Abbreviations E.g.
 -- insert mode xbd inserts strftime "%b %d", i.e. Jan 01
 -- :ab[breviate] lists all abbreviations
@@ -428,7 +458,9 @@ vim.cmd 'iab <expr> xdt (strftime("%A %B %e, %Y %T %Z"))'
 vim.cmd 'iab funciton function'
 vim.cmd 'iab teh the'
 
--- In your Neovim config (e.g., in a function or a separate module)
+--- Lookup a user by encoded ID from the local SQLite database.
+---@param db_path string
+---@param encoded_id string
 local function lookup_user_by_id(db_path, encoded_id)
   local sqlite = require 'sqlite'
   local db = sqlite:open(db_path) -- Open the database file
@@ -464,12 +496,28 @@ local function lookup_user_by_id(db_path, encoded_id)
   end
 end
 
+--- Lookup a user by encoded ID from the local SQLite database.
+-- Usage: :LookupUserID [id]
+-- If [id] is provided, it is used as the lookup key.
+-- If no argument is given, the word under the cursor (<cWORD>) is used.
+-- The found ID is saved to register "z" and the input is saved to register "y".
+-- Prints a message with the result.
 -- Example usage (e.g., mapped to a command)
 -- "mZwjmdZwe1S5uhHMdR9CVGqv3gQS1lzvOAd_r_pYRdY" 1000000000
 -- "1706b0559e4a8c8b7e1f486b590cbc5e8afef5d250a94c"
+-- @param args table: User command arguments (optional, may contain .args as the ID string)
+
 vim.api.nvim_create_user_command('LookupUserID', function(args)
-  -- local id = tonumber(args.fargs[1])
-  local id = tostring(args.fargs[1])
+  local id = (args and args.args) or '' -- args.args is the raw string of all args
+  if not id or id == '' then
+    -- Try cWORD
+    id = tostring(vim.fn.expand '<cWORD>')
+    print 'No user ID provided. Trying <cWORD>'
+    if not id or id == '' then
+      print 'No user ID found in <cWORD> either. Aborting.'
+      return
+    end
+  end
 
   local function trim_quotes(s)
     return (s:gsub('^([\'"])(.-)%1$', '%2'))
@@ -491,4 +539,23 @@ vim.api.nvim_create_user_command('LookupUserID', function(args)
   else
     print 'Invalid user ID provided.'
   end
-end, { nargs = 1, complete = 'expression' })
+end, { nargs = '?', complete = 'expression' })
+
+--[[ Neovide ]]
+if vim.g.neovide then
+  vim.keymap.set({ 'n', 'v' }, '<C-+>', ':lua vim.g.neovide_scale_factor = vim.g.neovide_scale_factor + 0.1<CR>')
+  vim.keymap.set({ 'n', 'v' }, '<C-->', ':lua vim.g.neovide_scale_factor = vim.g.neovide_scale_factor - 0.1<CR>')
+  vim.keymap.set({ 'n', 'v' }, '<C-0>', ':lua vim.g.neovide_scale_factor = 1<CR>') -- Reset to default
+end
+
+--- Generate a function annotation using Neogen for the function at or under the cursor.
+--- This command uses the 'neogen' plugin to create documentation comments.
+function CommentFunctionUnderCursor()
+  require('neogen').generate { type = 'func' }
+end
+
+vim.api.nvim_create_user_command(
+  'CommentFunction',
+  CommentFunctionUnderCursor,
+  { desc = 'Generate function annotation using Neogen for function under cursor' }
+)

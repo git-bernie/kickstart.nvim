@@ -4,7 +4,7 @@ Quite a powerful plugin.. ga starts it off...
 ]]
 return {
   'junegunn/vim-easy-align',
-  enabled = true,
+  enabled = false,
   config = function()
     vim.cmd 'xmap ga <Plug>(EasyAlign)'
     vim.cmd 'nmap ga <Plug>(EasyAlign)'

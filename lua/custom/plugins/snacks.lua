@@ -1,8 +1,11 @@
+---@diagnostic disable: undefined-global, undefined-field
 return {
   'folke/snacks.nvim',
   priority = 1000,
   lazy = false,
-  ---@class snacks.Config
+  ---@class snacks.Config, snacks.lazygit.Config
+  ---@type snacks.Config
+  ---@class snacks.lazygit.Config
   ---@field lazygit? snacks.lazygit.Config
   opts = {
     -- your configuration comes here
@@ -14,21 +17,34 @@ return {
     indent = { enabled = true },
     input = { enabled = true },
     picker = { enabled = true },
-    notifier = { enabled = true },
+    notifier = { enabled = true, timeout = 3000 },
     quickfile = { enabled = true },
     scope = { enabled = true },
     scroll = { enabled = false },
     statuscolumn = { enabled = true },
     words = { enabled = true },
+    styles = {
+      notification = {
+        -- wo = {wrap = true } -- enable wrap for notifications
+      },
+    },
   },
   keys = {
     {
       '<leader>gl',
       function()
-        -- local Snacks = require 'snacks'
         Snacks.lazygit()
       end,
       desc = '[G]it [L]azygit',
+      silent = false,
+    },
+    {
+      'gd',
+      function()
+        Snacks.picker.lsp_definitions()
+      end,
+      desc = '[G]o to [D]efinition (Snacks.picker.lsp_definitions)',
+      silent = false,
     },
   },
 }

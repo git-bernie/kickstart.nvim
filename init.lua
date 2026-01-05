@@ -95,6 +95,7 @@ vim.g.sql_type_default = 'mysql'
 
 -- disable automatic conversion of emoji characters to full-width? Might resolve some issues with
 -- emoji-icon-theme and cmp?
+-- 🐂
 vim.g.emoji = 0
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
@@ -164,6 +165,23 @@ vim.g.lazyvim_php_lsp = 'intelephense'
 -- in this case.
 vim.g.lazyvim_blink_main = true
 
+--[[ 
+-- Lua function to check composer.json for laravel/framework dependency
+-- Example usage
+      if is_laravel_in_composer() then
+  -- Handle Laravel specific configuration ]]
+function IsLaravelInComposer()
+  local composer_path = vim.fn.getcwd() .. '/composer.json'
+  if vim.fn.filereadable(composer_path) == 1 then
+    local file_content = table.concat(vim.fn.readfile(composer_path), '\n')
+    -- Simple string search (you could use a JSON parser for a more robust check)
+    if file_content:find 'laravel/framework' then
+      return true
+    end
+  end
+  return false
+end
+
 vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
   pattern = { '*.php', '*.ctp' },
   callback = function()
@@ -177,7 +195,16 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
     vim.opt_local.expandtab = true
     vim.opt_local.tabstop = 4
     vim.opt_local.iskeyword:append '-' -- lua vim.opt_local.iskeyword:remove '-'
+    vim.opt_local.textwidth = 110 -- NB: 110 works better than 120 on my split screen
     -- vim.opt.shiftwidth = 2
+    -- vim.opt_local.colorcolumn = { 80, 120 } -- Readability first; ideally 80; soft limit 120
+    vim.opt_local.colorcolumn = { 80, 110 } -- Readability first; ideally 80; soft limit 110
+
+    --[=[ if IsLaravelInComposer() then
+      -- Handle Laravel specific configuration
+      -- For example, set specific linting or formatting options
+      print [[+++ Laravel detected in composer.json!]]
+    end ]=]
   end,
 })
 
@@ -186,6 +213,7 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
   callback = function()
     vim.opt_local.iskeyword:append '-' -- lua vim.opt_local.iskeyword:remove '-'
     -- print [[+++ appended '-' to iskeyword!]]
+    vim.opt_local.colorcolumn = { 80, 120 }
   end,
 })
 
@@ -356,8 +384,11 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- Allow a local config to override general LSP setup
 local project_config_path = vim.fn.getcwd() .. '/.nvim.lua'
 if vim.fn.filereadable(project_config_path) == 1 then
-  local ok, err = pcall(vim.cmd, 'source ' .. project_config_path)
+  -- local ok, err = pcall(vim.cmd, 'source ' .. project_config_path)
   -- vim.cmd('source ' .. project_config_path)
+  local ok, err = pcall(function()
+    vim.cmd('source ' .. project_config_path)
+  end)
   if not ok then
     vim.notify('Error loading .nvim.lua: ' .. err, vim.log.levels.ERROR)
   else
@@ -546,6 +577,7 @@ require('lazy').setup {
 
       ['<localleader>i'] = {
         function(plugin)
+          local Util = require 'lazy.util'
           Util.notify(vim.inspect(plugin), {
             title = 'Inspect ' .. plugin.name,
             lang = 'lua',
@@ -731,7 +763,7 @@ require('lazy').setup {
         { '<leader>d', group = '[D]ocument' },
         { '<leader>f', group = '[F]ile or [F]zf' },
         { '<leader>g', group = '[G]it' },
-        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { '<leader>h', group = 'Git [H]unk (gitsigns, harpoon)', mode = { 'n', 'v' } },
         { '<leader>n', group = '[N]oice' },
         { '<leader>r', group = '[R]ename' },
         { '<leader>s', group = '[S]earch' },
@@ -1006,22 +1038,29 @@ require('lazy').setup {
           --
           -- In this case, we create a function that lets us more easily define mappings specific
           -- for LSP related items. It sets the mode, buffer and description for us each time.
-          local map = function(keys, func, desc, mode)
+          --[[ local map = function(keys, func, desc, mode)
             mode = mode or 'n'
             vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
+          end ]]
+          -- NB: map() modified here to accept opts or {} so I can add silent = false.
+          local map = function(keys, func, desc, mode, opts)
+            mode = mode or 'n'
+            opts = vim.tbl_extend('force', { buffer = event.buf, desc = 'LSP: ' .. desc }, opts or {})
+            vim.keymap.set(mode, keys, func, opts)
           end
-
           -- Jump to the definition of the word under your cursor.
           --  This is where a variable was first declared, or where a function is defined, etc.
           --  To jump back, press <C-t>.
           -- map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
-          map('gd', function()
+          -- This is defined in snacks.lua so I can remark it.
+          --[[ map('gd', function()
+            -- Is this different from C-]?
             Snacks.picker.lsp_definitions()
-          end, '[G]oto [D]efinition (Snacks.picker.lsp_definitions()')
+          end, '[G]oto [D]efinition (Snacks.picker.lsp_definitions()', nil, { silent = false }) ]]
           -- map('gd', vim.lsp.buf.definition, '[G]oto [D]efinition')
           -- map('gV', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition', { 'v' })
-
-          map('gV', '<cmd>vertical wincmd ]<cr>', '[G]oto Definition [V]ertical Split')
+          -- map('gV', '<cmd>vertical wincmd ]<cr>', '[G]oto Definition [V]ertical Split')
+          map('gV', '<cmd>vertical wincmd ] | normal! zz<cr>', '[G]oto Definition [V]ertical Split')
 
           -- Find references for the word under your cursor.
           map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
@@ -1406,11 +1445,12 @@ require('lazy').setup {
         -- requires: +sudo snap install astral-uv --classic
         build = 'make',
       },
-      -- { 'rafamadriz/friendly-snippets',
-      --   config = function()
-      --     require('luasnip.loaders.from_vscode').lazy_load()
-      --   end
-      -- },
+      {
+        'rafamadriz/friendly-snippets',
+        config = function()
+          require('luasnip.loaders.from_vscode').lazy_load()
+        end,
+      },
     },
     --- @module 'blink.cmp'
     --- @type blink.cmp.Config
@@ -1476,6 +1516,11 @@ require('lazy').setup {
             name = 'SshConfig',
             module = 'blink-cmp-sshconfig',
           },
+          --[[ laravel = {
+            name = 'laravel',
+            module = 'blink.compat.source',
+            score_offset = 95, -- show at a higher priority than lsp
+          }, ]]
         },
       },
 
@@ -1606,8 +1651,11 @@ require('lazy').setup {
       -- require('mini.diff').setup()
 
       require('mini.sessions').setup {
+        autoread = true,
         autowrite = true,
         directory = '',
+        file = 'Session.vim',
+        verbose = { read = true, write = true, delete = true },
       }
 
       require('mini.ai').setup()
@@ -1752,6 +1800,44 @@ require('lazy').setup {
   { import = 'custom.plugins' },
 }
 
+-- Define the PHP debug configuration
+-- This tells nvim-dap how to connect to Xdebug
+-- require('dap.configurations.php').php = {
+--[[ require('dap.configurations.php').php = {
+  {
+    type = 'php',
+    request = 'launch',
+    name = 'Listen for Xdebug',
+    port = 9003, -- Default Xdebug 3 port
+    host = '192.168.10.10',
+    address = 'http://192.168.10.10',
+    hostName = 'http://192.168.10.10',
+    -- Optional: Add path mappings if your project root on your host machine
+    -- is different from the path inside a Docker container or remote server
+    -- pathMappings = {
+    --   ["/var/www/html"] = "${workspaceFolder}",
+    -- },
+  },
+} ]]
+--[[ dap.configurations.php = {
+  {
+    name = 'Listen for Xdebug',
+    type = 'php',
+    request = 'launch',
+    port = 9003, -- Match this port to your xdebug.client_port setting in php.ini
+  }, ]]
+-- You can add other configurations here, e.g., for CLI scripts
+--[[ {
+    name = 'Launch currently open script',
+    type = 'php',
+    request = 'launch',
+    port = 9003,
+    program = '${file}',
+    host = '192.168.10.10',
+    address = 'http://192.168.10.10',
+    hostName = 'http://192.168.10.10',
+  },
+} ]]
 -- NOTE: Now I put them in after/plugin/keymaps.lua
 -- Keep my keymaps here to keep init.lua smaller.
 -- require 'lua.custom.keymaps.keymaps'

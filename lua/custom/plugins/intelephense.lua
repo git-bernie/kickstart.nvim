@@ -75,6 +75,7 @@ return {
           },
           stubs = {
             'main',
+            'php',
             '_ide_helper.php',
             '_ide_helper_models',
             'bcmath',
@@ -138,6 +139,7 @@ return {
             'sockets',
             'sodium',
             'SPL',
+            'superglobals',
             'sqlite3',
             'standard',
             'sysvmsg',

@@ -24,9 +24,9 @@ return {
     close_on_select = false,
     -- close_on_select = true,
     --   window - aerial window will display symbols for the buffer in the window from which it was opened
-    -- attach_mode = "window",
+    attach_mode = 'window',
     --   global - aerial window will display symbols for the current window
-    attach_mode = 'global',
+    -- attach_mode = 'global',
     close_automatic_events = {},
   },
   -- Optional dependencies
