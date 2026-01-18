@@ -114,6 +114,9 @@ vim.opt.diffopt:append 'iwhiteall' -- iwhite, iwhiteall ignore all whitespace
 -- Always too little too late
 vim.opt.backup = true
 
+-- https://github.com/andymass/vim-matchup?tab=readme-ov-file#interoperability
+vim.g.loaded_matchit = 1
+
 -- Append backup files with timestamp
 --https://toddknutson.bio/posts/how-to-enable-neovim-undo-backup-and-swap-files-when-switching-linux-groups/
 vim.api.nvim_create_autocmd('BufWritePre', {
@@ -158,6 +161,18 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
   end,
 })
 
+-- In init.lua
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'sh', 'bash', 'zsh' },
+  callback = function()
+    -- vim.api.nvim_set_hl(0, 'Comment', { fg = '#87CEEB' })
+    -- vim.api.nvim_set_hl(0, 'Comment', { fg = '#6B9DC0' }) -- Muted blue
+    vim.api.nvim_set_hl(0, 'Comment', { fg = '#5F8AA8' }) -- Steel blue
+    -- vim.api.nvim_set_hl(0, 'Comment', { fg = '#4A7B9D' }) -- Slate blue
+    -- vim.api.nvim_set_hl(0, 'Comment', { fg = '#6B8E9E' }) -- Dusty blue
+    -- Test with :highlight Comment guifg=#5F8AA8
+  end,
+})
 vim.g.lazyvim_php_lsp = 'intelephense'
 
 -- set to `true` to follow the main branch
@@ -199,6 +214,8 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
     -- vim.opt.shiftwidth = 2
     -- vim.opt_local.colorcolumn = { 80, 120 } -- Readability first; ideally 80; soft limit 120
     vim.opt_local.colorcolumn = { 80, 110 } -- Readability first; ideally 80; soft limit 110
+    -- vim.api.nvim_set_hl(0, 'Comment', { fg = '#6B9DC0' }) -- Muted blue
+    vim.api.nvim_set_hl(0, 'Comment', { fg = '#5F8AA8' }) -- Steel blue
 
     --[=[ if IsLaravelInComposer() then
       -- Handle Laravel specific configuration
@@ -226,7 +243,7 @@ if vim.fn.isdirectory(vim.env.HOME .. '/.backupdir') == 0 then
 end
 vim.opt.backupdir = { vim.env.HOME .. '/.backupdir', vim.fn.expand '~/tmp', '/tmp/' }
 
-vim.opt.backupskip = { '*.csv' }
+vim.opt.backupskip = { '*.csv', '.env', 'envvars' }
 
 -- Make line numbers default
 vim.opt.number = true
@@ -1169,8 +1186,8 @@ require('lazy').setup {
           },
         } or {},
         virtual_text = {
-          -- source = 'if_many',
-          source = true,
+          source = 'if_many',
+          -- source = true,
           spacing = 2,
           format = function(diagnostic)
             local diagnostic_message = {
@@ -1344,7 +1361,7 @@ require('lazy').setup {
     },
     opts = {
       notify_on_error = false,
-      -- format_on_save = function(bufnr)
+      -- format_on_save = function(bufnr) -- the original function, but format_on_save suggested instead
       format_after_save = function(bufnr)
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
@@ -1390,10 +1407,14 @@ require('lazy').setup {
         -- php = { 'php-cs-fixer', 'prettierd' },
         php = { 'php-cs-fixer' },
         html = { 'prettierd', 'htmlhint' },
+        sh = { 'shfmt' },
 
         -- yaml = { 'ymlfmt', stop_after_first = false },
       },
       formatters = {
+        shfmt = {
+          prepend_args = { '-i', '4' }, -- 4 spaces for indentation
+        },
         ['php-cs-fixer'] = {
           command = 'php-cs-fixer',
           args = {
@@ -1435,6 +1456,8 @@ require('lazy').setup {
           --     require('luasnip.loaders.from_vscode').lazy_load()
           --   end,
           -- },
+          'saghen/blink.compat',
+          'moyiz/blink-emoji.nvim',  -- native blink.cmp emoji source
         },
         opts = {},
       },
@@ -1496,7 +1519,7 @@ require('lazy').setup {
       },
 
       sources = {
-        default = { 'lsp', 'path', 'snippets', 'lazydev', 'buffer', 'copilot', 'sshconfig' },
+        default = { 'lsp', 'path', 'snippets', 'lazydev', 'buffer', 'copilot', 'sshconfig', 'emoji' },
         per_filetype = {
           lua = { inherit_defaults = true, 'lazydev' },
         },
@@ -1516,11 +1539,18 @@ require('lazy').setup {
             name = 'SshConfig',
             module = 'blink-cmp-sshconfig',
           },
-          --[[ laravel = {
+          laravel = {
             name = 'laravel',
             module = 'blink.compat.source',
             score_offset = 95, -- show at a higher priority than lsp
-          }, ]]
+          },
+          emoji = {
+            module = 'blink-emoji',
+            name = 'Emoji',
+            score_offset = 15,
+            min_keyword_length = 2,
+            opts = { insert = true }, -- insert emoji (not :name:)
+          },
         },
       },
 
@@ -1651,8 +1681,8 @@ require('lazy').setup {
       -- require('mini.diff').setup()
 
       require('mini.sessions').setup {
-        autoread = true,
-        autowrite = true,
+        autoread = false,
+        autowrite = false,
         directory = '',
         file = 'Session.vim',
         verbose = { read = true, write = true, delete = true },
@@ -1670,6 +1700,7 @@ require('lazy').setup {
 
       require('mini.bufremove').setup()
 
+      require('mini.hipatterns').setup()
       -- require('mini.visits').setup()
 
       -- ... and there is more!
@@ -1709,6 +1740,7 @@ require('lazy').setup {
         'svelte',
         'tsx',
         'typst',
+        'xml',
       },
       -- Autoinstall languages that are not installed
       auto_install = true,
@@ -1739,6 +1771,7 @@ require('lazy').setup {
           goto_next_start = {
             [']]'] = '@function.outer',
             [']b'] = '@block.outer',
+            [']e'] = '@class.outer',
           },
           goto_next_end = {
             [']['] = '@function.outer',
@@ -1747,6 +1780,7 @@ require('lazy').setup {
           goto_previous_start = {
             ['[['] = '@function.outer',
             ['[b'] = '@block.outer',
+            ['[e'] = '@class.outer',
           },
           goto_previous_end = {
             ['[]'] = '@function.outer',

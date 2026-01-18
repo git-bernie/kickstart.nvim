@@ -25,7 +25,8 @@ return {
             vim.cmd.normal { ']c', bang = true }
           else
             -- gitsigns.nav_hunk('next', { preview = true, foldopen = true })
-            gitsigns.nav_hunk { direction = 'next' }
+            -- gitsigns.nav_hunk { direction = 'next' }
+            gitsigns.nav_hunk 'next'
           end
         end, { desc = 'Jump to next git [c]hange' })
 
@@ -33,7 +34,8 @@ return {
           if vim.wo.diff then
             vim.cmd.normal { '[c', bang = true }
           else
-            gitsigns.nav_hunk { direction = 'last' }
+            -- gitsigns.nav_hunk { direction = 'last' }
+            gitsigns.nav_hunk 'last'
           end
         end, { desc = 'Jump to previous git [c]hange' })
 
@@ -65,7 +67,8 @@ return {
         end, { desc = '[H]unk [P]revious (gitsigns.nav_hunk. Use [c instead' }) ]]
         map('n', '<leader>hD', function()
           -- gitsigns.diffthis { against = '@'}
-          gitsigns.diffthis { against = '~' }
+          -- gitsigns.diffthis { against = '~' }
+          gitsigns.diffthis() -- default against the index, ('~1') for last commit
           -- `~` = previous commit (HEAD~)
           -- `@` = current commit (HEAD)
         end, { desc = 'gitsigns [D]iff against previous commit (~)' })

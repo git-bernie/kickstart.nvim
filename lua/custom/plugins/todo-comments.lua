@@ -45,8 +45,14 @@ return {
         color = 'hint',
         alt = { 'DEV', 'QQQ', 'QQ', 'qqq', 'ZZZ' },
       },
+      -- HACK is a built-in keyword, we just add more alts to it
       -- HACK: this a hack...
-      HACK = { alt = { 'TBD', 'WIP', 'WTF', 'DEPRECATED' } },
+      -- QUESTION: something
+      -- ANSWER: yada
+      -- Q: another Q
+      -- A: yada yada
+      HACK = { alt = { 'TBD', 'WIP', 'WTF', 'DEPRECATED', 'Q', 'QUESTION', 'A', 'ANSWER' } },
+      -- NOTE is a built-in keyword, we just add more alts to it
       -- Add to 'NOTE'
       -- NOTE: etc.
       NOTE = {
@@ -64,8 +70,7 @@ return {
           'NEW',
           'OLD',
           'PAGE',
-          'Q',
-          'QUESTION',
+          'SAFER',
           'STEP',
           'STEPS',
           'feat',

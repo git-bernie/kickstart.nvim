@@ -6,7 +6,15 @@
 -- vim.keymap.set('n', '<Space>xyy', ':lua print("Hello, world!")<CR>', { desc = 'Print "Hello, world!' })
 -- cabbrev evv e ~/.vimrc
 
-vim.keymap.set('n', '<Space>gv', '<cmd>Gvdiffsplit<CR>', { desc = '[G][V]diffsplit Open a vertical diffsplit' })
+-- Override the default C-] with a motion. Maybe it does this already?
+vim.keymap.set('n', '<C-]>', function()
+  -- vim.cmd 'tag'
+  vim.lsp.buf.definition()
+  vim.cmd 'normal! zz'
+end, { noremap = true, silent = true })
+
+-- the | normal! zi will toggle the folding in the diff view
+vim.keymap.set('n', '<Space>gv', '<cmd>Gvdiffsplit | normal! zi<CR>', { desc = '[G][V]diffsplit Open a vertical diffsplit' })
 vim.keymap.set('n', '<Space>cd', '<cmd>cd %:p:h<CR>', { desc = '[C]hange [D]irectory to the current file' })
 vim.keymap.set('n', '<Space>lcd', '<cmd>lcd %:p:h<CR>', { desc = '[L]ocal [C]hange [D]irectory to the current file' })
 --- Let me have "oo" and "OO" do what I want
@@ -124,15 +132,15 @@ vim.keymap.set('n', '<leader>tm', '<cmd>MarkdownPreviewToggle<CR>', { desc = '[T
 -- ms already taken by minimap
 vim.keymap.set('n', '<leader>mk', function()
   require('mini.sessions').write('Session.vim', { force = { write = true } })
-end, { desc = [[[M]a[k]e Session via MiniSessions.write('Session.vim')]], silent = false })
--- Assuming we have yq available
--- E.g. command! JsonToYaml %!yq -P
--- command! JsonToYaml setf yaml
-vim.api.nvim_create_user_command('JsonToYaml', function()
-  -- Save current buffer content, convert, and replace
-  vim.cmd '%!yq -pjson -P'
-  -- vim.cmd 'setf yaml' -- Set filetype to yaml
-end, { desc = 'Convert current buffer from JSON to YAML' })
+end, { desc = [[[M]a[k]e Session via .write('Session.vim')]], silent = false })
+
+vim.keymap.set('n', '<leader>md', function()
+  require('mini.sessions').delete('Session.vim', { force = { write = true } })
+end, { desc = [[[M]ake Session [D]elete via .delete('Session.vim')]], silent = false })
+
+vim.keymap.set('n', '<leader>mR', function()
+  require('mini.sessions').read('Session.vim', { force = { write = true } })
+end, { desc = [[[M]iniSessions [R]ead .read('Session.vim')]], silent = false })
 
 --
 -- Example v2 encoding "QjRpxuZGJKDxLUV1RFh8CPjYEf_t9y_8FYgc2DCXuVc"
@@ -210,6 +218,14 @@ if (vim.fn.executable 'yq') == 1 then
   -- NOTE: -P is --prettyPrint
   vim.keymap.set('n', '<leader>yq', "<cmd>. ! yq -pjson -P 'sort_keys(..)'<cr>", { desc = "[y] [q] -pjson -P 'sort_keys(..)' ..." })
   vim.keymap.set('v', '<leader>yq', "<cmd>'<,'> ! yq -pjson -P 'sort_keys(..)'<cr>", { buffer = true, desc = "[y] [q] -pjson -P 'sort_keys(..)' ..." })
+  -- Assuming we have yq available
+  -- E.g. command! JsonToYaml %!yq -P
+  -- command! JsonToYaml setf yaml
+  vim.api.nvim_create_user_command('JsonToYaml', function()
+    -- Save current buffer content, convert, and replace
+    vim.cmd '%!yq -pjson -P'
+    -- vim.cmd 'setf yaml' -- Set filetype to yaml
+  end, { desc = 'Convert current buffer from JSON to YAML' })
 end
 
 vim.keymap.set('n', '<leader>^', '<cmd>:vsplit<bar>bp<cr>', { noremap = true, desc = 'Vertical split and switch to previous buffer' })
@@ -259,6 +275,8 @@ vim.keymap.set(
   [[<cmd>:Git for-each-ref --sort=committerdate refs/heads/ --format='%(HEAD) %(align:35)%(color:yellow)%(refname:short)%(color:reset)%(end) - %(color:red)%(objectname:short)%(color:reset) - %(align:40)%(contents:subject)%(end) - %(authorname) (%(color:green)%(committerdate:relative)%(color:reset))'<CR>]],
   { desc = '[G]it [r]eflog' }
 ) ]=]
+
+--[[ FzfLua keymaps ]]
 vim.keymap.set('n', '<leader>fb', [[<cmd>lua require('fzf-lua').git_branches()<cr>]], { desc = '[G]it [b]ags (FzfLua)' })
 vim.keymap.set('n', '<leader>gt', [[<cmd>lua require('fzf-lua').git_tags()<cr>]], { desc = '[G]it [T]ags (FzfLua)' })
 vim.keymap.set('n', '<leader>fs', [[<cmd>lua require('fzf-lua').git_status()<cr>]], { desc = '[F]zfLua [S]tatus' })
@@ -268,8 +286,9 @@ vim.keymap.set('n', '<leader>fC', [[<cmd>lua require('fzf-lua').git_commits()<cr
 vim.keymap.set('n', '<leader>fw', [[<cmd>lua require('fzf-lua').grep_cword()<cr>]], { desc = '[F]zfLua c[w]ord' })
 -- vim.keymap.set('n', '<leader>f/', [[<cmd>lua require('fzf-lua').grep_curbuf()<cr>]], { desc = '[F]zfLua [/] grep_curbuf' })
 vim.keymap.set('n', '<leader>/', [[<cmd>lua require('fzf-lua').grep_curbuf()<cr>]], { desc = 'FzfLua [/] grep_curbuf' })
+vim.keymap.set('n', '<leader>f/', [[<cmd>lua require('fzf-lua').grep_project()<cr>]], { desc = '[F]zfLua [/] grep_project' })
 vim.keymap.set('n', '<leader>fl', [[<cmd>lua require('fzf-lua').grep({resume=true})<cr>]], { desc = '[F]zfLua [l] grep last (resume=true)' })
-vim.keymap.set('n', '<leader>fz', [[<cmd>FzfLua<cr>]], { desc = ':[F][z]fLua' })
+vim.keymap.set('n', '<leader>fz', [[<cmd>FzfLua<cr>]], { desc = ':[F][z]fLua see all FzfLua methods' })
 vim.keymap.set('n', '<leader>fF', [[<cmd>FzfLua files<cr>]], { desc = ':[f]zfLua [F]iles' })
 vim.keymap.set('n', '<leader>FF', [[<cmd>FzfLua files<cr>]], { desc = ':[f]zfLua [F]iles' })
 vim.keymap.set('n', '<leader>fg', [[<cmd>lua require('fzf-lua').live_grep({hidden = false})<cr>]], { desc = '[F]zfLua live_[g]rep ( -- to specify globs)' })
@@ -306,14 +325,33 @@ end, { silent = true, desc = 'Fuzzy complete path' })
 -- C-r "  "after/plugin/keymaps.lua""
 --]]
 
--- https://www.reddit.com/r/neovim/comments/1858n12/custom_keymap_to_copy_current_filepath_to/
-local function copyFullPath()
-  local filepath = vim.fn.expand '%'
-  -- double quotes for spaces in path?
-  vim.fn.setreg('+', '"' .. filepath .. '"') -- write to clippoard
+-- Usage:
+-- copyPath('full')
+-- copyPath('name')
+-- copyPath('absolute')
+-- You should probably learn how to use % a bit better!
+local function copyPath(type)
+  local modifiers = {
+    full = '%', -- relative path
+    name = '%:t', -- filename only
+    absolute = '%:p', -- absolute path
+  }
+  local filepath = vim.fn.expand(modifiers[type] or '%')
+  vim.fn.setreg('+', '"' .. filepath .. '"')
+  vim.notify(filepath)
 end
+
 -- E.g. "after/plugin/keymaps.lua"
-vim.keymap.set('n', '<leader>cf', copyFullPath, { desc = '[c]opy [f]ull path' })
+-- vim.keymap.set('n', '<leader>cf', copyFullPath, { desc = '[c]opy [f]ull path' })
+vim.keymap.set('n', '<leader>yp', function()
+  copyPath 'full'
+end, { desc = '[y]ank [p]ath %' })
+vim.keymap.set('n', '<leader>yP', function()
+  copyPath 'absolute'
+end, { desc = '[y]ank absolute [P]ath %:p' })
+vim.keymap.set('n', '<leader>yn', function()
+  copyPath 'name'
+end, { desc = '[y]ank file[n]ame %:t' })
 -- vim.keymap.set('n', 'sap', [[:norm sa<cmd>lua require'utils'.sudo_write()<CR>]], { silent = true })
 
 vim.api.nvim_create_user_command('Format', function(args)
@@ -328,7 +366,7 @@ vim.api.nvim_create_user_command('Format', function(args)
   require('conform').format { async = true, lsp_format = 'fallback', range = range }
 end, { range = true })
 
-vim.keymap.set('n', '<leader>gg', [[:G<CR>]], { silent = false, desc = '[G]oto:[G]it' })
+vim.keymap.set('n', '<leader>gg', [[:G<CR>]], { silent = false, desc = '[G]oto:Fu[G]itive' })
 -- vim.api.nvim_set_keymap('n', '-', [[<cmd>lua require('window-picker').pick_window()<CR>]], { desc = 'pick[-]window', silent = true, noremap = true })
 
 -- TreeSJ
@@ -519,11 +557,19 @@ vim.api.nvim_create_user_command('LookupUserID', function(args)
     end
   end
 
+  -- trim matching quotes
   local function trim_quotes(s)
-    return (s:gsub('^([\'"])(.-)%1$', '%2'))
+    return (s:gsub('^([\'"/,])(.-)%1$', '%2'))
   end
 
   id = trim_quotes(id)
+
+  -- trim leading/trailing characters
+  local function trim_quotes_and_slashes(s)
+    return (s:gsub('^[/"\',]+', ''):gsub('[/"\',]+$', ''))
+  end
+
+  id = trim_quotes_and_slashes(id)
 
   if id then
     vim.fn.setreg('y', tostring(id), 'c')
@@ -559,3 +605,7 @@ vim.api.nvim_create_user_command(
   CommentFunctionUnderCursor,
   { desc = 'Generate function annotation using Neogen for function under cursor' }
 )
+
+vim.api.nvim_create_user_command('BrowserSync', function()
+  vim.fn.system "browser-sync start --server --files '*.html,*.xhtml,*.css,*.js'"
+end, {})

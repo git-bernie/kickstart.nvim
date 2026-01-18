@@ -7,5 +7,8 @@ return {
   ---@type render.md.UserConfig
   opts = {
     latex = { enabled = false },
+    file_types = { 'markdown', 'vimwiki' },
+    only_render_image_at_cursor = true,
   },
+  vim.treesitter.language.register('markdown', 'vimwiki'),
 }

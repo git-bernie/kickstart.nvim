@@ -42,6 +42,7 @@ return {
       'gd',
       function()
         Snacks.picker.lsp_definitions()
+        vim.cmd 'normal! zz'
       end,
       desc = '[G]o to [D]efinition (Snacks.picker.lsp_definitions)',
       silent = false,

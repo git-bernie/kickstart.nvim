@@ -1,0 +1,3 @@
+return {
+  'MisanthropicBit/decipher.nvim',
+}

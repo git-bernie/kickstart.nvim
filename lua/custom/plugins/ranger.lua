@@ -19,6 +19,14 @@ return {
       },
     }
     vim.api.nvim_set_keymap('n', '<leader>ef', '', {
+      desc = 'Open Ranger [E]xternal [F]ile manager(?)',
+      noremap = true,
+      callback = function()
+        require('ranger-nvim').open(true)
+      end,
+    })
+    vim.api.nvim_set_keymap('n', '<leader>rr', '', {
+      desc = 'Open [R]ange[r]',
       noremap = true,
       callback = function()
         require('ranger-nvim').open(true)

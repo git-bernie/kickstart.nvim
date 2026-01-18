@@ -3,6 +3,10 @@ For awesome recipes @see https://github.com/nvim-neo-tree/neo-tree.nvim/wiki/Rec
 
 ## The `filesystem.follow_current_file` option is replaced with a table, please move to `filesystem.follow_current_file.enabled`.
 sessionoptions blank,buffers,curdir,folds,help,tabpages,winsize,terminal
+
+BUG: for "f" to filter you have to press "R" to refresh to see the results. Or open and close again.
+Remember that C-x is for clearing the filter.
+
 ]]
 return {
   'nvim-neo-tree/neo-tree.nvim',
