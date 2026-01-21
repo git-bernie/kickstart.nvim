@@ -285,8 +285,14 @@ vim.keymap.set('n', '<leader>fC', [[<cmd>lua require('fzf-lua').git_commits()<cr
 --[[ FzfLua has so many interesting methods: also available grep_cWORD]]
 vim.keymap.set('n', '<leader>fw', [[<cmd>lua require('fzf-lua').grep_cword()<cr>]], { desc = '[F]zfLua c[w]ord' })
 -- vim.keymap.set('n', '<leader>f/', [[<cmd>lua require('fzf-lua').grep_curbuf()<cr>]], { desc = '[F]zfLua [/] grep_curbuf' })
-vim.keymap.set('n', '<leader>/', [[<cmd>lua require('fzf-lua').grep_curbuf()<cr>]], { desc = 'FzfLua [/] grep_curbuf' })
-vim.keymap.set('n', '<leader>f/', [[<cmd>lua require('fzf-lua').grep_project()<cr>]], { desc = '[F]zfLua [/] grep_project' })
+
+vim.keymap.set(
+  'n',
+  '<leader>f/',
+  [[<cmd>lua require('fzf-lua').grep_project({prompt='Grep Project> ', winopts={title='Grep Project'}})<cr>]],
+  { desc = '[F]zfLua [/] grep_project' }
+)
+
 vim.keymap.set('n', '<leader>fl', [[<cmd>lua require('fzf-lua').grep({resume=true})<cr>]], { desc = '[F]zfLua [l] grep last (resume=true)' })
 vim.keymap.set('n', '<leader>fz', [[<cmd>FzfLua<cr>]], { desc = ':[F][z]fLua see all FzfLua methods' })
 vim.keymap.set('n', '<leader>fF', [[<cmd>FzfLua files<cr>]], { desc = ':[f]zfLua [F]iles' })
@@ -366,7 +372,47 @@ vim.api.nvim_create_user_command('Format', function(args)
   require('conform').format { async = true, lsp_format = 'fallback', range = range }
 end, { range = true })
 
-vim.keymap.set('n', '<leader>gg', [[:G<CR>]], { silent = false, desc = '[G]oto:Fu[G]itive' })
+-- Helper function to open fugitive and jump to the current file
+local function open_fugitive_and_jump_to_file()
+  -- Get the current file's path relative to git root
+  local current_file = vim.fn.expand '%:t'
+  if current_file == '' then
+    current_file = nil
+  end
+
+  -- Open fugitive
+  vim.cmd 'G'
+
+  -- If we had a file, search for it in the fugitive buffer
+  if current_file then
+    vim.schedule(function()
+      -- Search for the filename (case sensitive, no wrap, start from top)
+      vim.fn.cursor(1, 1)
+      local found = vim.fn.search(current_file, 'cW')
+      if found == 0 then
+        -- If not found, stay at the top
+        vim.fn.cursor(1, 1)
+      end
+    end)
+  end
+end
+
+vim.keymap.set('n', '<leader>gg', open_fugitive_and_jump_to_file, { silent = false, desc = '[G]oto:Fu[G]itive' })
+
+-- Toggle fugitive with <leader>GG. Keymap chosen to be like <leader>gg
+-- and not to conflict with other mappings.
+vim.keymap.set('n', '<leader>GG', function()
+  -- Check if fugitive buffer is already open in a window
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    if vim.bo[buf].filetype == 'fugitive' then
+      vim.api.nvim_win_close(win, false)
+      return
+    end
+  end
+  -- Not open, so open it and jump to current file
+  open_fugitive_and_jump_to_file()
+end, { silent = false, desc = '[G]it Toggle fugitive' })
 -- vim.api.nvim_set_keymap('n', '-', [[<cmd>lua require('window-picker').pick_window()<CR>]], { desc = 'pick[-]window', silent = true, noremap = true })
 
 -- TreeSJ

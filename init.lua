@@ -398,6 +398,15 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+-- Run external command and show output in :messages and noice history
+-- Usage: :Sh external_ip   or   :Sh ls -la
+vim.api.nvim_create_user_command('Sh', function(opts)
+  local output = vim.fn.system(opts.args)
+  output = output:gsub('\n$', '') -- trim trailing newline
+  vim.api.nvim_echo({ { output } }, true, {}) -- true = add to :messages history
+  vim.notify(output, vim.log.levels.INFO)
+end, { nargs = '+', desc = 'Run shell command and show output in messages/noice' })
+
 -- Allow a local config to override general LSP setup
 local project_config_path = vim.fn.getcwd() .. '/.nvim.lua'
 if vim.fn.filereadable(project_config_path) == 1 then
@@ -933,10 +942,15 @@ require('lazy').setup {
       -- vim.keymap.set('n', '<C-p>', builtin.find_files { follow = true }, { desc = '[S]earch [F]iles (use <leader>sf)' })
       vim.keymap.set('n', '<C-p>', function()
         builtin.find_files { follow = true }
-      end, { desc = '[S]earch [F]iles (use <leader>sf)' })
+      end, { desc = '[S]earch [F]iles (Fuzzy) (<C-p> or <leader>sf)' })
       --[[ vim.keymap.set('n', '<leader>yy', function()
         builtin.find_files { prompt_title = 'F[Y]nd [Y]er Files (hidden, noignore)', hidden = true, no_ignore = true }
       end, {}) ]]
+
+      -- Telescpe has more bells and whistles when you press <C-/>
+      vim.keymap.set('n', '<leader>/', function()
+        builtin.current_buffer_fuzzy_find { prompt_title = 'Current Buffer Fuzzy', results_title = 'Results Buffer Fuzzy' }
+      end, { desc = '[/] current_buffer_fuzzy_find' })
 
       vim.keymap.set('n', '<leader>gc', function()
         builtin.git_bcommits {
@@ -968,8 +982,9 @@ require('lazy').setup {
         builtin.live_grep {
           grep_open_files = true,
           prompt_title = 'Live Grep in Open Files',
+          results_title = 'Live Grep Open Files',
         }
-      end, { desc = '[S]earch [/] in Open Files' })
+      end, { desc = '[S]earch [/] in Open Files (live_grep)' })
 
       -- Shortcut for searching your Neovim configuration files
       vim.keymap.set('n', '<leader>sn', function()
@@ -1457,7 +1472,7 @@ require('lazy').setup {
           --   end,
           -- },
           'saghen/blink.compat',
-          'moyiz/blink-emoji.nvim',  -- native blink.cmp emoji source
+          'moyiz/blink-emoji.nvim', -- native blink.cmp emoji source
         },
         opts = {},
       },
@@ -1875,6 +1890,6 @@ require('lazy').setup {
 -- NOTE: Now I put them in after/plugin/keymaps.lua
 -- Keep my keymaps here to keep init.lua smaller.
 -- require 'lua.custom.keymaps.keymaps'
-
+--
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et fdm=marker fmr={{{,}}}
