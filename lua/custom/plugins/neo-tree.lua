@@ -4,7 +4,7 @@ For awesome recipes @see https://github.com/nvim-neo-tree/neo-tree.nvim/wiki/Rec
 ## The `filesystem.follow_current_file` option is replaced with a table, please move to `filesystem.follow_current_file.enabled`.
 sessionoptions blank,buffers,curdir,folds,help,tabpages,winsize,terminal
 
-BUG: for "f" to filter you have to press "R" to refresh to see the results. Or open and close again.
+FIX: Custom 'filter_and_refresh' command auto-refreshes after filtering (was: had to press "R" manually).
 Remember that C-x is for clearing the filter.
 
 ]]
@@ -35,6 +35,25 @@ return {
     auto_restore_session_experimental = true,
     use_libuv_file_watcher = true,
     close_if_last_window = true, -- misspelled in lua/kickstart/plugins/neo-tree.lua
+    commands = {
+      -- Custom filter command that auto-refreshes after filtering
+      filter_and_refresh = function(state)
+        local fs_commands = require('neo-tree.sources.filesystem.commands')
+        fs_commands.filter_on_submit(state)
+        -- Poll until filter popup closes, then call refresh directly
+        local timer = vim.uv.new_timer()
+        if not timer then
+          return
+        end
+        timer:start(100, 100, vim.schedule_wrap(function()
+          if vim.fn.mode() == 'n' then
+            timer:stop()
+            timer:close()
+            fs_commands.refresh(state)
+          end
+        end))
+      end,
+    },
     filesystem = {
       hijack_netrw_behavior = 'open_default',
       -- "open_current",
@@ -43,6 +62,7 @@ return {
         mappings = {
           ['\\'] = 'close_window',
           ['P'] = { 'toggle_preview', config = { use_float = true, use_image_nvim = true } },
+          ['f'] = 'filter_and_refresh', -- Use custom command instead of default filter
         },
       },
       follow_current_file = {
