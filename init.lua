@@ -789,7 +789,8 @@ require('lazy').setup {
         { '<leader>d', group = '[D]ocument' },
         { '<leader>f', group = '[F]ile or [F]zf' },
         { '<leader>g', group = '[G]it' },
-        { '<leader>h', group = 'Git [H]unk (gitsigns, harpoon)', mode = { 'n', 'v' } },
+        { '<leader>h', group = '[H] (harpoon)', mode = { 'n', 'v' } },
+        { '<leader>i', group = 'G[I]tsigns (gitsigns)', mode = { 'n', 'v' } },
         { '<leader>n', group = '[N]oice' },
         { '<leader>r', group = '[R]ename' },
         { '<leader>s', group = '[S]earch' },
@@ -911,11 +912,16 @@ require('lazy').setup {
       vim.keymap.set('n', '<leader>sc', builtin.lsp_document_symbols, { desc = '[S]earch [C]urrent Buffer Tags (lsp_document_symbols)' })
       vim.keymap.set('n', '<leader>sm', builtin.man_pages, { desc = '[S]earch [M]an pages' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-      vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+      vim.keymap.set('n', '<leader>s/', function()
+        builtin.live_grep { results_title = 'Live Grep' }
+      end, { desc = '[S]earch by [/G]rep' })
+      vim.keymap.set('n', '<leader>sg', function()
+        builtin.live_grep { results_title = 'Search by Live Grep' }
+      end, { desc = '[S]earch by [/G]rep' })
       vim.keymap.set('n', '<leader>sH', builtin.live_grep, { desc = '[S]earch by grep [H]idden' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
-      vim.keymap.set('n', '<leader>so', builtin.vim_options, { desc = '[S]earch vim_[o]ptions' })
+      vim.keymap.set('n', '<leader>sO', builtin.vim_options, { desc = '[S]earch vim_[O]ptions' })
 
       -- vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader>s.', function()
@@ -936,7 +942,13 @@ require('lazy').setup {
       -- I would like to make '<leader>ys' in lua but I don't know how to make the prompt stay open.
       vim.keymap.set('n', '<leader>ys', ':Telescope find_files hidden=true no_ignore=true search_dirs=~', { desc = '[Y]o [S]earch search_dirs=~' })
       vim.keymap.set('n', '<A-p>', function()
-        builtin.find_files { prompt_title = '[F]ind [F]iles (hidden, no_ignore)', hidden = true, no_ignore = true, follow = true }
+        builtin.find_files {
+          results_title = 'Find Files (hidden, no_ignore)',
+          prompt_title = '[F]ind [F]iles (hidden, no_ignore)',
+          hidden = true,
+          no_ignore = true,
+          follow = true,
+        }
       end, {})
       -- C-p habit. Sometimes removing <C-p> because neo-tree uses it as regular up/down; but j/k works fine.
       -- vim.keymap.set('n', '<C-p>', builtin.find_files { follow = true }, { desc = '[S]earch [F]iles (use <leader>sf)' })
@@ -978,13 +990,13 @@ require('lazy').setup {
 
       -- It's also possible to pass additional configuration options.
       --  ]See `:help telescope.builtin.live_grep()` for information about particular keys
-      vim.keymap.set('n', '<leader>s/', function()
+      vim.keymap.set('n', '<leader>so', function()
         builtin.live_grep {
           grep_open_files = true,
           prompt_title = 'Live Grep in Open Files',
           results_title = 'Live Grep Open Files',
         }
-      end, { desc = '[S]earch [/] in Open Files (live_grep)' })
+      end, { desc = '[S]earch in [O]pen Files (live_grep)' })
 
       -- Shortcut for searching your Neovim configuration files
       vim.keymap.set('n', '<leader>sn', function()
