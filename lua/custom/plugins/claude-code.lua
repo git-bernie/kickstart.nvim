@@ -3,7 +3,7 @@ return {
   dependencies = { 'nvim-lua/plenary.nvim' },
   keys = {
     { '<leader>cc', desc = 'Claude Code' },
-    { '<C-.>', desc = 'Claude Code Toggle', mode = { 'n', 't' } },
+    { '<C-.>', [[<cmd>ClaudeCode<cr>]], desc = 'Claude Code Toggle', mode = { 'n', 't' } },
   },
   opts = {
     window = {
