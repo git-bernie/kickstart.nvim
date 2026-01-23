@@ -3,11 +3,12 @@
 return {
   'christoomey/vim-tmux-navigator',
   cmd = {
-    'TmuxNavigateLeft',
     'TmuxNavigateDown',
-    'TmuxNavigateUp',
-    'TmuxNavigateRight',
+    'TmuxNavigateLeft',
     'TmuxNavigatePrevious',
+    'TmuxNavigateRight',
+    'TmuxNavigateUp',
+    'TmuxNavigatorProcessList',
   },
   keys = {
     { '<c-h>', '<cmd><C-U>TmuxNavigateLeft<cr>' },
