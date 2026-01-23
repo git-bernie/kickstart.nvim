@@ -6,11 +6,14 @@
 -- vim.keymap.set('n', '<Space>xyy', ':lua print("Hello, world!")<CR>', { desc = 'Print "Hello, world!' })
 -- cabbrev evv e ~/.vimrc
 
--- Override the default C-] with a motion. Maybe it does this already?
+-- Override the default C-] with LSP definition, but preserve tag jump in help buffers
 vim.keymap.set('n', '<C-]>', function()
-  -- vim.cmd 'tag'
-  vim.lsp.buf.definition()
-  vim.cmd 'normal! zz'
+  if vim.bo.filetype == 'help' then
+    vim.cmd('tag ' .. vim.fn.expand('<cword>'))
+  else
+    vim.lsp.buf.definition()
+    vim.cmd 'normal! zz'
+  end
 end, { noremap = true, silent = true })
 
 -- the | normal! zi will toggle the folding in the diff view
