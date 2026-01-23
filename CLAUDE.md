@@ -64,3 +64,59 @@ Uses `.stylua.toml`: 160 char width, 2-space indent, single quotes preferred. Gi
 
 - Current branch: `jan-2026`
 - Main branch for PRs: `master`
+
+## Jira CLI (acli) with Markdown
+
+When updating Jira issue descriptions or comments with formatted content, use the markdown-to-ADF workflow.
+
+### Available Tools
+
+**`md2adf`** - Convert markdown to Atlassian Document Format (ADF) JSON
+```bash
+md2adf file.md                    # from file
+echo '# Heading' | md2adf         # from stdin
+```
+
+**`jira-update-desc`** - Update a Jira issue description from markdown
+```bash
+jira-update-desc ISSUE-KEY file.md          # from file
+echo '# Description' | jira-update-desc ISSUE-KEY   # from stdin
+```
+
+**`jira-add-comment`** - Add a comment to a Jira issue from markdown
+```bash
+jira-add-comment ISSUE-KEY file.md          # from file
+echo '# Comment' | jira-add-comment ISSUE-KEY       # from stdin
+```
+
+### Why These Scripts Exist
+
+The `acli` command's `--description-file` flag does NOT work with raw ADF JSON. You must use `--from-json` with a payload like:
+
+```json
+{
+  "issues": ["ISSUE-KEY"],
+  "description": { "version": 1, "type": "doc", "content": [...] }
+}
+```
+
+The `jira-update-desc` script handles this automatically.
+
+### Notes
+
+- `jira-update-desc` uses `acli` with `--from-json` (required for ADF descriptions)
+- `jira-add-comment` uses the REST API directly (acli doesn't handle ADF for comments)
+- Both scripts read JIRA_API_TOKEN from `.env` files (project first, then nvim config)
+
+### Plain Text Alternative
+
+For simple updates without formatting, plain text works directly:
+```bash
+acli jira workitem edit --key ISSUE-KEY --description "Plain text description" --yes
+```
+
+### Viewing Issues
+
+```bash
+acli jira workitem view ISSUE-KEY
+```
