@@ -132,6 +132,15 @@ vim.api.nvim_create_autocmd({ 'WinEnter', 'BufEnter', 'WinResized' }, {
   end,
 })
 
+-- Open PDFs in system viewer instead of neovim
+vim.api.nvim_create_autocmd('BufReadCmd', {
+  pattern = '*.pdf',
+  callback = function()
+    vim.fn.system({ 'xdg-open', vim.fn.expand '%:p' })
+    vim.cmd 'bdelete'
+  end,
+})
+
 vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
   pattern = { '*.json', '*.jsonc' },
   callback = function()

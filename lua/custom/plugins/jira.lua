@@ -28,6 +28,7 @@ return {
     local project_env = vim.fn.getcwd() .. '/.env'
     local global_env = vim.fn.stdpath 'config' .. '/.env'
 
+    --- Get JIRA_API_TOKEN from .env files
     local api_token = read_env_file(project_env, 'JIRA_API_TOKEN') or read_env_file(global_env, 'JIRA_API_TOKEN')
     if not api_token then
       vim.notify('JIRA_API_TOKEN not found in .env (checked project and nvim config)', vim.log.levels.ERROR)

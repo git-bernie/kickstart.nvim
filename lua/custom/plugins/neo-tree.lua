@@ -36,6 +36,12 @@ return {
     use_libuv_file_watcher = true,
     close_if_last_window = true, -- misspelled in lua/kickstart/plugins/neo-tree.lua
     commands = {
+      -- Open file with system default application (xdg-open)
+      system_open = function(state)
+        local node = state.tree:get_node()
+        local path = node:get_id()
+        vim.fn.jobstart({ 'xdg-open', path }, { detach = true })
+      end,
       -- Custom filter command that auto-refreshes after filtering
       filter_and_refresh = function(state)
         local fs_commands = require('neo-tree.sources.filesystem.commands')
@@ -61,6 +67,7 @@ return {
       window = {
         mappings = {
           ['\\'] = 'close_window',
+          ['O'] = { 'system_open', desc = 'Open with system viewer' },
           ['P'] = { 'toggle_preview', config = { use_float = true, use_image_nvim = true } },
           ['f'] = 'filter_and_refresh', -- Use custom command instead of default filter
         },
