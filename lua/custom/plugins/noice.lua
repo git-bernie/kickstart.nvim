@@ -160,6 +160,21 @@ return {
           winhighlight = 'Normal:Normal,FloatBorder:FloatBorder,CursorLine:Visual,Search:None',
         },
       },
+      -- Skip popup for :grep and :vimgrep results (they go to quickfix anyway)
+      {
+        filter = {
+          event = 'msg_show',
+          kind = 'shell_out',
+        },
+        opts = { skip = true },
+      },
+      {
+        filter = {
+          event = 'msg_show',
+          find = '%(%d+ of %d+%)', -- matches "(1 of 23)" from :vimgrep
+        },
+        opts = { skip = true },
+      },
       -- Route shell command output (identified by `msg_show` and a minimum height) to a split view.
       { -- Alternately, :Noice disable
         view = 'split',
