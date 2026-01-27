@@ -136,7 +136,7 @@ vim.api.nvim_create_autocmd({ 'WinEnter', 'BufEnter', 'WinResized' }, {
 vim.api.nvim_create_autocmd('BufReadCmd', {
   pattern = '*.pdf',
   callback = function()
-    vim.fn.system({ 'xdg-open', vim.fn.expand '%:p' })
+    vim.fn.system { 'xdg-open', vim.fn.expand '%:p' }
     vim.cmd 'bdelete'
   end,
 })
@@ -239,7 +239,15 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
   callback = function()
     vim.opt_local.iskeyword:append '-' -- lua vim.opt_local.iskeyword:remove '-'
     -- print [[+++ appended '-' to iskeyword!]]
-    vim.opt_local.colorcolumn = { 80, 120 }
+    vim.opt_local.colorcolumn = { 80, 100 }
+  end,
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'markdown',
+  callback = function()
+    vim.opt_local.textwidth = 80
+    vim.opt_local.formatoptions:append 't' -- auto-wrap text
   end,
 })
 
@@ -250,6 +258,22 @@ if vim.fn.isdirectory(vim.env.HOME .. '/.backupdir') == 0 then
     vim.fn.mkdir(vim.fn.expand '~/tmp')
   end
 end
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'qf',
+  callback = function()
+    local title = vim.w.quickfix_title or ''
+    vim.wo.statusline = '%t ' .. title .. ' %=%l/%L'
+  end,
+})
+
+vim.api.nvim_create_autocmd('QuickFixCmdPost', {
+  pattern = { 'grep', 'vimgrep', 'make' },
+  callback = function()
+    vim.cmd 'copen'
+  end,
+})
+
 vim.opt.backupdir = { vim.env.HOME .. '/.backupdir', vim.fn.expand '~/tmp', '/tmp/' }
 
 vim.opt.backupskip = { '*.csv', '.env', 'envvars' }
@@ -806,6 +830,7 @@ require('lazy').setup {
         { '<leader>t', group = '[T]oggle' },
         { '<leader>w', group = '[W]orkspace' },
         { '<leader>y', group = '[Y]ours' },
+        { '<leader>/', group = '[/] searches' },
       },
     },
     -- See `:help which-key` for more information
@@ -921,9 +946,9 @@ require('lazy').setup {
       vim.keymap.set('n', '<leader>sc', builtin.lsp_document_symbols, { desc = '[S]earch [C]urrent Buffer Tags (lsp_document_symbols)' })
       vim.keymap.set('n', '<leader>sm', builtin.man_pages, { desc = '[S]earch [M]an pages' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-      vim.keymap.set('n', '<leader>s/', function()
+      vim.keymap.set('n', '<leader>/s', function()
         builtin.live_grep { results_title = 'Live Grep' }
-      end, { desc = '[S]earch by [/G]rep' })
+      end, { desc = '/[S]earch by Grep' })
       vim.keymap.set('n', '<leader>sg', function()
         builtin.live_grep { results_title = 'Search by Live Grep' }
       end, { desc = '[S]earch by [/G]rep' })
@@ -969,9 +994,9 @@ require('lazy').setup {
       end, {}) ]]
 
       -- Telescpe has more bells and whistles when you press <C-/>
-      vim.keymap.set('n', '<leader>/', function()
+      vim.keymap.set('n', '<leader>//', function()
         builtin.current_buffer_fuzzy_find { prompt_title = 'Current Buffer Fuzzy', results_title = 'Results Buffer Fuzzy' }
-      end, { desc = '[/] current_buffer_fuzzy_find' })
+      end, { desc = '[/]/ current_buffer_fuzzy_find' })
 
       vim.keymap.set('n', '<leader>gc', function()
         builtin.git_bcommits {
@@ -1645,19 +1670,14 @@ require('lazy').setup {
     -- lazy = false,
     event = 'VeryLazy',
     -- dependencies = { 'nvim-tree/nvim-web-devicons' },
-    options = { theme = 'gruvbox' },
-    --[[ sections = {
-      lualine_z = { 'branch', 'location', 'selectioncount' },
-    }, ]]
-    --[[ opts = function()
-      return {
-        section = {
-          lualine_z = { 'branch', 'location', 'selectioncount' },
-        },
-      }
-    end, ]]
     opts = function()
       return {
+        options = {
+          theme = 'gruvbox',
+          disabled_filetypes = {
+            statusline = { 'qf' },
+          },
+        },
         sections = {
           -- lualine_b = { 'branch', 'diff', 'diagnostics', { max_length = 20 } },
           -- lualine_b = { 'branch', 'diagnostics', { max_length = 20 } },
