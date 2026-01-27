@@ -404,10 +404,16 @@ vim.keymap.del('n', '[B')
 vim.keymap.set('n', '<leader>bn', ':bnext<CR>', { desc = 'Next buffer' })
 vim.keymap.set('n', '<leader>bp', ':bprevious<CR>', { desc = 'Previous buffer' })
 
--- original: 'rg --vimgrep -uu '
--- QQQ:
--- vim.cmd [[ set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case\ -uu\ --search-zip\ ]]
--- Problems with typing these in command mode....
+-- [[ Grep configuration with ripgrep ]]
+-- Use ripgrep for :grep with vimgrep-compatible output
+-- The grepformat handles both match lines (file:line:col:text) and context lines (file-line-text)
+-- This allows -A/-B/-C context flags to work with quickfix navigation (Ctrl-J/K)
+vim.opt.grepprg = 'rg --vimgrep --no-heading --smart-case'
+vim.opt.grepformat = '%f:%l:%c:%m,%f-%l-%m'
+-- Usage: :grep pattern        (basic search)
+--        :grep -A3 pattern    (3 lines after each match)
+--        :grep -B2 pattern    (2 lines before each match)
+--        :grep -C3 pattern    (3 lines before and after)
 -- vim.keymap.set('c', 'Et', '<cmd>:bot split | term<CR>', { desc = 'Open [T]erminal Below' })
 -- vim.keymap.set('c', 'Etv', '<cmd>:vert split | term<CR>', { desc = 'Open [T]erminal Vert' })
 
