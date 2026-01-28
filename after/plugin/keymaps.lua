@@ -104,7 +104,7 @@ vim.keymap.set('n', '<leader>tW', function()
     -- table.insert(diffoptstable, 'iwhiteall')
     -- table.insert(vim.opt.diffopt, 'iwhiteall')
     -- print 'Will try to insert iwhiteall...'
-    -- table.insert(vim.opt.diffopt, 'iwhiteall')
+    -- table.insert(vim.opt.diffopt, 'iwhitInieall')
     vim.opt.diffopt:append 'iwhiteall'
   else
     -- print(__('Will try to remove whiteall from position #%s', tostring(found_at)))
