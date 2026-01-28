@@ -263,7 +263,7 @@ vim.api.nvim_create_autocmd('FileType', {
   pattern = 'qf',
   callback = function()
     local title = vim.w.quickfix_title or ''
-    vim.wo.statusline = '%t ' .. title .. ' %=%l/%L'
+    vim.wo.statusline = '%t ' .. title .. ' %l/%L'
   end,
 })
 
@@ -414,6 +414,21 @@ vim.opt.grepformat = '%f:%l:%c:%m,%f-%l-%m'
 --        :grep -A3 pattern    (3 lines after each match)
 --        :grep -B2 pattern    (2 lines before each match)
 --        :grep -C3 pattern    (3 lines before and after)
+
+--[[ 
+-- For vimscript users, the equivalent configuration is:
+--"Grep configuration with context line support for quickfix navigation
+" Supports -A/-B/-C flags with Ctrl-J/K navigation
+if executable('rg')
+" Use ripgrep if available
+set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
+set grepformat=%f:%l:%c:%m,%f-%l-%m
+else
+" Fall back to GNU grep with recursive search
+set grepprg=grep\ -rn\ --include='*'
+set grepformat=%f:%l:%m,%f-%l-%m
+endif ]]
+
 -- vim.keymap.set('c', 'Et', '<cmd>:bot split | term<CR>', { desc = 'Open [T]erminal Below' })
 -- vim.keymap.set('c', 'Etv', '<cmd>:vert split | term<CR>', { desc = 'Open [T]erminal Vert' })
 
@@ -1677,6 +1692,48 @@ require('lazy').setup {
     event = 'VeryLazy',
     -- dependencies = { 'nvim-tree/nvim-web-devicons' },
     opts = function()
+      -- Custom component to show git revision and date for fugitive buffers
+      local fugitive_cache = {}
+      local function fugitive_rev()
+        local bufname = vim.fn.expand '%'
+        if bufname:match '^fugitive://' then
+          -- Check cache first
+          if fugitive_cache[bufname] then
+            return fugitive_cache[bufname]
+          end
+          -- Extract the commit hash from fugitive:// path
+          local rev = bufname:match '%.git//(%x+)'
+          if rev then
+            -- Get commit date and timestamp
+            local git_out = vim.fn.system('git log -1 --format=%ci,%ct ' .. rev .. ' 2>/dev/null')
+            local date, timestamp = git_out:match '^(%d+%-%d+%-%d+).-,(%d+)'
+            local result
+            if date and timestamp then
+              local days_ago = math.floor((os.time() - tonumber(timestamp)) / 86400)
+              local ago_str
+              if days_ago == 0 then
+                ago_str = 'today'
+              elseif days_ago == 1 then
+                ago_str = '1d'
+              elseif days_ago < 30 then
+                ago_str = days_ago .. 'd'
+              elseif days_ago < 365 then
+                ago_str = math.floor(days_ago / 30) .. 'mo'
+              else
+                ago_str = math.floor(days_ago / 365) .. 'y'
+              end
+              result = ' ' .. rev:sub(1, 7) .. ' ' .. date .. ' (' .. ago_str .. ')'
+            else
+              result = ' ' .. rev:sub(1, 7)
+            end
+            fugitive_cache[bufname] = result
+            return result
+          end
+          return ' GIT'
+        end
+        return ''
+      end
+
       return {
         options = {
           theme = 'gruvbox',
@@ -1687,10 +1744,14 @@ require('lazy').setup {
         sections = {
           -- lualine_b = { 'branch', 'diff', 'diagnostics', { max_length = 20 } },
           -- lualine_b = { 'branch', 'diagnostics', { max_length = 20 } },
-          lualine_b = { 'branch' },
+          lualine_b = { 'branch', { fugitive_rev, color = { fg = '#fabd2f', gui = 'bold' } } },
           -- lualine_b = {'branch', 'diff', 'diagnostics'},
           lualine_x = { 'aerial', 'filetype' },
           lualine_z = { 'location', 'selectioncount', 'searchcount' },
+        },
+        inactive_sections = {
+          lualine_b = { { fugitive_rev, color = { fg = '#fabd2f' } } },
+          lualine_c = { 'filename' },
         },
       }
     end,

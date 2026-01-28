@@ -3,8 +3,7 @@ return {
   dependencies = {
     'copilotlsp-nvim/copilot-lsp', -- (optional) for NES functionality
   },
-  cmd = 'Copilot',
-  event = 'InsertEnter', -- Lazy Loading
+  lazy = false, -- Load eagerly to avoid RPC errors on startup
   config = function()
     require('copilot').setup {
       suggestion = {

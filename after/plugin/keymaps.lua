@@ -9,7 +9,7 @@
 -- Override the default C-] with LSP definition, but preserve tag jump in help buffers
 vim.keymap.set('n', '<C-]>', function()
   if vim.bo.filetype == 'help' then
-    vim.cmd('tag ' .. vim.fn.expand('<cword>'))
+    vim.cmd('tag ' .. vim.fn.expand '<cword>')
   else
     vim.lsp.buf.definition()
     vim.cmd 'normal! zz'
@@ -57,8 +57,11 @@ vim.keymap.set('i', 'jk', '<esc>', { desc = '[jk] to escape' })
 --  [[ normal mode: ripgrep with args ]]
 vim.keymap.set(
   'n',
-  '<leader>fg',
-  ":lua require('telescope').extensions.live_grep_args.live_grep_args({prompt_title = '[F]ind [G]rep using live_grep_args (\"word\" -- *.php)'})<cr>",
+  '<leader>/g',
+  function()
+    require('telescope').extensions.live_grep_args.live_grep_args { prompt_title = '/Find [G]rep using live_grep_args ("word" -- *.php)' }
+  end,
+  -- ":lua require('telescope').extensions.live_grep_args.live_grep_args({prompt_title = '/Find [G]rep using live_grep_args (\"word\" -- *.php)'})<cr>",
   {}
 )
 
@@ -280,27 +283,31 @@ vim.keymap.set(
 ) ]=]
 
 --[[ FzfLua keymaps ]]
-vim.keymap.set('n', '<leader>fb', [[<cmd>lua require('fzf-lua').git_branches()<cr>]], { desc = '[G]it [b]ags (FzfLua)' })
+vim.keymap.set('n', '<leader>fb', [[<cmd>lua require('fzf-lua').git_branches()<cr>]], { desc = '[G]it [b]ranches (FzfLua)' })
 vim.keymap.set('n', '<leader>gt', [[<cmd>lua require('fzf-lua').git_tags()<cr>]], { desc = '[G]it [T]ags (FzfLua)' })
 vim.keymap.set('n', '<leader>fs', [[<cmd>lua require('fzf-lua').git_status()<cr>]], { desc = '[F]zfLua [S]tatus' })
 vim.keymap.set('n', '<leader>fc', [[<cmd>lua require('fzf-lua').git_bcommits()<cr>]], { desc = '[F]zfLua Git Buffer [C]ommits' })
 vim.keymap.set('n', '<leader>fC', [[<cmd>lua require('fzf-lua').git_commits()<cr>]], { desc = '[F]zfLua Git (Directory) [C]ommits' })
 --[[ FzfLua has so many interesting methods: also available grep_cWORD]]
 vim.keymap.set('n', '<leader>fw', [[<cmd>lua require('fzf-lua').grep_cword()<cr>]], { desc = '[F]zfLua c[w]ord' })
+-- running out of f!
+-- vim.keymap.set('n', '<leader>b/', [[<cmd>lua require('fzf-lua').grep_curbuf()<cr>]], { desc = 'FzfLua grep_cur[b/]uf' })
 -- vim.keymap.set('n', '<leader>f/', [[<cmd>lua require('fzf-lua').grep_curbuf()<cr>]], { desc = '[F]zfLua [/] grep_curbuf' })
 
-vim.keymap.set(
-  'n',
-  '<leader>f/',
-  [[<cmd>lua require('fzf-lua').grep_project({prompt='Grep Project> ', winopts={title='Grep Project'}})<cr>]],
-  { desc = '[F]zfLua [/] grep_project' }
-)
+vim.keymap.set('n', '<leader>/b', function()
+  require('fzf-lua').grep_curbuf { prompt = 'Grep Cur Buff> ', winopts = { title = 'Grep Current Buffer' } }
+end, { desc = 'FzfLua grep_cur[/b]uf' })
+vim.keymap.set('n', '<leader>/f', function()
+  require('fzf-lua').grep_project { prompt = 'Grep Project> ', winopts = { title = 'Grep Project' } }
+end, { desc = '[F]zfLua [/] grep_project' })
 
 vim.keymap.set('n', '<leader>fl', [[<cmd>lua require('fzf-lua').grep({resume=true})<cr>]], { desc = '[F]zfLua [l] grep last (resume=true)' })
 vim.keymap.set('n', '<leader>fz', [[<cmd>FzfLua<cr>]], { desc = ':[F][z]fLua see all FzfLua methods' })
 vim.keymap.set('n', '<leader>fF', [[<cmd>FzfLua files<cr>]], { desc = ':[f]zfLua [F]iles' })
 vim.keymap.set('n', '<leader>FF', [[<cmd>FzfLua files<cr>]], { desc = ':[f]zfLua [F]iles' })
-vim.keymap.set('n', '<leader>fg', [[<cmd>lua require('fzf-lua').live_grep({hidden = false})<cr>]], { desc = '[F]zfLua live_[g]rep ( -- to specify globs)' })
+vim.keymap.set('n', '<leader>/g', function()
+  require('fzf-lua').live_grep { hidden = false, prompt = 'Live Grep> ', winopts = { title = 'Live Grep' } }
+end, { desc = 'FzfLua live_[/g]rep ( -- to specify globs)' })
 vim.keymap.set('n', '<leader>fd', [[<cmd>lua require('fzf-lua').diagnostics_document()<cr>]], { desc = '[F]zfLua live_[d]iagnostics_document)' })
 vim.keymap.set('n', '<leader>fD', [[<cmd>lua require('fzf-lua').diagnostics_workspace()<cr>]], { desc = '[F]zfLua live_[D]iagnostics_workspace)' })
 vim.keymap.set('n', '<leader>fm', function()

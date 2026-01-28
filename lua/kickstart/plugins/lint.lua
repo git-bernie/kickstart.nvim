@@ -7,6 +7,7 @@ return {
       local lint = require 'lint'
       lint.linters_by_ft = {
         -- markdown = { 'markdownlint' }, -- stop linting malformed help markdown files!
+        php = { 'phpstan' },
       }
 
       -- To allow other plugins to add linters to require('lint').linters_by_ft,

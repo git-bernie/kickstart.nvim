@@ -31,11 +31,11 @@ return {
   },
   keys = {
     {
-      '<leader>gl',
+      '<leader>lg',
       function()
         Snacks.lazygit()
       end,
-      desc = '[G]it [L]azygit',
+      desc = '[L]azy[G]it',
       silent = false,
     },
     {
