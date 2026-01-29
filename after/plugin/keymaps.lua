@@ -57,12 +57,11 @@ vim.keymap.set('i', 'jk', '<esc>', { desc = '[jk] to escape' })
 --  [[ normal mode: ripgrep with args ]]
 vim.keymap.set(
   'n',
-  '<leader>/g',
+  '<leader>sa',
   function()
-    require('telescope').extensions.live_grep_args.live_grep_args { prompt_title = '/Find [G]rep using live_grep_args ("word" -- *.php)' }
+    require('telescope').extensions.live_grep_args.live_grep_args { prompt_title = '[S]earch with [a]rgs ("word" -- *.php)' }
   end,
-  -- ":lua require('telescope').extensions.live_grep_args.live_grep_args({prompt_title = '/Find [G]rep using live_grep_args (\"word\" -- *.php)'})<cr>",
-  {}
+  { desc = '[S]earch with [a]rgs (Telescope live_grep_args)' }
 )
 
 -- [[  commandline: ripgrep with args ]]
@@ -251,8 +250,8 @@ vim.keymap.set('n', '<C-w>Q', 'ZQ<CR>', { desc = '[C-w] [Q]uit without saving!' 
 vim.keymap.set('n', 'gcp', ':norm yygccp<CR>', { silent = true, expr = false, desc = 'Copy and comment current line and paste below' })
 vim.keymap.set('n', 'gcP', ':norm yygccP<CR>', { silent = true, expr = false, desc = 'Copy and comment current line and paste above' })
 
-vim.keymap.set('n', '<leader>st', '<cmd>split +term<CR>', { desc = '[S]plit [T]erminal (split)' })
-vim.keymap.set('n', '<leader>sv', '<cmd>vsplit +term<CR>', { desc = '[S]plit [v]ertical terminal (vsplit)' })
+vim.keymap.set('n', '<leader>Ts', '<cmd>split +term<CR>', { desc = '[T]erminal [s]plit' })
+vim.keymap.set('n', '<leader>Tv', '<cmd>vsplit +term<CR>', { desc = '[T]erminal [v]split' })
 
 vim.keymap.set('n', '<leader>tw', '<cmd>set wrap!<CR>', { desc = '[T]oggle [w]rap', silent = false })
 
@@ -294,25 +293,24 @@ vim.keymap.set('n', '<leader>fw', [[<cmd>lua require('fzf-lua').grep_cword()<cr>
 -- vim.keymap.set('n', '<leader>b/', [[<cmd>lua require('fzf-lua').grep_curbuf()<cr>]], { desc = 'FzfLua grep_cur[b/]uf' })
 -- vim.keymap.set('n', '<leader>f/', [[<cmd>lua require('fzf-lua').grep_curbuf()<cr>]], { desc = '[F]zfLua [/] grep_curbuf' })
 
-vim.keymap.set('n', '<leader>/b', function()
+vim.keymap.set('n', '<leader>fB', function()
   require('fzf-lua').grep_curbuf { prompt = 'Grep Cur Buff> ', winopts = { title = 'Grep Current Buffer' } }
-end, { desc = 'FzfLua grep_cur[/b]uf' })
-vim.keymap.set('n', '<leader>/f', function()
+end, { desc = '[F]zfLua grep current [B]uffer' })
+vim.keymap.set('n', '<leader>fp', function()
   require('fzf-lua').grep_project { prompt = 'Grep Project> ', winopts = { title = 'Grep Project' } }
-end, { desc = '[F]zfLua [/] grep_project' })
+end, { desc = '[F]zfLua grep [p]roject' })
 
 vim.keymap.set('n', '<leader>fl', [[<cmd>lua require('fzf-lua').grep({resume=true})<cr>]], { desc = '[F]zfLua [l] grep last (resume=true)' })
 vim.keymap.set('n', '<leader>fz', [[<cmd>FzfLua<cr>]], { desc = ':[F][z]fLua see all FzfLua methods' })
-vim.keymap.set('n', '<leader>fF', [[<cmd>FzfLua files<cr>]], { desc = ':[f]zfLua [F]iles' })
-vim.keymap.set('n', '<leader>FF', [[<cmd>FzfLua files<cr>]], { desc = ':[f]zfLua [F]iles' })
-vim.keymap.set('n', '<leader>/g', function()
+vim.keymap.set('n', '<leader>fF', [[<cmd>FzfLua files<cr>]], { desc = '[F]zfLua [F]iles' })
+vim.keymap.set('n', '<leader>fg', function()
   require('fzf-lua').live_grep { hidden = false, prompt = 'Live Grep> ', winopts = { title = 'Live Grep' } }
-end, { desc = 'FzfLua live_[/g]rep ( -- to specify globs)' })
+end, { desc = '[F]zfLua live [g]rep' })
 vim.keymap.set('n', '<leader>fd', [[<cmd>lua require('fzf-lua').diagnostics_document()<cr>]], { desc = '[F]zfLua live_[d]iagnostics_document)' })
 vim.keymap.set('n', '<leader>fD', [[<cmd>lua require('fzf-lua').diagnostics_workspace()<cr>]], { desc = '[F]zfLua live_[D]iagnostics_workspace)' })
-vim.keymap.set('n', '<leader>fm', function()
+vim.keymap.set('n', '<leader>sM', function()
   require('telescope').extensions.media_files.media_files()
-end, { desc = 'Find media files' })
+end, { desc = '[S]earch [M]edia files (Telescope)' })
 vim.keymap.set(
   'n',
   '<leader>fh',

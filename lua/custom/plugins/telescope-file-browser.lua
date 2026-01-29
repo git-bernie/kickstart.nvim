@@ -19,15 +19,15 @@ return {
   config = function()
     vim.keymap.set(
       'n',
-      '<leader>ff',
+      '<leader>se',
       '<cmd>Telescope file_browser follow_symlinks=true prompt_path=true create_from_prompt=false preview=true<cr>',
-      { desc = '[F]ile [F]ind by Browser', silent = true }
+      { desc = '[S]earch [e]xplorer (file browser)', silent = true }
     )
     vim.keymap.set(
       'n',
-      '<leader>fd',
+      '<leader>sE',
       '<cmd>Telescope file_browser path=%:p:h follow_symlinks=true prompt_path=true create_from_prompt=false preview=true<cr>',
-      { desc = '[F]ile Browser to this [D]ir' }
+      { desc = '[S]earch [E]xplorer here (buffer dir)' }
     )
   end,
 }
