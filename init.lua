@@ -472,7 +472,7 @@ if vim.fn.filereadable(project_config_path) == 1 then
   if not ok then
     vim.notify('Error loading .nvim.lua: ' .. err, vim.log.levels.ERROR)
   else
-    vim.notify 'Found a local .nvim.lua in this project'
+    -- vim.notify 'Found a local .nvim.lua in this project'
   end
 end
 
