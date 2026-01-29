@@ -152,6 +152,21 @@ return {
 
     -- https://github.com/folke/noice.nvim/wiki/Configuration-Recipes#show-recording-messages
     routes = {
+      -- Skip repetitive Copilot error notifications (they flood when Copilot dies)
+      {
+        filter = {
+          event = 'notify',
+          find = 'Copilot',
+        },
+        opts = { skip = true },
+      },
+      {
+        filter = {
+          event = 'notify',
+          find = 'copilot',
+        },
+        opts = { skip = true },
+      },
       {
         view = 'notify',
         filter = { event = 'msg_showmode', kind = '', find = 'written' },
