@@ -931,15 +931,27 @@ require('lazy').setup {
 
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
+      local action_layout = require 'telescope.actions.layout'
       require('telescope').setup {
-        -- You can put your default mappings / updates / etc. in here
-        --  All the info you're looking for is in `:help telescope.setup()`
-        --
-        -- defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
-        -- },
+        defaults = {
+          layout_strategy = 'flex',
+          layout_config = {
+            flip_columns = 100, -- switch to horizontal when width < 100 (default 120)
+            horizontal = { preview_width = 0.5 },
+            vertical = { preview_height = 0.4 },
+          },
+          cycle_layout_list = { 'vertical', 'horizontal' },
+          mappings = {
+            i = {
+              ['<M-p>'] = { action_layout.toggle_preview, type = 'action', opts = { desc = 'Toggle preview' } },
+              ['<M-l>'] = { action_layout.cycle_layout_next, type = 'action', opts = { desc = 'Cycle layout' } },
+            },
+            n = {
+              ['<M-p>'] = { action_layout.toggle_preview, type = 'action', opts = { desc = 'Toggle preview' } },
+              ['<M-l>'] = { action_layout.cycle_layout_next, type = 'action', opts = { desc = 'Cycle layout' } },
+            },
+          },
+        },
         -- pickers = {}
         extensions = {
           ['ui-select'] = {
@@ -1011,14 +1023,15 @@ require('lazy').setup {
         builtin.find_files { prompt_title = 'F[Y]nd [Y]er Files (hidden, noignore)', hidden = true, no_ignore = true }
       end, {}) ]]
 
-      -- Telescpe has more bells and whistles when you press <C-/>
+      -- Telescope has more bells and whistles when you press <C-/>
+      -- Global: <M-p> toggles preview, <M-l> cycles layout (vertical/horizontal)
       vim.keymap.set('n', '<leader>//', function()
         builtin.current_buffer_fuzzy_find { prompt_title = 'Current Buffer Fuzzy', results_title = 'Results Buffer Fuzzy' }
       end, { desc = '[/]/ current_buffer_fuzzy_find' })
 
       vim.keymap.set('n', '<leader>sb', function()
         builtin.current_buffer_fuzzy_find { prompt_title = 'Current Buffer Fuzzy', results_title = 'Results Buffer Fuzzy' }
-      end, { desc = '[S]earch [B]uffer current_buffer_fuzzy_find' })
+      end, { desc = '[S]earch [B]uffer' })
 
       vim.keymap.set('n', '<leader>gc', function()
         builtin.git_bcommits {
