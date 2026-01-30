@@ -1016,6 +1016,10 @@ require('lazy').setup {
         builtin.current_buffer_fuzzy_find { prompt_title = 'Current Buffer Fuzzy', results_title = 'Results Buffer Fuzzy' }
       end, { desc = '[/]/ current_buffer_fuzzy_find' })
 
+      vim.keymap.set('n', '<leader>sb', function()
+        builtin.current_buffer_fuzzy_find { prompt_title = 'Current Buffer Fuzzy', results_title = 'Results Buffer Fuzzy' }
+      end, { desc = '[S]earch [B]uffer current_buffer_fuzzy_find' })
+
       vim.keymap.set('n', '<leader>gc', function()
         builtin.git_bcommits {
           prompt_title = '[G]it Buffer [c]ommits',
@@ -1333,6 +1337,14 @@ require('lazy').setup {
         -- tsserver = {},
         -- intelephense = {}
         html = {},
+        jsonls = {
+          settings = {
+            json = {
+              schemas = require('schemastore').json.schemas(),
+              validate = { enable = true },
+            },
+          },
+        },
         -- ts_Ls = {}
 
         lua_ls = { -- {{{
