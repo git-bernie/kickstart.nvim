@@ -132,14 +132,15 @@ vim.api.nvim_create_autocmd({ 'WinEnter', 'BufEnter', 'WinResized' }, {
   end,
 })
 
--- Open PDFs in system viewer instead of neovim
-vim.api.nvim_create_autocmd('BufReadCmd', {
-  pattern = '*.pdf',
-  callback = function()
-    vim.fn.system { 'xdg-open', vim.fn.expand '%:p' }
-    vim.cmd 'bdelete'
-  end,
-})
+-- Open PDFs in system viewer (disabled - use O in neo-tree for system viewer)
+-- This was triggering Okular during neo-tree preview
+-- vim.api.nvim_create_autocmd('BufReadCmd', {
+--   pattern = '*.pdf',
+--   callback = function()
+--     vim.fn.system { 'xdg-open', vim.fn.expand '%:p' }
+--     vim.cmd 'bdelete'
+--   end,
+-- })
 
 vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
   pattern = { '*.json', '*.jsonc' },
@@ -972,6 +973,9 @@ require('lazy').setup {
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<leader>sF', function()
+        builtin.find_files { hidden = true, no_ignore = true, prompt_title = 'Find Files (hidden, no_ignore)' }
+      end, { desc = '[S]earch [F]iles (hidden)' })
       -- A bad idea because C-p is used so much
       -- vim.keymap.set('n', '<leader>cp', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
@@ -979,10 +983,15 @@ require('lazy').setup {
       vim.keymap.set('n', '<leader>sc', builtin.lsp_document_symbols, { desc = '[S]earch [C]urrent Buffer Tags (lsp_document_symbols)' })
       vim.keymap.set('n', '<leader>sm', builtin.man_pages, { desc = '[S]earch [M]an pages' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
+      vim.keymap.set('n', '<leader>sW', function()
+        builtin.grep_string { additional_args = { '--hidden', '--no-ignore' }, prompt_title = 'Grep Word (hidden, no_ignore)' }
+      end, { desc = '[S]earch current [W]ord (hidden)' })
       vim.keymap.set('n', '<leader>sg', function()
         builtin.live_grep { results_title = 'Search by Live Grep' }
       end, { desc = '[S]earch by [/G]rep' })
-      vim.keymap.set('n', '<leader>sH', builtin.live_grep, { desc = '[S]earch by grep [H]idden' })
+      vim.keymap.set('n', '<leader>sG', function()
+        builtin.live_grep { additional_args = { '--hidden', '--no-ignore' }, prompt_title = 'Live Grep (hidden, no_ignore)' }
+      end, { desc = '[S]earch by [G]rep (hidden)' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>sO', builtin.vim_options, { desc = '[S]earch vim_[O]ptions' })
@@ -1198,6 +1207,7 @@ require('lazy').setup {
           -- Fuzzy find all the symbols in your current workspace.
           --  Similar to document symbols, except searches over your entire project.
           map('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+          map('<leader>sW', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[S]earch [W]orkspace Symbols')
 
           -- Rename the variable under your cursor.
           --  Most Language Servers support renaming across files, etc.
@@ -1339,7 +1349,7 @@ require('lazy').setup {
       local servers = {
         clangd = {},
         -- gopls = {},
-        -- pyright = {},
+        pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -1490,7 +1500,7 @@ require('lazy').setup {
       formatters_by_ft = {
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
+        python = { 'isort', 'black' },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
         -- javascript = { 'prettierd', 'prettier', stop_after_first = true },
@@ -1876,6 +1886,7 @@ require('lazy').setup {
         'vim',
         'vimdoc',
         'php',
+        'python',
         'javascript',
         'vue',
         -- 'latex',
@@ -1883,6 +1894,7 @@ require('lazy').setup {
         'scss',
         'sql',
         'svelte',
+        'toml',
         'tsx',
         'typst',
         'xml',
