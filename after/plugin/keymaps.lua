@@ -55,14 +55,9 @@ vim.keymap.set('n', '<Leader>wk', '<cmd>WhichKey<cr>', { desc = 'Sho[W] [W]hich 
 vim.keymap.set('i', 'jk', '<esc>', { desc = '[jk] to escape' })
 
 --  [[ normal mode: ripgrep with args ]]
-vim.keymap.set(
-  'n',
-  '<leader>sa',
-  function()
-    require('telescope').extensions.live_grep_args.live_grep_args { prompt_title = '[S]earch with [a]rgs ("word" -- *.php)' }
-  end,
-  { desc = '[S]earch with [a]rgs (Telescope live_grep_args)' }
-)
+vim.keymap.set('n', '<leader>sa', function()
+  require('telescope').extensions.live_grep_args.live_grep_args { prompt_title = '[S]earch with [a]rgs ("word" -- *.php)' }
+end, { desc = '[S]earch with [a]rgs (Telescope live_grep_args)' })
 
 -- [[  commandline: ripgrep with args ]]
 -- NOTE: every time I press rg quickly in command mode, this would trigger the command.
@@ -135,17 +130,25 @@ vim.keymap.set('n', '<leader>tm', '<cmd>MarkdownPreviewToggle<CR>', { desc = '[T
 
 -- See settings in init.lua for MiniSessions config
 -- ms already taken by minimap
+-- Use explicit cwd paths to ensure per-project sessions
 vim.keymap.set('n', '<leader>mk', function()
-  require('mini.sessions').write('Session.vim', { force = { write = true } })
-end, { desc = [[[M]a[k]e Session via .write('Session.vim')]], silent = false })
+  local session_path = vim.fn.getcwd() .. '/Session.vim'
+  require('mini.sessions').write(session_path, { force = true })
+end, { desc = '[M]a[k]e Session (cwd/Session.vim)', silent = false })
 
 vim.keymap.set('n', '<leader>md', function()
-  require('mini.sessions').delete('Session.vim', { force = { write = true } })
-end, { desc = [[[M]ake Session [D]elete via .delete('Session.vim')]], silent = false })
+  local session_path = vim.fn.getcwd() .. '/Session.vim'
+  require('mini.sessions').delete(session_path, { force = true })
+end, { desc = '[M]ake Session [D]elete (cwd/Session.vim)', silent = false })
 
 vim.keymap.set('n', '<leader>mR', function()
-  require('mini.sessions').read('Session.vim', { force = { write = true } })
-end, { desc = [[[M]iniSessions [R]ead .read('Session.vim')]], silent = false })
+  local session_path = vim.fn.getcwd() .. '/Session.vim'
+  if vim.fn.filereadable(session_path) == 1 then
+    require('mini.sessions').read(session_path, { force = true })
+  else
+    vim.notify('No Session.vim in ' .. vim.fn.getcwd(), vim.log.levels.WARN)
+  end
+end, { desc = '[M]iniSessions [R]ead (cwd/Session.vim)', silent = false })
 
 --
 -- Example v2 encoding "QjRpxuZGJKDxLUV1RFh8CPjYEf_t9y_8FYgc2DCXuVc"
@@ -282,7 +285,7 @@ vim.keymap.set(
 ) ]=]
 
 --[[ FzfLua keymaps ]]
-vim.keymap.set('n', '<leader>fb', [[<cmd>lua require('fzf-lua').git_branches()<cr>]], { desc = '[G]it [b]ranches (FzfLua)' })
+vim.keymap.set('n', '<leader>fB', [[<cmd>lua require('fzf-lua').git_branches()<cr>]], { desc = '[G]it [B]ranches (FzfLua)' })
 vim.keymap.set('n', '<leader>gt', [[<cmd>lua require('fzf-lua').git_tags()<cr>]], { desc = '[G]it [T]ags (FzfLua)' })
 vim.keymap.set('n', '<leader>fs', [[<cmd>lua require('fzf-lua').git_status()<cr>]], { desc = '[F]zfLua [S]tatus' })
 vim.keymap.set('n', '<leader>fc', [[<cmd>lua require('fzf-lua').git_bcommits()<cr>]], { desc = '[F]zfLua Git Buffer [C]ommits' })
@@ -293,7 +296,7 @@ vim.keymap.set('n', '<leader>fw', [[<cmd>lua require('fzf-lua').grep_cword()<cr>
 -- vim.keymap.set('n', '<leader>b/', [[<cmd>lua require('fzf-lua').grep_curbuf()<cr>]], { desc = 'FzfLua grep_cur[b/]uf' })
 -- vim.keymap.set('n', '<leader>f/', [[<cmd>lua require('fzf-lua').grep_curbuf()<cr>]], { desc = '[F]zfLua [/] grep_curbuf' })
 
-vim.keymap.set('n', '<leader>fB', function()
+vim.keymap.set('n', '<leader>fb', function()
   require('fzf-lua').grep_curbuf { prompt = 'Grep Cur Buff> ', winopts = { title = 'Grep Current Buffer' } }
 end, { desc = '[F]zfLua grep current [B]uffer' })
 vim.keymap.set('n', '<leader>fp', function()

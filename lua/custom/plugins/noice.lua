@@ -97,7 +97,7 @@ return {
         size = {
           width = 'auto',
           height = 'auto',
-          max_width = 80, -- Optional: set a maximum width for readability
+          max_width = 120, -- Increased from 80 for long output like :pwd
         },
         -- Optional: ensure messages stack downwards (top_down = true) or upwards (top_down = false)
         -- If you want the latest message at the absolute top, set top_down = false
@@ -175,13 +175,14 @@ return {
           winhighlight = 'Normal:Normal,FloatBorder:FloatBorder,CursorLine:Visual,Search:None',
         },
       },
-      -- Skip popup for :grep and :vimgrep results (they go to quickfix anyway)
+      -- Route shell output to split (so :!ls ~ etc. are visible)
+      -- Note: grep/vimgrep results still skipped by the pattern match below
       {
+        view = 'split',
         filter = {
           event = 'msg_show',
           kind = 'shell_out',
         },
-        opts = { skip = true },
       },
       {
         filter = {
@@ -226,4 +227,14 @@ return {
     { '<Leader>nh', '<cmd>Noice history<CR>', desc = '[N]oice [H]istory', mode = 'n', silent = true, noremap = true },
     { '<Leader>nl', '<cmd>NoiceLast<CR>', desc = '[N]oice [L]ast', mode = 'n', silent = true, noremap = true },
   },
+  init = function()
+    -- Remind about g< after shell commands (output goes to split, g< recalls it)
+    vim.api.nvim_create_autocmd('ShellCmdPost', {
+      callback = function()
+        vim.defer_fn(function()
+          vim.notify('Tip: g< to see output again', vim.log.levels.INFO, { timeout = 2000 })
+        end, 100) -- slight delay so it appears after the split
+      end,
+    })
+  end,
 }
