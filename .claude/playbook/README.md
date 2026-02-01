@@ -31,6 +31,7 @@ When starting a task, ask Claude:
 | [noice-message-routing](knowledge/noice-message-routing.md) | How Noice routes messages to views, filters, and the split/notify/skip options |
 | [mini-sessions](knowledge/mini-sessions.md) | MiniSessions per-project setup, cwd-based paths, autoread/autowrite |
 | [telescope-hidden-files](knowledge/telescope-hidden-files.md) | How to search hidden/ignored files in Telescope pickers |
+| [telescope-layout-persistence](knowledge/telescope-layout-persistence.md) | Persist layout choice (flex/vertical/horizontal) across pickers and sessions |
 
 ## Adding New Entries
 

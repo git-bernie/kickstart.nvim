@@ -933,23 +933,59 @@ require('lazy').setup {
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
       local action_layout = require 'telescope.actions.layout'
+      local action_state = require 'telescope.actions.state'
+
+      -- Persist layout preference across sessions
+      local layout_file = vim.fn.stdpath 'data' .. '/telescope_layout.txt'
+      local function get_saved_layout()
+        local f = io.open(layout_file, 'r')
+        if f then
+          local layout = f:read '*l'
+          f:close()
+          if layout and layout ~= '' then
+            return layout
+          end
+        end
+        return 'flex'
+      end
+
+      local function save_layout(layout)
+        local f = io.open(layout_file, 'w')
+        if f then
+          f:write(layout)
+          f:close()
+        end
+      end
+
+      -- Custom cycle action that persists the choice
+      local function cycle_layout_and_save(prompt_bufnr)
+        action_layout.cycle_layout_next(prompt_bufnr)
+        local picker = action_state.get_current_picker(prompt_bufnr)
+        if picker and picker.layout_strategy then
+          -- Update default for future pickers in this session
+          require('telescope.config').values.layout_strategy = picker.layout_strategy
+          -- Save for next session
+          save_layout(picker.layout_strategy)
+        end
+      end
+
       require('telescope').setup {
         defaults = {
-          layout_strategy = 'flex',
+          layout_strategy = get_saved_layout(),
           layout_config = {
-            flip_columns = 100, -- switch to horizontal when width < 100 (default 120)
+            flex = { flip_columns = 100 }, -- switch to horizontal when width < 100 (default 120)
             horizontal = { preview_width = 0.5 },
             vertical = { preview_height = 0.4 },
           },
-          cycle_layout_list = { 'vertical', 'horizontal' },
+          cycle_layout_list = { 'flex', 'vertical', 'horizontal' },
           mappings = {
             i = {
               ['<M-p>'] = { action_layout.toggle_preview, type = 'action', opts = { desc = 'Toggle preview' } },
-              ['<M-l>'] = { action_layout.cycle_layout_next, type = 'action', opts = { desc = 'Cycle layout' } },
+              ['<M-l>'] = { cycle_layout_and_save, type = 'action', opts = { desc = 'Cycle layout (saves)' } },
             },
             n = {
               ['<M-p>'] = { action_layout.toggle_preview, type = 'action', opts = { desc = 'Toggle preview' } },
-              ['<M-l>'] = { action_layout.cycle_layout_next, type = 'action', opts = { desc = 'Cycle layout' } },
+              ['<M-l>'] = { cycle_layout_and_save, type = 'action', opts = { desc = 'Cycle layout (saves)' } },
             },
           },
         },
