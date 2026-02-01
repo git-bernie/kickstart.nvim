@@ -983,9 +983,9 @@ require('lazy').setup {
       vim.keymap.set('n', '<leader>sc', builtin.lsp_document_symbols, { desc = '[S]earch [C]urrent Buffer Tags (lsp_document_symbols)' })
       vim.keymap.set('n', '<leader>sm', builtin.man_pages, { desc = '[S]earch [M]an pages' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-      vim.keymap.set('n', '<leader>sW', function()
+      vim.keymap.set('n', '<leader>s*', function()
         builtin.grep_string { additional_args = { '--hidden', '--no-ignore' }, prompt_title = 'Grep Word (hidden, no_ignore)' }
-      end, { desc = '[S]earch current [W]ord (hidden)' })
+      end, { desc = '[S]earch current word [*] (hidden)' })
       vim.keymap.set('n', '<leader>sg', function()
         builtin.live_grep { results_title = 'Search by Live Grep' }
       end, { desc = '[S]earch by [/G]rep' })
