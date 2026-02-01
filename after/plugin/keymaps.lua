@@ -355,7 +355,8 @@ local function copyPath(type)
   }
   local filepath = vim.fn.expand(modifiers[type] or '%')
   vim.fn.setreg('+', '"' .. filepath .. '"')
-  vim.notify(filepath)
+  vim.fn.setreg('g', filepath)
+  vim.notify(filepath .. '\n(yanked to "+ and "g)', vim.log.levels.INFO)
 end
 
 -- E.g. "after/plugin/keymaps.lua"
@@ -668,15 +669,20 @@ vim.api.nvim_create_user_command('BrowserSync', function()
 end, {})
 
 -- Custom <C-g> that shows basename first (always visible), then full path
--- Solves the problem of long paths truncating the filename in notifications
+-- Copies to "g register for easy pasting. Use 1<C-g> for absolute path.
 vim.keymap.set('n', '<C-g>', function()
+  local count = vim.v.count
   local basename = vim.fn.expand '%:t'
-  local filepath = vim.fn.expand '%:~:.' -- relative to cwd or home
+  local filepath = count >= 1 and vim.fn.expand '%:p' or vim.fn.expand '%:~:.'
   local modified = vim.bo.modified and ' [+]' or ''
   local readonly = vim.bo.readonly and ' [RO]' or ''
   local line_info = string.format('  (%d/%d)', vim.fn.line '.', vim.fn.line '$')
 
-  -- Basename first line, path second line
-  local msg = basename .. modified .. readonly .. line_info .. '\n' .. filepath
+  -- Copy filepath to "g register
+  vim.fn.setreg('g', filepath)
+
+  -- Basename first line, path second line, register hint third
+  local path_type = count >= 1 and 'absolute' or 'relative'
+  local msg = basename .. modified .. readonly .. line_info .. '\n' .. filepath .. '\n("g = ' .. path_type .. ' path)'
   vim.notify(msg, vim.log.levels.INFO)
-end, { desc = 'Show file info (basename first)' })
+end, { desc = 'Show file info (basename first), yank to "g' })
