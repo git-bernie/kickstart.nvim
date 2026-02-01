@@ -9,6 +9,14 @@ When starting a task, ask Claude:
 - "Do we have a runbook for...?"
 - "What do we know about...?" (for knowledge topics)
 
+## Habits (What to remember)
+
+| Habit | Trigger |
+|-------|---------|
+| [session-end-capture](habits/session-end-capture.md) | Before ending a Claude session |
+| [after-shell-command](habits/after-shell-command.md) | After running `:!` commands |
+| [after-fixing-issue](habits/after-fixing-issue.md) | After debugging/fixing any issue |
+
 ## Runbooks (How to do things)
 
 | Runbook | Use When |
@@ -27,6 +35,7 @@ When starting a task, ask Claude:
 ## Adding New Entries
 
 Use the templates:
+- `habits/_template.md` - For behaviors ("remember to do X when Y")
 - `runbooks/_template.md` - For procedures ("how to do X")
 - `knowledge/_template.md` - For understanding ("how X works")
 
