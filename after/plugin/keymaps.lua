@@ -666,3 +666,17 @@ vim.api.nvim_create_user_command(
 vim.api.nvim_create_user_command('BrowserSync', function()
   vim.fn.system "browser-sync start --server --files '*.html,*.xhtml,*.css,*.js'"
 end, {})
+
+-- Custom <C-g> that shows basename first (always visible), then full path
+-- Solves the problem of long paths truncating the filename in notifications
+vim.keymap.set('n', '<C-g>', function()
+  local basename = vim.fn.expand '%:t'
+  local filepath = vim.fn.expand '%:~:.' -- relative to cwd or home
+  local modified = vim.bo.modified and ' [+]' or ''
+  local readonly = vim.bo.readonly and ' [RO]' or ''
+  local line_info = string.format('  (%d/%d)', vim.fn.line '.', vim.fn.line '$')
+
+  -- Basename first line, path second line
+  local msg = basename .. modified .. readonly .. line_info .. '\n' .. filepath
+  vim.notify(msg, vim.log.levels.INFO)
+end, { desc = 'Show file info (basename first)' })
