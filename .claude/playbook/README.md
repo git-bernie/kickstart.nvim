@@ -32,6 +32,7 @@ When starting a task, ask Claude:
 | [mini-sessions](knowledge/mini-sessions.md) | MiniSessions per-project setup, cwd-based paths, autoread/autowrite |
 | [telescope-hidden-files](knowledge/telescope-hidden-files.md) | How to search hidden/ignored files in Telescope pickers |
 | [telescope-layout-persistence](knowledge/telescope-layout-persistence.md) | Persist layout choice (flex/vertical/horizontal) across pickers and sessions |
+| [noice-cmdline-cursor-issue](knowledge/noice-cmdline-cursor-issue.md) | **OPEN ISSUE:** Fake cursor covers last character in Kitty terminal |
 
 ## Adding New Entries
 
