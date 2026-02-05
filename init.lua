@@ -1386,6 +1386,10 @@ require('lazy').setup {
         clangd = {},
         -- gopls = {},
         pyright = {},
+        marksman = {
+          -- Use .marksman.toml as workspace root (not cwd or .git)
+          root_dir = require('lspconfig.util').root_pattern('.marksman.toml'),
+        },
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -1424,6 +1428,17 @@ require('lazy').setup {
           },
         }, -- }}}
         -- vue_ls = {},
+        yamlls = {
+          settings = {
+            yaml = {
+              schemaStore = { enable = true }, -- Auto-fetch from schemastore.org
+              schemas = {
+                -- Custom schemas (global location)
+                ['/home/bernie/.local/share/schemas/homestead-schema.json'] = '**/Homestead.yaml',
+              },
+            },
+          },
+        },
       }
 
       -- Ensure the servers and tools above are installed
@@ -1483,6 +1498,7 @@ require('lazy').setup {
       require('lint').setup {
         linters_by_ft = {
           html = { 'htmlhint' }, -- Example linter
+          yaml = { 'yamllint' },
           -- Add other file types and their linters here
         },
       }
@@ -1934,6 +1950,7 @@ require('lazy').setup {
         'tsx',
         'typst',
         'xml',
+        'yaml',
       },
       -- Autoinstall languages that are not installed
       auto_install = true,
