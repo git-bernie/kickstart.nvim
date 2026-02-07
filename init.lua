@@ -1903,7 +1903,9 @@ require('lazy').setup {
 
       require('mini.jump').setup()
 
-      require('mini.animate').setup()
+      require('mini.animate').setup {
+        resize = { enable = false },
+      }
 
       require('mini.bufremove').setup()
 
