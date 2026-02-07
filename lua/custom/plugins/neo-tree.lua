@@ -42,7 +42,9 @@ return {
         -- After creating a file/folder, move cursor to it
         event = 'file_added',
         handler = function(destination)
-          vim.cmd('Neotree reveal_file=' .. vim.fn.fnameescape(destination))
+          vim.defer_fn(function()
+            vim.cmd('Neotree reveal_file=' .. vim.fn.fnameescape(destination))
+          end, 100)
         end,
       },
       {
