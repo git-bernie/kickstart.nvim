@@ -39,6 +39,13 @@ return {
     -- Custom preview for PDFs - convert to text instead of opening external viewer
     event_handlers = {
       {
+        -- After creating a file/folder, move cursor to it
+        event = 'file_added',
+        handler = function(destination)
+          vim.cmd('Neotree reveal_file=' .. vim.fn.fnameescape(destination))
+        end,
+      },
+      {
         event = 'file_open_requested',
         handler = function(args)
           local path = args.path
