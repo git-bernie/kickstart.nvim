@@ -113,6 +113,19 @@ return {
           require('neo-tree.sources.filesystem.commands').open(state)
         end
       end,
+      -- Open file and close Neo-tree (like Aerial's o/<C-CR>)
+      open_and_close = function(state)
+        local node = state.tree:get_node()
+        local path = node:get_id()
+        local ext = path:match('%.(%w+)$')
+        local binary_exts = { pdf = true, png = true, jpg = true, jpeg = true, gif = true, mp4 = true, mp3 = true, zip = true, tar = true, gz = true }
+        if ext and binary_exts[ext:lower()] then
+          vim.fn.jobstart({ 'xdg-open', path }, { detach = true })
+        else
+          require('neo-tree.sources.filesystem.commands').open(state)
+        end
+        require('neo-tree.command').execute({ action = 'close' })
+      end,
       -- Custom filter command that auto-refreshes after filtering
       filter_and_refresh = function(state)
         local fs_commands = require('neo-tree.sources.filesystem.commands')
@@ -141,6 +154,7 @@ return {
           ['<CR>'] = { 'smart_open', desc = 'Smart open (system viewer for PDFs)' },
           ['O'] = { 'system_open', desc = 'Open with system viewer' },
           ['P'] = { 'pdf_safe_preview', desc = 'Preview (PDFs as text)' },
+          ['<C-CR>'] = { 'open_and_close', desc = 'Open and close tree' },
           ['f'] = 'filter_and_refresh', -- Use custom command instead of default filter
         },
       },
