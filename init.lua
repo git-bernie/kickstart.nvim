@@ -63,7 +63,7 @@ Kickstart Guide:
     This should be the first place you go to look when you're stuck or confused
     with something. It's one of my favorite Neovim features.
 
-    MOST IMPORTANTLY, we provide a keymap "<space>sh" to [s]earch the [h]elp documentation,
+jq: parse error: Invalid numeric literal at line 1, column 9
     which is very useful when you're not exactly sure of what you're looking for.
 
   I have left several `:help X` comments throughout the init.lua
@@ -265,6 +265,13 @@ vim.api.nvim_create_autocmd('FileType', {
   callback = function()
     local title = vim.w.quickfix_title or ''
     vim.wo.statusline = '%t ' .. title .. ' %l/%L'
+
+    -- d = open entry and diff against HEAD (useful after :0Gclog)
+    vim.keymap.set('n', 'd', function()
+      local line = vim.api.nvim_win_get_cursor(0)[1]
+      vim.cmd('cc ' .. line)
+      vim.cmd 'Gvdiffsplit @'
+    end, { buffer = true, desc = 'Open and diff vs HEAD' })
   end,
 })
 
@@ -1388,7 +1395,7 @@ require('lazy').setup {
         pyright = {},
         marksman = {
           -- Use .marksman.toml as workspace root (not cwd or .git)
-          root_dir = require('lspconfig.util').root_pattern('.marksman.toml'),
+          root_dir = require('lspconfig.util').root_pattern '.marksman.toml',
         },
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs

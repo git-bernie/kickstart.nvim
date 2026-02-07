@@ -652,6 +652,14 @@ if vim.g.neovide then
   vim.keymap.set({ 'n', 'v' }, '<C-0>', ':lua vim.g.neovide_scale_factor = 1<CR>') -- Reset to default
 end
 
+-- "mZwjmdZwe1S5uhHMdR9CVGqv3gQS1lzvOAd_r_pYRdY" 1000000000
+-- "1706b0559e4a8c8b7e1f486b590cbc5e8afef5d250a94c"
+-- https://example.co/path/1706b0559e4a8c8b7e1f486b590cbc5e8afef5d250a94c/query?enc=mZwjmdZwe1S5uhHMdR9CVGqv3gQS1lzvOAd_r_pYRdY&ver=1000000000
+vim.keymap.set('n', '<leader>xd', require('lc-cyber').decode_word, { desc = 'Decode LC ID under cursor' })
+vim.keymap.set('n', '<leader>xy', require('lc-cyber').decode_word_to_clipboard, { desc = 'Decode LC ID to clipboard' })
+vim.keymap.set('v', '<leader>xd', require('lc-cyber').decode_selection, { desc = 'Decode LC ID selection' })
+vim.keymap.set('v', '<leader>cx', require('lc-cyber').decode_selection_to_clipboard, { desc = 'Decode LC ID to clipboard' })
+
 --- Generate a function annotation using Neogen for the function at or under the cursor.
 --- This command uses the 'neogen' plugin to create documentation comments.
 function CommentFunctionUnderCursor()

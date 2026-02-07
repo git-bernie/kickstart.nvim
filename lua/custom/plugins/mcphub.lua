@@ -4,7 +4,7 @@ return {
   dependencies = {
     'nvim-lua/plenary.nvim',
   },
-  enabled = false,
+  enabled = true,
   build = 'bundled_build.lua',
   cmd = 'MCPHub',
   keys = {
@@ -13,6 +13,11 @@ return {
   config = function()
     require('mcphub').setup {
       use_bundled_binary = true,
+      -- Look for .mcp.json (Claude Code format) in addition to defaults
+      workspace = {
+        enabled = true,
+        look_for = { '.mcp.json', '.mcphub/servers.json', '.vscode/mcp.json', '.cursor/mcp.json' },
+      },
       extensions = {
         copilotchat = {
           enabled = true,

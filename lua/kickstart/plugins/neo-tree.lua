@@ -1,11 +1,12 @@
 -- Neo-tree is a Neovim plugin to browse the file system
 -- https://github.com/nvim-neo-tree/neo-tree.nvim
 
+-- Note: Additional config in custom/plugins/neo-tree.lua
 return {
   'nvim-neo-tree/neo-tree.nvim',
   version = '*',
   dependencies = {
-    '3rd/image.nvim', -- Optional image support in preview window: See `# Preview Mode` for more information
+    -- '3rd/image.nvim', -- Disabled: causes preview errors with PDFs
     'nvim-lua/plenary.nvim',
     'nvim-tree/nvim-web-devicons', -- not strictly required, but recommended
     'MunifTanjim/nui.nvim',

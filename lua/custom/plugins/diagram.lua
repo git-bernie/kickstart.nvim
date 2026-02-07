@@ -1,5 +1,6 @@
 return {
   '3rd/diagram.nvim',
+  enabled = false, -- Disabled: requires image.nvim which causes Neo-tree PDF preview errors
   dependencies = {
     { '3rd/image.nvim', opts = {} }, -- you'd probably want to configure image.nvim manually instead of doing this
   },

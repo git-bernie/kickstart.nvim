@@ -23,11 +23,13 @@ return {
       '<cmd>Telescope file_browser follow_symlinks=true prompt_path=true create_from_prompt=false preview=true<cr>',
       { desc = '[S]earch [e]xplorer (file browser)', silent = true }
     )
-    vim.keymap.set(
+    --[[ 
+    --- the difference is the path=%p:h which opens the file_browser in the current file's directoty. Meh.- 
+    ---vim.keymap.set(
       'n',
       '<leader>sE',
       '<cmd>Telescope file_browser path=%:p:h follow_symlinks=true prompt_path=true create_from_prompt=false preview=true<cr>',
       { desc = '[S]earch [E]xplorer here (buffer dir)' }
-    )
+    ) ]]
   end,
 }

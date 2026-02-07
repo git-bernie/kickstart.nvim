@@ -10,6 +10,7 @@ return {
   config = function()
     require('emoji').setup()
     local ts = require('telescope').load_extension 'emoji'
-    vim.keymap.set('n', '<leader>se', ts.emoji, { desc = '[S]earch [E]moji' })
+    -- Rarely used and search explorer a better use case.
+    vim.keymap.set('n', '<leader>sE', ts.emoji, { desc = '[S]earch [E]moji' })
   end,
 }

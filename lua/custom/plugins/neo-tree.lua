@@ -14,7 +14,7 @@ return {
   branch = 'v3.x',
   -- version = '*',
   dependencies = {
-    '3rd/image.nvim', -- Optional image support in preview window: See `# Preview Mode` for more information
+    -- '3rd/image.nvim', -- Disabled: causes preview errors with PDFs
     'nvim-lua/plenary.nvim',
     'nvim-tree/nvim-web-devicons', -- not strictly required, but recommended
     'MunifTanjim/nui.nvim',
@@ -26,21 +26,92 @@ return {
     { '<leader>tf', ':Neotree float<CR>', desc = 'Neo[T]ree [F]loat', silent = true },
     { '<leader>tc', ':Neotree current<CR>', desc = 'Neo[T]ree [C]urrent', silent = true },
   },
-  window = {
-    mappings = {
-      ['P'] = { 'toggle_preview', config = { use_float = true, use_image_nvim = true } },
-    },
-  },
   opts = {
     auto_restore_session_experimental = true,
     use_libuv_file_watcher = true,
     close_if_last_window = true, -- misspelled in lua/kickstart/plugins/neo-tree.lua
+    window = {
+      mappings = {
+        -- Disable image.nvim for preview - causes errors with PDFs
+        ['P'] = { 'pdf_safe_preview', desc = 'Preview (PDFs as text)' },
+      },
+    },
+    -- Custom preview for PDFs - convert to text instead of opening external viewer
+    event_handlers = {
+      {
+        event = 'file_open_requested',
+        handler = function(args)
+          local path = args.path
+          local ext = path:match('%.(%w+)$')
+          if ext and ext:lower() == 'pdf' then
+            -- For preview, convert PDF to text in a scratch buffer
+            local buf = vim.api.nvim_create_buf(false, true)
+            vim.api.nvim_buf_set_option(buf, 'buftype', 'nofile')
+            vim.api.nvim_buf_set_option(buf, 'bufhidden', 'wipe')
+            vim.api.nvim_buf_set_name(buf, 'PDF Preview: ' .. vim.fn.fnamemodify(path, ':t'))
+            local output = vim.fn.systemlist('pdftotext -layout "' .. path .. '" -')
+            vim.api.nvim_buf_set_lines(buf, 0, -1, false, output)
+            vim.api.nvim_buf_set_option(buf, 'modifiable', false)
+            vim.cmd('vsplit')
+            vim.api.nvim_win_set_buf(0, buf)
+            return { handled = true }
+          end
+        end,
+      },
+    },
     commands = {
+      -- Custom preview that handles PDFs as text instead of launching Okular
+      pdf_safe_preview = function(state)
+        local node = state.tree:get_node()
+        local path = node:get_id()
+        local ext = path:match('%.(%w+)$')
+        if ext and ext:lower() == 'pdf' then
+          -- Convert PDF to text and show in a float window
+          local buf = vim.api.nvim_create_buf(false, true)
+          vim.api.nvim_buf_set_option(buf, 'buftype', 'nofile')
+          vim.api.nvim_buf_set_option(buf, 'bufhidden', 'wipe')
+          vim.api.nvim_buf_set_name(buf, 'PDF: ' .. vim.fn.fnamemodify(path, ':t'))
+          local output = vim.fn.systemlist('pdftotext -layout "' .. path .. '" -')
+          vim.api.nvim_buf_set_lines(buf, 0, -1, false, output)
+          vim.api.nvim_buf_set_option(buf, 'modifiable', false)
+          -- Open in a float window
+          local width = math.floor(vim.o.columns * 0.6)
+          local height = math.floor(vim.o.lines * 0.8)
+          local win = vim.api.nvim_open_win(buf, true, {
+            relative = 'editor',
+            width = width,
+            height = height,
+            col = math.floor((vim.o.columns - width) / 2),
+            row = math.floor((vim.o.lines - height) / 2),
+            style = 'minimal',
+            border = 'rounded',
+            title = ' PDF Preview (q to close) ',
+            title_pos = 'center',
+          })
+          -- Press q to close
+          vim.api.nvim_buf_set_keymap(buf, 'n', 'q', ':close<CR>', { noremap = true, silent = true })
+        else
+          -- Use normal preview for non-PDFs
+          require('neo-tree.sources.common.preview').toggle(state)
+        end
+      end,
       -- Open file with system default application (xdg-open)
       system_open = function(state)
         local node = state.tree:get_node()
         local path = node:get_id()
         vim.fn.jobstart({ 'xdg-open', path }, { detach = true })
+      end,
+      -- Smart open: use system viewer for binary files, neovim for text
+      smart_open = function(state)
+        local node = state.tree:get_node()
+        local path = node:get_id()
+        local ext = path:match('%.(%w+)$')
+        local binary_exts = { pdf = true, png = true, jpg = true, jpeg = true, gif = true, mp4 = true, mp3 = true, zip = true, tar = true, gz = true }
+        if ext and binary_exts[ext:lower()] then
+          vim.fn.jobstart({ 'xdg-open', path }, { detach = true })
+        else
+          require('neo-tree.sources.filesystem.commands').open(state)
+        end
       end,
       -- Custom filter command that auto-refreshes after filtering
       filter_and_refresh = function(state)
@@ -67,8 +138,9 @@ return {
       window = {
         mappings = {
           ['\\'] = 'close_window',
+          ['<CR>'] = { 'smart_open', desc = 'Smart open (system viewer for PDFs)' },
           ['O'] = { 'system_open', desc = 'Open with system viewer' },
-          ['P'] = { 'toggle_preview', config = { use_float = true, use_image_nvim = true } },
+          ['P'] = { 'pdf_safe_preview', desc = 'Preview (PDFs as text)' },
           ['f'] = 'filter_and_refresh', -- Use custom command instead of default filter
         },
       },
