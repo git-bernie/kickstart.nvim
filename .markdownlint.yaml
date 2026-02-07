@@ -36,7 +36,8 @@ line-length: false # MD013
   # code_blocks: false
 no-inline-html: false # MD033
 no-bare-urls: false # MD034
-blanks-around-headings: false # MD022
+blanks-around-headings: true # MD022
+blanks-around-lists: true # MD032
 blanks-around-tables: false # MD058
 fenced-code-language: false # MD040
 markdown-disable: true # 
