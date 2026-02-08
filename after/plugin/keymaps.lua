@@ -217,6 +217,84 @@ if (vim.fn.executable 'jq') == 1 then
 
   vim.keymap.set('n', '<leader>jl', '<cmd>. ! jq --sort-keys<cr>', { desc = '[y] [j]son pretty print' })
   vim.keymap.set('v', '<leader>jl', "<cmd>'<,'> ! jq --sort-keys<cr>", { buffer = true, desc = '[y] [j]son pretty print' })
+
+  -- Extract JSON from a log line and show formatted in a float
+  vim.keymap.set('n', '<leader>jx', function()
+    local line = vim.api.nvim_get_current_line()
+
+    -- Find valid JSON by scanning for { or [ and matching balanced braces
+    -- Prefers the longest valid JSON found (catches full arrays like [{...},{...}])
+    local json_str = nil
+    local openers = { ['{'] = '}', ['['] = ']' }
+    for i = #line, 1, -1 do
+      local ch = line:sub(i, i)
+      if ch == '}' or ch == ']' then
+        local close = ch
+        local open = close == '}' and '{' or '['
+        -- Walk backwards to find the matching opener
+        local depth = 0
+        for j = i, 1, -1 do
+          local c = line:sub(j, j)
+          if c == close then
+            depth = depth + 1
+          elseif c == open then
+            depth = depth - 1
+          end
+          if depth == 0 then
+            local candidate = line:sub(j, i)
+            if candidate ~= '[]' then
+              local ok, _ = pcall(vim.fn.json_decode, candidate)
+              if ok then
+                json_str = candidate
+                break
+              end
+            end
+            break
+          end
+        end
+        if json_str then
+          break
+        end
+      end
+    end
+
+    if not json_str then
+      vim.notify('No valid JSON found on this line', vim.log.levels.WARN)
+      return
+    end
+
+    -- Format with jq
+    local formatted = vim.fn.systemlist('echo ' .. vim.fn.shellescape(json_str) .. ' | jq --sort-keys .')
+    if vim.v.shell_error ~= 0 then
+      -- Fallback: try without sort
+      formatted = vim.fn.systemlist('echo ' .. vim.fn.shellescape(json_str) .. ' | jq .')
+    end
+    if vim.v.shell_error ~= 0 then
+      formatted = { json_str }
+    end
+
+    -- Show in a float
+    local buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, formatted)
+    vim.bo[buf].filetype = 'json'
+    vim.bo[buf].bufhidden = 'wipe'
+    vim.bo[buf].modifiable = false
+
+    local width = math.min(math.max(40, #(formatted[1] or '') + 4), math.floor(vim.o.columns * 0.8))
+    local height = math.min(#formatted, math.floor(vim.o.lines * 0.7))
+    vim.api.nvim_open_win(buf, true, {
+      relative = 'cursor',
+      width = width,
+      height = height,
+      col = 2,
+      row = 1,
+      style = 'minimal',
+      border = 'rounded',
+      title = ' JSON from log line (q to close) ',
+      title_pos = 'center',
+    })
+    vim.keymap.set('n', 'q', '<cmd>close<CR>', { buffer = buf, silent = true })
+  end, { desc = 'E[x]tract JSON from log line' })
 end
 
 -- Not as useful as jq but sometimes needed, if just to remember how to use yq
