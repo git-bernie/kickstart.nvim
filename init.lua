@@ -171,6 +171,12 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
   end,
 })
 
+vim.filetype.add {
+  pattern = {
+    ['%.env[%.%w]*'] = 'config',
+  },
+}
+
 -- In init.lua
 vim.api.nvim_create_autocmd('FileType', {
   pattern = { 'sh', 'bash', 'zsh' },

@@ -6,7 +6,7 @@ return {
     enable_on_load = false,
     verbose = true,
     -- envvars is really a shell file with export so it does not work well
-    file_name = { '.env', 'env-*' },
+    file_name = { '.env', 'env-*', 'env.*' },
   },
 }
 
