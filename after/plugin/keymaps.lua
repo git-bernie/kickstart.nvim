@@ -221,39 +221,97 @@ if (vim.fn.executable 'jq') == 1 then
   -- Extract JSON from a log line and show formatted in a float
   vim.keymap.set('n', '<leader>jx', function()
     local line = vim.api.nvim_get_current_line()
+    local col = vim.api.nvim_win_get_cursor(0)[2] + 1 -- 1-indexed
 
-    -- Find valid JSON by scanning for { or [ and matching balanced braces
-    -- Prefers the longest valid JSON found (catches full arrays like [{...},{...}])
+    -- Helper: find matching closer scanning forward from an opener
+    local function find_matching_close(pos)
+      local open = line:sub(pos, pos)
+      local close = open == '{' and '}' or ']'
+      local depth = 0
+      for k = pos, #line do
+        local c = line:sub(k, k)
+        if c == open then
+          depth = depth + 1
+        elseif c == close then
+          depth = depth - 1
+        end
+        if depth == 0 then
+          return k
+        end
+      end
+      return nil
+    end
+
     local json_str = nil
-    local openers = { ['{'] = '}', ['['] = ']' }
-    for i = #line, 1, -1 do
+
+    -- Priority 1: Find the outermost JSON that contains the cursor
+    for i = 1, col do
       local ch = line:sub(i, i)
-      if ch == '}' or ch == ']' then
-        local close = ch
-        local open = close == '}' and '{' or '['
-        -- Walk backwards to find the matching opener
-        local depth = 0
-        for j = i, 1, -1 do
-          local c = line:sub(j, j)
-          if c == close then
-            depth = depth + 1
-          elseif c == open then
-            depth = depth - 1
+      if ch == '{' or ch == '[' then
+        local close_pos = find_matching_close(i)
+        if close_pos and close_pos >= col then
+          local candidate = line:sub(i, close_pos)
+          if candidate ~= '[]' and candidate ~= '{}' then
+            local ok, _ = pcall(vim.fn.json_decode, candidate)
+            if ok then
+              json_str = candidate
+              break -- outermost wins
+            end
           end
-          if depth == 0 then
-            local candidate = line:sub(j, i)
-            if candidate ~= '[]' then
+        end
+      end
+    end
+
+    -- Priority 2: Find next valid JSON from cursor position forward
+    if not json_str then
+      for i = col, #line do
+        local ch = line:sub(i, i)
+        if ch == '{' or ch == '[' then
+          local close_pos = find_matching_close(i)
+          if close_pos then
+            local candidate = line:sub(i, close_pos)
+            if candidate ~= '[]' and candidate ~= '{}' then
               local ok, _ = pcall(vim.fn.json_decode, candidate)
               if ok then
                 json_str = candidate
                 break
               end
             end
-            break
           end
         end
-        if json_str then
-          break
+      end
+    end
+
+    -- Priority 3: Fallback - scan right-to-left for longest valid JSON
+    if not json_str then
+      for i = #line, 1, -1 do
+        local ch = line:sub(i, i)
+        if ch == '}' or ch == ']' then
+          local close = ch
+          local open = close == '}' and '{' or '['
+          local depth = 0
+          for j = i, 1, -1 do
+            local c = line:sub(j, j)
+            if c == close then
+              depth = depth + 1
+            elseif c == open then
+              depth = depth - 1
+            end
+            if depth == 0 then
+              local candidate = line:sub(j, i)
+              if candidate ~= '[]' and candidate ~= '{}' then
+                local ok, _ = pcall(vim.fn.json_decode, candidate)
+                if ok then
+                  json_str = candidate
+                  break
+                end
+              end
+              break
+            end
+          end
+          if json_str then
+            break
+          end
         end
       end
     end
