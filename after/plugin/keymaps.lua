@@ -594,12 +594,13 @@ vim.g.noice_enabled = true
 
 local picker = require 'window-picker'
 -- vim.keymap.set('n', ',w', function()
+-- comma shortcut
 vim.keymap.set('n', ',w', function()
   local picked_window_id = picker.pick_window {
     include_current_win = true,
   } or vim.api.nvim_get_current_win()
   vim.api.nvim_set_current_win(picked_window_id)
-end, { desc = 'Pick a window' })
+end, { desc = '[,] Pick a [w]indow' })
 
 vim.keymap.set('n', '-', function()
   local picked_window_id = picker.pick_window {
@@ -822,14 +823,15 @@ vim.keymap.set('n', '<C-g>', function()
   local readonly = vim.bo.readonly and ' [RO]' or ''
   local line_info = string.format('  (%d/%d)', vim.fn.line '.', vim.fn.line '$')
 
-  -- Copy filepath to "g register
+  -- Copy filepath to "+" (system clipboard) and "g registers
+  vim.fn.setreg('+', filepath)
   vim.fn.setreg('g', filepath)
 
   -- Basename first line, path second line, register hint third
   local path_type = count >= 1 and 'absolute' or 'relative'
-  local msg = basename .. modified .. readonly .. line_info .. '\n' .. filepath .. '\n("g = ' .. path_type .. ' path)'
+  local msg = basename .. modified .. readonly .. line_info .. '\n' .. filepath .. '\n("+ and "g = ' .. path_type .. ' path)'
   vim.notify(msg, vim.log.levels.INFO)
-end, { desc = 'Show file info (basename first), yank to "g' })
+end, { desc = 'Show file info (basename first), yank to "+ and "g' })
 
 -- Custom :Pwd that shows leaf directory first (always visible), then full path
 -- Same UX pattern as <C-g> above: most important info first.
