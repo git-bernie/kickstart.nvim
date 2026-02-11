@@ -814,6 +814,10 @@ require('lazy').setup {
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
     opts = {
+      triggers = {
+        { '<auto>', mode = 'nxsot' }, -- default auto-detection
+        { ',', mode = { 'n', 'v' } }, -- also trigger on ,
+      },
       icons = {
         -- set icon mappings to true if you have a Nerd Font
         mappings = vim.g.have_nerd_font,
@@ -866,6 +870,7 @@ require('lazy').setup {
         { '<leader>w', group = '[W]orkspace' },
         { '<leader>y', group = '[Y]ours' },
         { '<leader>/', group = '[/] searches' },
+        { ',', group = '[,] comma-prefix' },
       },
     },
     -- See `:help which-key` for more information
