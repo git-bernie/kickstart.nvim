@@ -835,18 +835,19 @@ end, { desc = 'Show file info (basename first), yank to "+ and "g' })
 
 -- Custom :Pwd that shows leaf directory first (always visible), then full path
 -- Same UX pattern as <C-g> above: most important info first.
--- Copies to "g register. Use :Pwd! for non-~ (absolute) path.
+-- Copies to "+" (system clipboard) and "g register. Use :Pwd! for non-~ (absolute) path.
 vim.api.nvim_create_user_command('Pwd', function(opts)
   local cwd = vim.fn.getcwd()
   local display_path = opts.bang and cwd or vim.fn.fnamemodify(cwd, ':~')
   local leaf = vim.fn.fnamemodify(cwd, ':t')
   local path_type = opts.bang and 'absolute' or '~ path'
 
+  vim.fn.setreg('+', display_path)
   vim.fn.setreg('g', display_path)
 
-  local msg = leaf .. '/\n' .. display_path .. '\n("g = ' .. path_type .. ')'
+  local msg = leaf .. '/\n' .. display_path .. '\n("+ and "g = ' .. path_type .. ')'
   vim.notify(msg, vim.log.levels.INFO)
-end, { bang = true, desc = 'Show cwd (leaf first), yank to "g. Use ! for absolute.' })
+end, { bang = true, desc = 'Show cwd (leaf first), yank to "+ and "g. Use ! for absolute.' })
 
 -- Redirect :pwd to :Pwd so muscle memory works
 vim.cmd [[cnoreabbrev <expr> pwd (getcmdtype() == ':' && getcmdline() ==# 'pwd') ? 'Pwd' : 'pwd']]
