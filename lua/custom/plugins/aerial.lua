@@ -7,6 +7,23 @@ local jump_and_close = {
   end,
 }
 
+-- Toggle between normal and wide aerial window (matches Neo-tree's `e` key)
+local toggle_widen = {
+  desc = 'Toggle widen aerial window',
+  callback = function()
+    local winid = vim.api.nvim_get_current_win()
+    if vim.w[winid].aerial_widened then
+      vim.api.nvim_win_set_width(winid, vim.w[winid].aerial_prev_width)
+      vim.w[winid].aerial_widened = false
+    else
+      vim.w[winid].aerial_prev_width = vim.api.nvim_win_get_width(winid)
+      local wide = math.min(80, math.floor(vim.o.columns * 0.5))
+      vim.api.nvim_win_set_width(winid, wide)
+      vim.w[winid].aerial_widened = true
+    end
+  end,
+}
+
 return {
   'stevearc/aerial.nvim',
   enabled = true,
@@ -40,6 +57,7 @@ return {
       -- <C-CR> / o = jump and close (ignores close_on_select setting)
       ['<C-CR>'] = jump_and_close,
       ['o'] = jump_and_close,
+      ['e'] = toggle_widen,
     },
   },
   -- Optional dependencies
