@@ -1,5 +1,10 @@
 -- ~/.config/nvim/after/ftplugin/markdown.lua
 
+-- Treesitter-based folding: folds at heading levels
+vim.opt_local.foldmethod = 'expr'
+vim.opt_local.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+vim.opt_local.foldlevel = 99 -- start with all folds open
+
 -- Follow markdown links with <CR>, resolve relative to current file
 vim.keymap.set('n', '<CR>', function()
   local line = vim.api.nvim_get_current_line()
