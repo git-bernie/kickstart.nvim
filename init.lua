@@ -1446,6 +1446,7 @@ require('lazy').setup {
           },
         }, -- }}}
         -- vue_ls = {},
+        ansiblels = {},
         yamlls = {
           settings = {
             yaml = {
@@ -1584,8 +1585,8 @@ require('lazy').setup {
         blade = { 'blade-formatter' },
         markdown = { 'cbfmt', 'markdown-toc', 'markdownlint', stop_after_first = false },
         -- sql = { 'sqlfmt', 'sqruff' },
-        sql = { 'sql_formatter' },
-        -- sql = { 'sqlfluff' }, --  use vim.diagnostic.enable(false, …)
+        -- sql = { 'sql_formatter' },
+        sql = { 'sqlfluff' },
         -- php = { 'pretty-php', 'duster', 'php-cs-fixer' },
         -- php = { 'duster', 'php-cs-fixer' },
         -- php = { 'php-cs-fixer', 'prettierd' },

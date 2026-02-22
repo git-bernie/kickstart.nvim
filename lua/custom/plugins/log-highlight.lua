@@ -9,6 +9,7 @@ return {
       'tracker.log.*',
       '*access*.log.*',
       '*error*.log.*',
+      '*.log.*',
     },
   },
 }

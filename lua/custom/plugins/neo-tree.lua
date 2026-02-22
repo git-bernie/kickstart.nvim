@@ -51,7 +51,7 @@ return {
         event = 'file_open_requested',
         handler = function(args)
           local path = args.path
-          local ext = path:match('%.(%w+)$')
+          local ext = path:match '%.(%w+)$'
           if ext and ext:lower() == 'pdf' then
             -- For preview, convert PDF to text in a scratch buffer
             local buf = vim.api.nvim_create_buf(false, true)
@@ -61,7 +61,7 @@ return {
             local output = vim.fn.systemlist('pdftotext -layout "' .. path .. '" -')
             vim.api.nvim_buf_set_lines(buf, 0, -1, false, output)
             vim.api.nvim_buf_set_option(buf, 'modifiable', false)
-            vim.cmd('vsplit')
+            vim.cmd 'vsplit'
             vim.api.nvim_win_set_buf(0, buf)
             return { handled = true }
           end
@@ -73,7 +73,7 @@ return {
       pdf_safe_preview = function(state)
         local node = state.tree:get_node()
         local path = node:get_id()
-        local ext = path:match('%.(%w+)$')
+        local ext = path:match '%.(%w+)$'
         if ext and ext:lower() == 'pdf' then
           -- Convert PDF to text and show in a float window
           local buf = vim.api.nvim_create_buf(false, true)
@@ -114,8 +114,8 @@ return {
       smart_open = function(state)
         local node = state.tree:get_node()
         local path = node:get_id()
-        local ext = path:match('%.(%w+)$')
-        local binary_exts = { pdf = true, png = true, jpg = true, jpeg = true, gif = true, mp4 = true, mp3 = true, zip = true, tar = true, gz = true }
+        local ext = path:match '%.(%w+)$'
+        local binary_exts = { pdf = true, png = true, jpg = true, jpeg = true, gif = true, mp4 = true, mp3 = true, zip = false, tar = false, gz = false }
         if ext and binary_exts[ext:lower()] then
           vim.fn.jobstart({ 'xdg-open', path }, { detach = true })
         else
@@ -126,31 +126,35 @@ return {
       open_and_close = function(state)
         local node = state.tree:get_node()
         local path = node:get_id()
-        local ext = path:match('%.(%w+)$')
+        local ext = path:match '%.(%w+)$'
         local binary_exts = { pdf = true, png = true, jpg = true, jpeg = true, gif = true, mp4 = true, mp3 = true, zip = true, tar = true, gz = true }
         if ext and binary_exts[ext:lower()] then
           vim.fn.jobstart({ 'xdg-open', path }, { detach = true })
         else
           require('neo-tree.sources.filesystem.commands').open(state)
         end
-        require('neo-tree.command').execute({ action = 'close' })
+        require('neo-tree.command').execute { action = 'close' }
       end,
       -- Custom filter command that auto-refreshes after filtering
       filter_and_refresh = function(state)
-        local fs_commands = require('neo-tree.sources.filesystem.commands')
+        local fs_commands = require 'neo-tree.sources.filesystem.commands'
         fs_commands.filter_on_submit(state)
         -- Poll until filter popup closes, then call refresh directly
         local timer = vim.uv.new_timer()
         if not timer then
           return
         end
-        timer:start(100, 100, vim.schedule_wrap(function()
-          if vim.fn.mode() == 'n' then
-            timer:stop()
-            timer:close()
-            fs_commands.refresh(state)
-          end
-        end))
+        timer:start(
+          100,
+          100,
+          vim.schedule_wrap(function()
+            if vim.fn.mode() == 'n' then
+              timer:stop()
+              timer:close()
+              fs_commands.refresh(state)
+            end
+          end)
+        )
       end,
     },
     filesystem = {

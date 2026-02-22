@@ -53,6 +53,7 @@ vim.keymap.set('n', '<a-k>', '<cmd>cprevious<cr>', { desc = ':cprevious' })
 -- vim.keymap.set('n', 's', '<cmd>WhichKey<cr>', { desc = '[s]how which key mappings for cmd mode' })
 vim.keymap.set('n', '<Leader>wk', '<cmd>WhichKey<cr>', { desc = 'Sho[W] [W]hich key mappings for cmd mode' })
 vim.keymap.set('i', 'jk', '<esc>', { desc = '[jk] to escape' })
+vim.keymap.set('i', 'jK', '<esc>:write<cr>', { desc = '[jK] to escape and save', silent = false })
 
 --  [[ normal mode: ripgrep with args ]]
 vim.keymap.set('n', '<leader>sa', function()
@@ -394,6 +395,8 @@ vim.keymap.set('n', '<leader>Tv', '<cmd>vsplit +term<CR>', { desc = '[T]erminal 
 
 vim.keymap.set('n', '<leader>tw', '<cmd>set wrap!<CR>', { desc = '[T]oggle [w]rap', silent = false })
 
+-- Convert *.tsv to *.csv and actually convert tabs to commas
+-- : for F in $(ls *.tsv); do echo $F; B=$(basename "$F" .tsv); echo "$B"; csvtool -t TAB -u COMMA col 1- "$F" > "$B.csv"; done
 -- TODO: this is best put ins csvview.lua
 vim.keymap.set('n', '<leader>tv', '<cmd>CsvViewToggle<CR>', { desc = '[T]oggle Cs[v]ViewEnable', silent = false })
 
@@ -823,13 +826,28 @@ vim.keymap.set('n', '<C-g>', function()
   local readonly = vim.bo.readonly and ' [RO]' or ''
   local line_info = string.format('  (%d/%d)', vim.fn.line '.', vim.fn.line '$')
 
+  -- Format the size for display (e.g., human-readable format)
+  local function format_size(bytes)
+    local sizes = { 'B', 'KB', 'MB', 'GB' }
+    local i = 0
+    local size = bytes
+    while size >= 1024 and i < #sizes do
+      size = size / 1024.0
+      i = i + 1
+    end
+    -- Use string.format for one decimal place
+    return string.format('%.1f%s', size, sizes[i + 1])
+  end
+
   -- Copy filepath to "+" (system clipboard) and "g registers
   vim.fn.setreg('+', filepath)
   vim.fn.setreg('g', filepath)
 
   -- Basename first line, path second line, register hint third
+  local formatted_size = format_size(vim.fn.getfsize(vim.fn.expand '%:p'))
   local path_type = count >= 1 and 'absolute' or 'relative'
-  local msg = basename .. modified .. readonly .. line_info .. '\n' .. filepath .. '\n("+ and "g = ' .. path_type .. ' path)'
+  local msg = basename .. modified .. readonly .. line_info .. '\n' .. filepath .. '\n("+ and "g = ' .. path_type .. ' path)' .. '\nSize = ' .. formatted_size
+
   vim.notify(msg, vim.log.levels.INFO)
 end, { desc = 'Show file info (basename first), yank to "+ and "g' })
 

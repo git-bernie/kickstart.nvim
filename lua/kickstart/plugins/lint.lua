@@ -5,10 +5,15 @@ return {
     event = { 'BufReadPre', 'BufNewFile' },
     config = function()
       local lint = require 'lint'
+
+      -- Use project-local phpstan binary (picks up Larastan in Laravel projects)
+      lint.linters.phpstan.cmd = './vendor/bin/phpstan'
+
       lint.linters_by_ft = {
         -- markdown = { 'markdownlint' }, -- stop linting malformed help markdown files!
         php = { 'phpstan' },
         python = { 'ruff' },
+        sql = { 'sqlfluff' },
       }
 
       -- To allow other plugins to add linters to require('lint').linters_by_ft,
