@@ -10,5 +10,7 @@ return {
     file_types = { 'markdown', 'vimwiki' },
     only_render_image_at_cursor = true,
   },
-  vim.treesitter.language.register('markdown', 'vimwiki'),
+  init = function()
+    vim.treesitter.language.register('markdown', 'vimwiki')
+  end,
 }

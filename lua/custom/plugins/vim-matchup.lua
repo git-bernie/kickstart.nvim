@@ -8,7 +8,6 @@ highlighted along with the 'matchpairs' symbols such as `()`, `{}`, and `[]`.
 ]=]
 return {
   'andymass/vim-matchup',
-  enabled = true,
   config = function()
     vim.g.matchup_matchparen_offscreen = { method = 'popup' }
     vim.g.matchup_treesitter_stopline = 1500
@@ -20,9 +19,4 @@ return {
     vim.g.matchup_treesitter_include_match_words = true
     -- vim.g.matchup_delim_start_plaintext = 1
   end,
-  opts = {
-    treesitter = {
-      stopline = 1500,
-    },
-  },
 }

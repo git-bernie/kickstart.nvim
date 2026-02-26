@@ -63,7 +63,6 @@ Kickstart Guide:
     This should be the first place you go to look when you're stuck or confused
     with something. It's one of my favorite Neovim features.
 
-jq: parse error: Invalid numeric literal at line 1, column 9
     which is very useful when you're not exactly sure of what you're looking for.
 
   I have left several `:help X` comments throughout the init.lua
@@ -218,7 +217,7 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
   callback = function()
     -- vim.opt_local.foldmethod = 'expr'
     -- vim.opt_local.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-    vim.opt_local.foldmethod = 'indent'
+    vim.opt_local.foldmethod = 'expr'
     vim.opt_local.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
     vim.opt_local.foldlevelstart = 99
     vim.opt_local.shiftwidth = 4
@@ -260,7 +259,7 @@ vim.api.nvim_create_autocmd('FileType', {
 
 if vim.fn.isdirectory(vim.env.HOME .. '/.backupdir') == 0 then
   -- vim.fn.mkdir(vim.env.HOME .. '/.backupdir')
-  if vim.fn.mkdir(vim.env.HOME .. '/.backupdir') ~= true then
+  if vim.fn.mkdir(vim.env.HOME .. '/.backupdir') ~= 1 then
     print 'Could not create backupdir'
     vim.fn.mkdir(vim.fn.expand '~/tmp')
   end
@@ -321,7 +320,7 @@ vim.opt.breakindent = true
 
 -- Save undo history
 if vim.fn.isdirectory(vim.env.HOME .. '/.undodir') == 0 then
-  if vim.fn.mkdir(vim.env.HOME .. '/.undodir') ~= true then
+  if vim.fn.mkdir(vim.env.HOME .. '/.undodir') ~= 1 then
     print 'Could not create undodir'
     vim.fn.mkdir(vim.fn.expand '~/tmp/.undodir')
   end
@@ -898,7 +897,6 @@ require('lazy').setup {
     -- branch = '0.1.x',
     -- branch = '0.1.8',
     tag = '0.1.8',
-    file_ignore_patterns = { 'node_modules', '.git/', 'dist/', 'build/', '_ide_helper_models.php' },
     dependencies = {
       'nvim-lua/plenary.nvim',
       { -- If encountering errors, see telescope-fzf-native README for installation instructions
@@ -989,6 +987,7 @@ require('lazy').setup {
 
       require('telescope').setup {
         defaults = {
+          file_ignore_patterns = { 'node_modules', '.git/', 'dist/', 'build/', '_ide_helper_models.php' },
           layout_strategy = get_saved_layout(),
           layout_config = {
             flex = { flip_columns = 100 }, -- switch to horizontal when width < 100 (default 120)
@@ -1491,19 +1490,10 @@ require('lazy').setup {
         -- require('lspconfig')['intelephense'].setup(servers['intelephense']),
         handlers = {
           function(server_name)
-            -- print('I am calling server_name: ', server_name)
             local server = servers[server_name] or {}
-            -- This handles overriding only values explicitly passed
-            -- by the server configuration above. Useful when disabling
-            -- certain features of an LSP (for example, turning off formatting for tsserver)
-
-            print('server_name: ' .. server_name)
-            print(server_name .. ' ' .. vim.inspect(capabilities))
             server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            -- return require('lspconfig')[server_name].setup(server)
-            -- require('lspconfig')[server_name].setup(server)
-            -- vim.lsp.config(server_name).setup(server) -- QQQ:
-            vim.lsp.enable(server_name) -- QQQ:updated Friday, September 19, 2025 to fix 0.11 etc.
+            vim.lsp.config(server_name, server)
+            vim.lsp.enable(server_name)
           end,
         },
       }
@@ -1514,17 +1504,13 @@ require('lazy').setup {
     'mfussenegger/nvim-lint',
     event = 'BufReadPost',
     config = function()
-      require('lint').setup {
-        linters_by_ft = {
-          html = { 'htmlhint' }, -- Example linter
-          yaml = { 'yamllint' },
-          -- Add other file types and their linters here
-        },
+      require('lint').linters_by_ft = {
+        html = { 'htmlhint' },
+        yaml = { 'yamllint' },
       }
-      -- Optional: Run linting on buffer modification or when an LSP attaches
       vim.api.nvim_create_autocmd({ 'BufWritePost', 'BufReadPost', 'InsertLeave' }, {
         callback = function()
-          require('lint').run()
+          require('lint').try_lint()
         end,
       })
     end,
@@ -1787,8 +1773,7 @@ require('lazy').setup {
       vim.cmd.hi 'Comment gui=none'
     end,
   },
-  -- Highlight todo, notes, etc in comments
-  { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
+  -- Highlight todo, notes, etc in comments (configured in lua/custom/plugins/todo-comments.lua)
   {
     'nvim-lualine/lualine.nvim',
     -- lazy = false,
@@ -1913,8 +1898,6 @@ require('lazy').setup {
         file = 'Session.vim',
         verbose = { read = true, write = true, delete = true },
       }
-
-      require('mini.ai').setup()
 
       require('mini.map').setup()
 

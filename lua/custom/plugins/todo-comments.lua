@@ -90,18 +90,21 @@ return {
     exclude = {},
   },
 
-  -- Jump to next keyword -- I changed this to use ]w instead of ]t which conflicts with 'jump to next matching tag'
-  vim.keymap.set('n', ']w', function()
-    require('todo-comments').jump_next()
-  end, { desc = 'Next todo comment' }),
-
-  -- Jump to previous keyword
-  vim.keymap.set('n', '[w', function()
-    require('todo-comments').jump_prev()
-  end, { desc = 'Previous todo comment' }),
-
-  --[[ -- You can also specify a list of valid jump keywords
-    vim.keymap.set("n", "]t", function()
-      require("todo-comments").jump_next({keywords = { "ERROR", "WARNING" }})
-    end, { desc = "Next error/warning todo comment" }), ]]
+  -- Jump to next/previous keyword -- using ]w/[w instead of ]t/[t which conflicts with 'jump to next matching tag'
+  keys = {
+    {
+      ']w',
+      function()
+        require('todo-comments').jump_next()
+      end,
+      desc = 'Next todo comment',
+    },
+    {
+      '[w',
+      function()
+        require('todo-comments').jump_prev()
+      end,
+      desc = 'Previous todo comment',
+    },
+  },
 }
