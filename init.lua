@@ -893,61 +893,254 @@ require('lazy').setup {
 
   { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
-    event = 'VimEnter',
-    -- branch = '0.1.x',
-    -- branch = '0.1.8',
+    cmd = { 'Telescope' },
     tag = '0.1.8',
     dependencies = {
       'nvim-lua/plenary.nvim',
       { -- If encountering errors, see telescope-fzf-native README for installation instructions
         'nvim-telescope/telescope-fzf-native.nvim',
-
-        -- `build` is used to run some command when the plugin is installed/updated.
-        -- This is only run then, not every time Neovim starts up.
         build = 'make',
-
-        -- `cond` is a condition used to determine whether this plugin should be
-        -- installed and loaded.
         cond = function()
           return vim.fn.executable 'make' == 1
         end,
       },
       { 'nvim-telescope/telescope-ui-select.nvim' },
-
-      -- Useful for getting pretty icons, but requires a Nerd Font.
       { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
-
-      -- live-grep-args
+      { 'nvim-telescope/telescope-live-grep-args.nvim', version = '^1.0.0' },
+    },
+    keys = {
+      -- Core search
       {
-        'nvim-telescope/telescope-live-grep-args.nvim',
-
-        -- This will not install any breaking changes.
-        -- For major updates, this must be adjusted manually.
-        version = '^1.0.0',
+        '<leader>sh',
+        function()
+          require('telescope.builtin').help_tags()
+        end,
+        desc = '[S]earch [H]elp',
+      },
+      {
+        '<leader>sk',
+        function()
+          require('telescope.builtin').keymaps()
+        end,
+        desc = '[S]earch [K]eymaps',
+      },
+      {
+        '<leader>sf',
+        function()
+          require('telescope.builtin').find_files()
+        end,
+        desc = '[S]earch [F]iles',
+      },
+      {
+        '<leader>sF',
+        function()
+          require('telescope.builtin').find_files { hidden = true, no_ignore = true, prompt_title = 'Find Files (hidden, no_ignore)' }
+        end,
+        desc = '[S]earch [F]iles (hidden)',
+      },
+      {
+        '<leader>ss',
+        function()
+          require('telescope.builtin').builtin()
+        end,
+        desc = '[S]earch [S]elect Telescope',
+      },
+      {
+        '<leader>sc',
+        function()
+          require('telescope.builtin').lsp_document_symbols()
+        end,
+        desc = '[S]earch [C]urrent Buffer Tags (lsp_document_symbols)',
+      },
+      {
+        '<leader>sm',
+        function()
+          require('telescope.builtin').man_pages()
+        end,
+        desc = '[S]earch [M]an pages',
+      },
+      {
+        '<leader>sw',
+        function()
+          require('telescope.builtin').grep_string()
+        end,
+        desc = '[S]earch current [W]ord',
+      },
+      {
+        '<leader>s*',
+        function()
+          require('telescope.builtin').grep_string { additional_args = { '--hidden', '--no-ignore' }, prompt_title = 'Grep Word (hidden, no_ignore)' }
+        end,
+        desc = '[S]earch current word [*] (hidden)',
+      },
+      {
+        '<leader>sg',
+        function()
+          require('telescope.builtin').live_grep { results_title = 'Search by Live Grep' }
+        end,
+        desc = '[S]earch by [/G]rep',
+      },
+      {
+        '<leader>sG',
+        function()
+          require('telescope.builtin').live_grep { additional_args = { '--hidden', '--no-ignore' }, prompt_title = 'Live Grep (hidden, no_ignore)' }
+        end,
+        desc = '[S]earch by [G]rep (hidden)',
+      },
+      {
+        '<leader>sd',
+        function()
+          require('telescope.builtin').diagnostics()
+        end,
+        desc = '[S]earch [D]iagnostics',
+      },
+      {
+        '<leader>sr',
+        function()
+          require('telescope.builtin').resume()
+        end,
+        desc = '[S]earch [R]esume',
+      },
+      {
+        '<leader>sO',
+        function()
+          require('telescope.builtin').vim_options()
+        end,
+        desc = '[S]earch vim_[O]ptions',
+      },
+      {
+        '<leader>s.',
+        function()
+          require('telescope.builtin').oldfiles { only_cwd = true, prompt_title = 'Cwd: Recent Files' }
+        end,
+        desc = '[S]earch Recent Files ("." for repeat)',
+      },
+      {
+        '<leader>s:',
+        function()
+          require('telescope.builtin').command_history()
+        end,
+        desc = '[S]earch [:]Command [H]istory',
+      },
+      {
+        '<leader>so',
+        function()
+          require('telescope.builtin').live_grep { grep_open_files = true, prompt_title = 'Live Grep in Open Files', results_title = 'Live Grep Open Files' }
+        end,
+        desc = '[S]earch in [O]pen Files (live_grep)',
+      },
+      {
+        '<leader>sn',
+        function()
+          require('telescope.builtin').find_files { cwd = vim.fn.stdpath 'config' }
+        end,
+        desc = '[S]earch [N]eovim files',
+      },
+      {
+        '<leader>sb',
+        function()
+          require('telescope.builtin').current_buffer_fuzzy_find { prompt_title = 'Current Buffer Fuzzy', results_title = 'Results Buffer Fuzzy' }
+        end,
+        desc = '[S]earch [B]uffer',
+      },
+      {
+        '<leader>sW',
+        function()
+          require('telescope.builtin').lsp_dynamic_workspace_symbols()
+        end,
+        desc = '[S]earch [W]orkspace Symbols',
+      },
+      -- Buffers
+      {
+        '<leader><leader>',
+        function()
+          require('telescope.builtin').buffers()
+        end,
+        desc = '[ ] Find existing buffers',
+      },
+      -- Git
+      {
+        '<leader>gb',
+        function()
+          require('telescope.builtin').git_branches()
+        end,
+        desc = '[G]it [B]ranches',
+      },
+      {
+        '<leader>gs',
+        function()
+          require('telescope.builtin').git_status()
+        end,
+        desc = '[G]it [S]tatus',
+      },
+      {
+        '<leader>gc',
+        function()
+          require('telescope.builtin').git_bcommits { prompt_title = '[G]it Buffer [c]ommits' }
+        end,
+        desc = '[G]it [B]uffer [c]ommits',
+      },
+      {
+        '<leader>gC',
+        function()
+          require('telescope.builtin').git_commits { prompt_title = '[G]it Directory [C]ommits' }
+        end,
+        desc = '[G]it Directory [C]ommits',
+      },
+      -- Y-prefix (muscle memory)
+      {
+        '<leader>yg',
+        function()
+          require('telescope.builtin').live_grep()
+        end,
+        desc = '[S]earch by [G]rep',
+      },
+      {
+        '<leader>yh',
+        function()
+          require('telescope.builtin').command_history()
+        end,
+        desc = '[S]earch [C]command [H]istory',
+      },
+      {
+        '<leader>yo',
+        function()
+          require('telescope.builtin').lsp_document_symbols()
+        end,
+        desc = '[Y]o [O]utline (lsp_document_symbols)',
+      },
+      { '<leader>ys', ':Telescope find_files hidden=true no_ignore=true search_dirs=~', desc = '[Y]o [S]earch search_dirs=~' },
+      -- Alt/Ctrl shortcuts
+      {
+        '<A-p>',
+        function()
+          require('telescope.builtin').find_files {
+            results_title = 'Find Files (hidden, no_ignore)',
+            prompt_title = '[F]ind [F]iles (hidden, no_ignore)',
+            hidden = true,
+            no_ignore = true,
+            follow = true,
+          }
+        end,
+        desc = 'Find Files (hidden, no_ignore)',
+      },
+      {
+        '<C-p>',
+        function()
+          require('telescope.builtin').find_files { follow = true }
+        end,
+        desc = '[S]earch [F]iles (Fuzzy) (<C-p> or <leader>sf)',
+      },
+      -- Buffer fuzzy find
+      {
+        '<leader>//',
+        function()
+          require('telescope.builtin').current_buffer_fuzzy_find { prompt_title = 'Current Buffer Fuzzy', results_title = 'Results Buffer Fuzzy' }
+        end,
+        desc = '[/]/ current_buffer_fuzzy_find',
       },
     },
     config = function()
-      -- Telescope is a fuzzy finder that comes with a lot of different things that
-      -- it can fuzzy find! It's more than just a "file finder", it can search
-      -- many different aspects of Neovim, your workspace, LSP, and more!
-      --
-      -- The easiest way to use Telescope, is to start by doing something like:
-      --  :Telescope help_tags
-      --
-      -- After running this command, a window will open up and you're able to
-      -- type in the prompt window. You'll see a list of `help_tags` options and
-      -- a corresponding preview of the help.
-      --
-      -- Two important keymaps to use while in Telescope are:
-      --  - Insert mode: <c-/>
-      --  - Normal mode: ?
-      --
-      -- This opens a window that shows you all of the keymaps for the current
-      -- Telescope picker. This is really useful to discover what Telescope can
-      -- do as well as how to actually do it!
-
-      -- [[ Configure Telescope ]]
-      -- See `:help telescope` and `:help telescope.setup()`
       local action_layout = require 'telescope.actions.layout'
       local action_state = require 'telescope.actions.state'
 
@@ -973,14 +1166,11 @@ require('lazy').setup {
         end
       end
 
-      -- Custom cycle action that persists the choice
       local function cycle_layout_and_save(prompt_bufnr)
         action_layout.cycle_layout_next(prompt_bufnr)
         local picker = action_state.get_current_picker(prompt_bufnr)
         if picker and picker.layout_strategy then
-          -- Update default for future pickers in this session
           require('telescope.config').values.layout_strategy = picker.layout_strategy
-          -- Save for next session
           save_layout(picker.layout_strategy)
         end
       end
@@ -990,7 +1180,7 @@ require('lazy').setup {
           file_ignore_patterns = { 'node_modules', '.git/', 'dist/', 'build/', '_ide_helper_models.php' },
           layout_strategy = get_saved_layout(),
           layout_config = {
-            flex = { flip_columns = 100 }, -- switch to horizontal when width < 100 (default 120)
+            flex = { flip_columns = 100 },
             horizontal = { preview_width = 0.5 },
             vertical = { preview_height = 0.4 },
           },
@@ -1006,7 +1196,6 @@ require('lazy').setup {
             },
           },
         },
-        -- pickers = {}
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -1014,125 +1203,10 @@ require('lazy').setup {
         },
       }
 
-      -- Enable Telescope extensions if they are installed
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
       pcall(require('telescope').load_extension, 'live_grep_args')
       pcall(require('telescope').load_extension, 'media_files')
-      -- pcall(require('telescope').load_extension, 'emoji')
-
-      -- See `:help telescope.builtin`
-      local builtin = require 'telescope.builtin'
-      vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
-      vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
-      vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
-      vim.keymap.set('n', '<leader>sF', function()
-        builtin.find_files { hidden = true, no_ignore = true, prompt_title = 'Find Files (hidden, no_ignore)' }
-      end, { desc = '[S]earch [F]iles (hidden)' })
-      -- A bad idea because C-p is used so much
-      -- vim.keymap.set('n', '<leader>cp', builtin.find_files, { desc = '[S]earch [F]iles' })
-      vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
-      -- vim.keymap.set('n', '<leader>sc', builtin.current_buffer_tags, { desc = '[S]earch [C]urrent Buffer Tags' })
-      vim.keymap.set('n', '<leader>sc', builtin.lsp_document_symbols, { desc = '[S]earch [C]urrent Buffer Tags (lsp_document_symbols)' })
-      vim.keymap.set('n', '<leader>sm', builtin.man_pages, { desc = '[S]earch [M]an pages' })
-      vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-      vim.keymap.set('n', '<leader>s*', function()
-        builtin.grep_string { additional_args = { '--hidden', '--no-ignore' }, prompt_title = 'Grep Word (hidden, no_ignore)' }
-      end, { desc = '[S]earch current word [*] (hidden)' })
-      vim.keymap.set('n', '<leader>sg', function()
-        builtin.live_grep { results_title = 'Search by Live Grep' }
-      end, { desc = '[S]earch by [/G]rep' })
-      vim.keymap.set('n', '<leader>sG', function()
-        builtin.live_grep { additional_args = { '--hidden', '--no-ignore' }, prompt_title = 'Live Grep (hidden, no_ignore)' }
-      end, { desc = '[S]earch by [G]rep (hidden)' })
-      vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
-      vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
-      vim.keymap.set('n', '<leader>sO', builtin.vim_options, { desc = '[S]earch vim_[O]ptions' })
-
-      -- vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-      vim.keymap.set('n', '<leader>s.', function()
-        builtin.oldfiles { only_cwd = true, prompt_title = 'Cwd: Recent Files' }
-      end, { desc = '[S]earch Recent Files ("." for repeat)' })
-
-      vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
-
-      -- Some additional Telescope keymaps I like to preserve for muscle memory
-      vim.keymap.set('n', '<leader>gb', builtin.git_branches, { desc = '[G]it [B]ranches' })
-      vim.keymap.set('n', '<leader>gs', builtin.git_status, { desc = '[G]it [S]tatus' })
-      -- vim.keymap.set('n', '<leader>yb', builtin.buffers, { desc = '[Y]o Find existing buffers', silent = false })
-      vim.keymap.set('n', '<leader>yg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
-      vim.keymap.set('n', '<leader>yh', builtin.command_history, { desc = '[S]earch [C]command [H]istory' })
-      vim.keymap.set('n', '<leader>s:', builtin.command_history, { desc = '[S]earch [:]Command [H]istory' })
-      --vim.keymap.set('n', '<leader>yo', builtin.current_buffer_tags, { desc = '[Y]o [O]utline (Buffer Tags)' })
-      vim.keymap.set('n', '<leader>yo', builtin.lsp_document_symbols, { desc = '[Y]o [O]utline (lsp_document_symbols)' })
-      -- I would like to make '<leader>ys' in lua but I don't know how to make the prompt stay open.
-      vim.keymap.set('n', '<leader>ys', ':Telescope find_files hidden=true no_ignore=true search_dirs=~', { desc = '[Y]o [S]earch search_dirs=~' })
-      vim.keymap.set('n', '<A-p>', function()
-        builtin.find_files {
-          results_title = 'Find Files (hidden, no_ignore)',
-          prompt_title = '[F]ind [F]iles (hidden, no_ignore)',
-          hidden = true,
-          no_ignore = true,
-          follow = true,
-        }
-      end, {})
-      -- C-p habit. Sometimes removing <C-p> because neo-tree uses it as regular up/down; but j/k works fine.
-      -- vim.keymap.set('n', '<C-p>', builtin.find_files { follow = true }, { desc = '[S]earch [F]iles (use <leader>sf)' })
-      vim.keymap.set('n', '<C-p>', function()
-        builtin.find_files { follow = true }
-      end, { desc = '[S]earch [F]iles (Fuzzy) (<C-p> or <leader>sf)' })
-      --[[ vim.keymap.set('n', '<leader>yy', function()
-        builtin.find_files { prompt_title = 'F[Y]nd [Y]er Files (hidden, noignore)', hidden = true, no_ignore = true }
-      end, {}) ]]
-
-      -- Telescope has more bells and whistles when you press <C-/>
-      -- Global: <M-p> toggles preview, <M-l> cycles layout (vertical/horizontal)
-      vim.keymap.set('n', '<leader>//', function()
-        builtin.current_buffer_fuzzy_find { prompt_title = 'Current Buffer Fuzzy', results_title = 'Results Buffer Fuzzy' }
-      end, { desc = '[/]/ current_buffer_fuzzy_find' })
-
-      vim.keymap.set('n', '<leader>sb', function()
-        builtin.current_buffer_fuzzy_find { prompt_title = 'Current Buffer Fuzzy', results_title = 'Results Buffer Fuzzy' }
-      end, { desc = '[S]earch [B]uffer' })
-
-      vim.keymap.set('n', '<leader>gc', function()
-        builtin.git_bcommits {
-          prompt_title = '[G]it Buffer [c]ommits',
-        }
-      end, { desc = '[G]it [B]uffer [c]ommits' })
-
-      vim.keymap.set('n', '<leader>gC', function()
-        builtin.git_commits {
-          prompt_title = '[G]it Directory [C]ommits',
-        }
-      end, { desc = '[G]it Directory [C]ommits' })
-
-      -- Slightly advanced example of overriding default behavior and theme
-      -- ME: I prefer fzf's version
-      --[[
-         [ vim.keymap.set('n', '<leader>/', function()
-         [   -- You can pass additional configuration to Telescope to change the theme, layout, etc.
-         [   builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-         [     winblend = 10,
-         [     previewer = false,
-         [   })
-         [ end, { desc = '[/] Fuzzily search in current buffer' })
-         ]]
-
-      -- It's also possible to pass additional configuration options.
-      --  ]See `:help telescope.builtin.live_grep()` for information about particular keys
-      vim.keymap.set('n', '<leader>so', function()
-        builtin.live_grep {
-          grep_open_files = true,
-          prompt_title = 'Live Grep in Open Files',
-          results_title = 'Live Grep Open Files',
-        }
-      end, { desc = '[S]earch in [O]pen Files (live_grep)' })
-
-      -- Shortcut for searching your Neovim configuration files
-      vim.keymap.set('n', '<leader>sn', function()
-        builtin.find_files { cwd = vim.fn.stdpath 'config' }
-      end, { desc = '[S]earch [N]eovim files' })
     end,
   },
 
@@ -1418,12 +1492,14 @@ require('lazy').setup {
         -- intelephense = {}
         html = {},
         jsonls = {
-          settings = {
-            json = {
-              schemas = require('schemastore').json.schemas(),
-              validate = { enable = true },
-            },
-          },
+          on_new_config = function(new_config)
+            new_config.settings = vim.tbl_deep_extend('force', new_config.settings or {}, {
+              json = {
+                schemas = require('schemastore').json.schemas(),
+                validate = { enable = true },
+              },
+            })
+          end,
         },
         -- ts_Ls = {}
 
@@ -1601,7 +1677,7 @@ require('lazy').setup {
 
   { -- Autocompletion
     'saghen/blink.cmp',
-    event = { 'VimEnter', 'InsertEnter' },
+    event = 'InsertEnter',
     version = '1.*',
     dependencies = {
       -- Snippet Engine

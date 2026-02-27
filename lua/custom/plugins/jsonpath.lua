@@ -1,4 +1,4 @@
 return {
   'phelipetls/jsonpath.nvim',
-  enabled = true,
+  ft = { 'json', 'jsonc' },
 }
