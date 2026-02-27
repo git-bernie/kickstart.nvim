@@ -10,6 +10,7 @@ CamelCaseWords snake_case_words
 --]]
 return {
   'chaoren/vim-wordmotion',
+  event = 'VeryLazy',
   init = function()
     vim.g.wordmotion_prefix = ','
   end,

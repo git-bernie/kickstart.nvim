@@ -7,13 +7,13 @@ return {
   -- Optional dependency
   dependencies = { 'hrsh7th/nvim-cmp' },
   config = function()
-    local npairs = require('nvim-autopairs')
+    local npairs = require 'nvim-autopairs'
 
     npairs.setup {}
 
     -- Disable backtick pairing entirely - more trouble than it's worth
     -- (causes issues with ``` code fences and cursor movement)
-    npairs.remove_rule('`')
+    npairs.remove_rule '`'
 
     -- If you want to automatically add `(` after selecting a function or method
     local cmp_autopairs = require 'nvim-autopairs.completion.cmp'

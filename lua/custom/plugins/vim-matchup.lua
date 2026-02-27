@@ -8,6 +8,7 @@ highlighted along with the 'matchpairs' symbols such as `()`, `{}`, and `[]`.
 ]=]
 return {
   'andymass/vim-matchup',
+  event = 'BufReadPost',
   config = function()
     vim.g.matchup_matchparen_offscreen = { method = 'popup' }
     vim.g.matchup_treesitter_stopline = 1500

@@ -541,7 +541,7 @@ require('lazy').setup {
   defaults = {
     -- Set this to `true` to have all your plugins lazy-loaded by default.
     -- Only do this if you know what you are doing, as it can lead to unexpected behavior.
-    lazy = false, -- should plugins be lazy-loaded?
+    lazy = true, -- should plugins be lazy-loaded?
     -- It's recommended to leave version=false for now, since a lot the plugin that support versionineck,
     -- have outdated releases, which may break your Neovim install.
     version = nil, -- always use the latest git commit
@@ -733,14 +733,12 @@ require('lazy').setup {
       paths = {}, -- add any custom paths here that you want to includes in the rtp
       ---@type string[] list any plugins you want to disable here
       disabled_plugins = {
-        -- "gzip",
-        -- "matchit",
-        -- "matchparen",
-        -- "netrwPlugin",
-        -- "tarPlugin",
-        -- "tohtml",
-        -- "tutor",
-        -- "zipPlugin",
+        'gzip',
+        'netrwPlugin',
+        'tarPlugin',
+        'tohtml',
+        'tutor',
+        'zipPlugin',
       },
     },
   },
@@ -766,7 +764,7 @@ require('lazy').setup {
   },
 
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-  'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
+  { 'tpope/vim-sleuth', event = 'BufReadPost' }, -- Detect tabstop and shiftwidth automatically
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -782,6 +780,7 @@ require('lazy').setup {
   -- See `:help gitsigns` to understand what the configuration keys do
   { -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
+    event = 'BufReadPost',
     opts = {
       signs = {
         add = { text = '+' },
@@ -1228,6 +1227,7 @@ require('lazy').setup {
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
+    event = 'BufReadPost',
     dependencies = {
       -- Automatically install LSPs and related tools to stdpath for Neovim
       -- Mason must be loaded before its dependents so we need to set it up here.
@@ -1828,6 +1828,7 @@ require('lazy').setup {
     -- 'ellisonleao/gruvbox.nvim',
     -- 'craftzdog/solarized-osaka',
     -- 'lifepillar/vim-gruvbox8',
+    lazy = false,
     priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
       -- Load the colorscheme here.
@@ -1922,6 +1923,7 @@ require('lazy').setup {
   },
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
+    event = 'VimEnter',
     config = function()
       -- Better Around/Inside textobjects
       --
@@ -1930,8 +1932,6 @@ require('lazy').setup {
       --  - yinq - [Y]ank [I]nside [N]ext [Q]uote
       --  - ci'  - [C]hange [I]nside [']quote
       require('mini.ai').setup { n_lines = 500 }
-
-      require('mini.align').setup()
 
       -- Add/delete/replace surroundings (brackets, quotes, etc.)
       --
@@ -1958,45 +1958,53 @@ require('lazy').setup {
         return '%2l:%-2v'
       end
 
-      --*mini.files* Navigate and manipulate file system
-      -- I forget about it and forget how it works...
-      -- require('mini.files').setup()
+      -- Defer non-critical mini modules to VeryLazy for faster startup
+      vim.api.nvim_create_autocmd('User', {
+        pattern = 'VeryLazy',
+        callback = function()
+          require('mini.align').setup()
 
-      -- Adds some cool stuff in addition to fugitive.
-      -- require('mini.git').setup()
+          --*mini.files* Navigate and manipulate file system
+          -- require('mini.files').setup()
 
-      -- require('mini.diff').setup()
+          -- Adds some cool stuff in addition to fugitive.
+          -- require('mini.git').setup()
 
-      require('mini.sessions').setup {
-        autoread = false,
-        autowrite = false,
-        directory = '',
-        file = 'Session.vim',
-        verbose = { read = true, write = true, delete = true },
-      }
+          -- require('mini.diff').setup()
 
-      require('mini.map').setup()
+          require('mini.sessions').setup {
+            autoread = false,
+            autowrite = false,
+            directory = '',
+            file = 'Session.vim',
+            verbose = { read = true, write = true, delete = true },
+          }
 
-      -- require('mini.splitjoin').setup()
+          require('mini.map').setup()
 
-      require('mini.jump').setup()
+          -- require('mini.splitjoin').setup()
 
-      require('mini.animate').setup {
-        resize = { enable = false },
-      }
+          require('mini.jump').setup()
 
-      require('mini.bufremove').setup()
+          require('mini.animate').setup {
+            resize = { enable = false },
+          }
 
-      require('mini.hipatterns').setup()
-      -- require('mini.visits').setup()
+          require('mini.bufremove').setup()
 
-      -- ... and there is more!
-      --  Check out: https://github.com/echasnovski/mini.nvim
-      require('mini.extra').setup()
+          require('mini.hipatterns').setup()
+          -- require('mini.visits').setup()
+
+          -- ... and there is more!
+          --  Check out: https://github.com/echasnovski/mini.nvim
+          require('mini.extra').setup()
+        end,
+      })
     end,
   },
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
+    event = 'BufReadPost',
     build = ':TSUpdate',
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`

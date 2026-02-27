@@ -1,5 +1,21 @@
 return {
   'kelly-lin/ranger.nvim',
+  keys = {
+    {
+      '<leader>ef',
+      function()
+        require('ranger-nvim').open(true)
+      end,
+      desc = 'Open Ranger [E]xternal [F]ile manager(?)',
+    },
+    {
+      '<leader>rr',
+      function()
+        require('ranger-nvim').open(true)
+      end,
+      desc = 'Open [R]ange[r]',
+    },
+  },
   config = function()
     require('ranger-nvim').setup {
       enable_cmds = false,
@@ -18,19 +34,5 @@ return {
         y = 0.5,
       },
     }
-    vim.api.nvim_set_keymap('n', '<leader>ef', '', {
-      desc = 'Open Ranger [E]xternal [F]ile manager(?)',
-      noremap = true,
-      callback = function()
-        require('ranger-nvim').open(true)
-      end,
-    })
-    vim.api.nvim_set_keymap('n', '<leader>rr', '', {
-      desc = 'Open [R]ange[r]',
-      noremap = true,
-      callback = function()
-        require('ranger-nvim').open(true)
-      end,
-    })
   end,
 }

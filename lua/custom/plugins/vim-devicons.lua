@@ -1,4 +1,4 @@
 return {
   'ryanoasis/vim-devicons',
-  enabled = true,
+  event = 'VeryLazy',
 }

@@ -1,6 +1,6 @@
 return {
   'nvim-telescope/telescope-media-files.nvim',
-  enabled = true,
+  cmd = 'Telescope',
   extensions = {
     media_files = {
       -- filetypes whitelist
