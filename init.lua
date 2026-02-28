@@ -1341,15 +1341,22 @@ require('lazy').setup {
       --  You can press `g?` for help in this menu.
       -- require('mason').setup()
 
-      -- You can add other tools here that you want Mason to install
-      -- for you, so that they are available from within Neovim.
-      local ensure_installed = vim.tbl_keys(servers or {})
-      vim.list_extend(ensure_installed, {
-        'stylua', -- Used to format Lua code
-        -- 'intelephense',
-        -- 'bash',
-        'bashls',
-      })
+      -- Mason uses its own package names (hyphenated), not LSP config names.
+      -- Since we removed mason-lspconfig (the name-translation layer), list Mason names explicitly.
+      local ensure_installed = {
+        -- LSP servers (Mason package names)
+        'ansible-language-server',
+        'bash-language-server',
+        'clangd',
+        'html-lsp',
+        'json-lsp',
+        'lua-language-server',
+        'marksman',
+        'pyright',
+        'yaml-language-server',
+        -- Formatters & linters
+        'stylua',
+      }
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       -- Configure and enable each LSP server directly (Neovim 0.11+ native API)
