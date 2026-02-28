@@ -1235,8 +1235,6 @@ require('lazy').setup {
 
       -- { 'mason-org/mason.nvim', opts = {}, config = true }, -- NOTE: Must be loaded before dependants
       { 'mason-org/mason.nvim', opts = {} }, -- NOTE: Must be loaded before dependants
-      -- 'williamboman/mason-lspconfig.nvim',
-      'mason-org/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
       -- Useful status updates for LSP.
@@ -1348,19 +1346,6 @@ require('lazy').setup {
           --  For example, in C this would take you to the header.
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
-          -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
-          ---@param client vim.lsp.Client
-          ---@param method vim.lsp.protocol.Method
-          ---@param bufnr? integer some lsp support methods only in specific files
-          ---@return boolean
-          local function client_supports_method(client, method, bufnr)
-            if vim.fn.has 'nvim-0.11' == 1 then
-              return client:supports_method(method, bufnr)
-            else
-              return client.supports_method(method, { bufnr = bufnr })
-            end
-          end
-
           -- The following two autocommands are used to highlight references of the
           -- word under your cursor when your cursor rests there for a little while.
           --    See `:help CursorHold` for information about when this is executed
@@ -1368,7 +1353,7 @@ require('lazy').setup {
           -- When you move your cursor, the highlights will be cleared (the second autocommand).
           local client = vim.lsp.get_client_by_id(event.data.client_id)
 
-          if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
+          if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
             local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
             vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
               buffer = event.buf,
@@ -1395,7 +1380,7 @@ require('lazy').setup {
           -- code, if the language server you are using supports them
           --
           -- This may be unwanted, since they displace some of your code
-          if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
+          if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
             map('<leader>th', function()
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
             end, '[T]oggle Inlay [H]ints')
@@ -1554,25 +1539,12 @@ require('lazy').setup {
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
-      -- See https://github.com/williamboman/mason-lspconfig.nvim
-      require('mason-lspconfig').setup {
-        -- print 'I am in mason-lspconfig',
-        --@type string[]
-        -- ensure_installed = { 'intelephense' }, -- added in 4feb2025 to quiet the diagnostic
-        ensure_installed = { 'vue_ls' }, -- added in 4feb2025 to quiet the diagnostic
-        --@type boolean
-        automatic_installation = true, -- added in 4feb2025 to quiet the diagnostic
-        automatic_enable = true,
-        -- require('lspconfig')['intelephense'].setup(servers['intelephense']),
-        handlers = {
-          function(server_name)
-            local server = servers[server_name] or {}
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            vim.lsp.config(server_name, server)
-            vim.lsp.enable(server_name)
-          end,
-        },
-      }
+      -- Configure and enable each LSP server directly (Neovim 0.11+ native API)
+      for name, server in pairs(servers) do
+        server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+        vim.lsp.config(name, server)
+        vim.lsp.enable(name)
+      end
     end,
   },
   -- LInter ?
@@ -1922,7 +1894,7 @@ require('lazy').setup {
     end,
   },
   { -- Collection of various small independent plugins/modules
-    'echasnovski/mini.nvim',
+    'nvim-mini/mini.nvim',
     event = 'VimEnter',
     config = function()
       -- Better Around/Inside textobjects
