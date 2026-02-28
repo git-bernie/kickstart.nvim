@@ -1,7 +1,7 @@
 # lazy.nvim Performance Patterns & Anti-Patterns
 
 ## Overview
-Guide to optimizing Neovim startup with lazy.nvim. These patterns were discovered during a comprehensive audit of 116+ plugins that reduced startup from 3,067ms to 1,862ms (39% improvement).
+Guide to optimizing Neovim startup with lazy.nvim. These patterns were discovered during a comprehensive audit of 116+ plugins that reduced startup from 3,067ms to 278ms (91% improvement).
 
 ## Anti-Patterns (Things That Defeat Lazy Loading)
 
@@ -144,6 +144,36 @@ Saves ~15-25ms. Safe if you use neo-tree instead of netrw.
 ### Set `defaults.lazy = true`
 Flips the default so all plugins are lazy unless they opt out. Forces you to be intentional about loading, but catches accidental eager loading of every new plugin you add.
 
+### Removing mason-lspconfig: name translation gotcha
+When removing `mason-lspconfig` in favor of Neovim 0.11's native `vim.lsp.config()` + `vim.lsp.enable()`, you lose the **LSP-name → Mason-package-name translation layer**. Mason's registry uses hyphenated names, not LSP config names:
+
+| LSP config name | Mason package name |
+|----------------|--------------------|
+| `lua_ls` | `lua-language-server` |
+| `bashls` | `bash-language-server` |
+| `jsonls` | `json-lsp` |
+| `html` | `html-lsp` |
+| `yamlls` | `yaml-language-server` |
+| `ansiblels` | `ansible-language-server` |
+| `pyright` | `pyright` (same) |
+| `clangd` | `clangd` (same) |
+
+If you use `mason-tool-installer`, replace `vim.tbl_keys(servers)` with explicit Mason package names:
+```lua
+-- BAD: passes LSP names like "lua_ls" — mason can't find them
+local ensure_installed = vim.tbl_keys(servers or {})
+
+-- GOOD: use Mason's own package names
+local ensure_installed = {
+  'lua-language-server', 'bash-language-server', 'json-lsp',
+  'html-lsp', 'yaml-language-server', 'pyright', 'clangd',
+  'stylua',  -- formatters/linters use their own names
+}
+```
+
+### Trim verbose lazy.nvim defaults
+Only specify values that differ from lazy.nvim's built-in defaults. Removing ~188 lines of redundant config (root, git, rocks, pkg, dev, install, headless, diff, checker, readme, state, profiling) cut an additional ~570ms off startup — every table literal is parsed and allocated at init time.
+
 ## Verification Commands
 
 ```bash
@@ -162,11 +192,14 @@ nvim --headless -c "lua vim.defer_fn(function() vim.cmd([[messages]]) vim.cmd([[
 
 ## Performance Audit Results (Feb 2026)
 
-| Phase | Total Startup | init.lua Self-Time |
-|-------|--------------|-------------------|
-| Before any optimization | ~3,067ms | 677ms |
-| Phase 1 (blink, telescope, schemastore) | ~2,400ms | ~500ms |
-| Phase 2 (defaults.lazy, mini split, debug fix, 20+ plugins) | ~1,862ms | 251ms |
+| Phase | Headless Startup |
+|-------|-----------------|
+| Before any optimization | ~3,067ms |
+| Phase 1 (blink, telescope, schemastore, 11 plugins) | ~2,400ms |
+| Phase 2 (defaults.lazy, mini split, debug fix, 20+ plugins) | ~850ms |
+| Phase 3 (trim defaults, upstream fixes, guess-indent) | **~278ms** |
+
+**Total reduction: 91% (3,067ms → 278ms)**
 
 Key savings:
 - `defaults.lazy = true`: ~200ms (60+ plugins deferred)
@@ -174,3 +207,5 @@ Key savings:
 - debug.lua keys anti-pattern fix: ~37ms
 - fzf-lua, vim-devicons, notify, ranger, digraph-picker defers: ~100ms
 - Built-in plugins disabled: ~15-25ms
+- Trim ~188 lines of redundant lazy.nvim defaults: ~570ms
+- Replace vim-sleuth with guess-indent.nvim: minor
