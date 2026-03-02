@@ -28,5 +28,5 @@ return {
       display_mode = 'border',
     },
   },
-  cmd = { 'CsvViewEnable', 'CsvViewDisable', 'CsvViewToggle' },
+  cmd = { 'CsvViewEnable', 'CsvViewDisable', 'CsvViewToggle', 'CsvViewInfo' },
 }
