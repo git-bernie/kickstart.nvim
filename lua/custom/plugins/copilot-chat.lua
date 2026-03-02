@@ -33,7 +33,8 @@ return {
     build = 'make tiktoken',
     opts = {
       -- See Configuration section for options
-      model = 'claude-sonnet-4.5',
+      -- model = 'claude-sonnet-4.5',
+      model = 'gpt-4o',
     },
     keys = {
       { '<leader>co', '<cmd>CopilotChat<cr>', desc = '[C]opilotChat [O]pen' },

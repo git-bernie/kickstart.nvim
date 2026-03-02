@@ -11,14 +11,14 @@ vim.keymap.set('n', '<CR>', function()
   local col = vim.api.nvim_win_get_cursor(0)[2]
 
   -- Find markdown link: [text](path)
-  for link in line:gmatch('%[.-%]%((.-)%)') do
+  for link in line:gmatch '%[.-%]%((.-)%)' do
     local escaped = link:gsub('([%(%)%.%%%+%-%*%?%[%]%^%$])', '%%%1')
     local pattern = '%[.-%]%(' .. escaped .. '%)'
     local start_pos, end_pos = line:find(pattern)
     if start_pos and col >= start_pos - 1 and col <= end_pos then
-      local current_dir = vim.fn.expand('%:p:h')
+      local current_dir = vim.fn.expand '%:p:h'
       local target = current_dir .. '/' .. link
-      target = target:gsub('#.*$', '')  -- Remove anchor
+      target = target:gsub('#.*$', '') -- Remove anchor
 
       if vim.fn.filereadable(target) == 1 then
         vim.cmd('edit ' .. vim.fn.fnameescape(target))
