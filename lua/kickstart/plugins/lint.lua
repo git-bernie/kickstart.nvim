@@ -6,8 +6,13 @@ return {
     config = function()
       local lint = require 'lint'
 
-      -- Use project-local phpstan binary (picks up Larastan in Laravel projects)
-      lint.linters.phpstan.cmd = './vendor/bin/phpstan'
+      -- Prefer project-local phpstan (picks up Larastan), fall back to global
+      local local_phpstan = vim.fn.getcwd() .. '/vendor/bin/phpstan'
+      if vim.fn.executable(local_phpstan) == 1 then
+        lint.linters.phpstan.cmd = local_phpstan
+      elseif vim.fn.executable 'phpstan' == 1 then
+        lint.linters.phpstan.cmd = 'phpstan'
+      end
 
       lint.linters_by_ft = {
         -- markdown = { 'markdownlint' }, -- stop linting malformed help markdown files!

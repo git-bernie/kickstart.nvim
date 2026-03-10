@@ -18,6 +18,7 @@ return {
     local ok, inspected = pcall(vim.inspect, include_paths)
     -- print('local include_paths now ' .. (ok and inspected or 'error inspecting include_paths'))
 
+    vim.lsp.enable('intelephense')
     vim.lsp.config('intelephense', {
       -- vim.lsp.config().intelephense.setup {
       -- require('lspconfig').intelephense.setup {

@@ -10,19 +10,34 @@ return {
     hint = 'floating-big-letter',
   }, ]]
 
+  keys = {
+    {
+      '-',
+      function()
+        local picked = require('window-picker').pick_window { include_current_win = true }
+          or vim.api.nvim_get_current_win()
+        vim.api.nvim_set_current_win(picked)
+      end,
+      desc = 'Pick a window',
+    },
+    {
+      ',w',
+      function()
+        local picked = require('window-picker').pick_window { include_current_win = true }
+          or vim.api.nvim_get_current_win()
+        vim.api.nvim_set_current_win(picked)
+      end,
+      desc = '[,] Pick a [w]indow',
+    },
+  },
   config = function()
     require('window-picker').setup {
-      -- hint = 'statusline-winbar',
       hint = 'floating-big-letter',
-      -- vim.api.nvim_set_keymap('n', '-', '<cmd>lua require("window-picker").pick_window()<cr>', { desc = '[-]ChooseWin', silent = true, noremap = true }),
       filter_rules = {
         include_current_win = false,
         autoselect_one = true,
-        -- filter using buffer options
         bo = {
-          -- if the file type is one of following, the window will be ignored
           filetype = { 'neo-tree', 'neo-tree-popup', 'notify' },
-          -- if the buffer type is one of following, the window will be ignored
           buftype = { 'terminal', 'quickfix' },
         },
       },

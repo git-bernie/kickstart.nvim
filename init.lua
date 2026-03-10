@@ -92,6 +92,10 @@ vim.opt.spelloptions = 'noplainbuffer,camel'
 
 vim.g.sql_type_default = 'mysql'
 
+-- Use the faster php_only treesitter parser for PHP files (2.5x faster — skips HTML injection overhead)
+-- Pure PHP files (classes, commands, etc.) don't need the HTML-aware parser
+vim.treesitter.language.register('php_only', 'php')
+
 -- disable automatic conversion of emoji characters to full-width? Might resolve some issues with
 -- emoji-icon-theme and cmp?
 -- 🐂
@@ -140,6 +144,22 @@ vim.api.nvim_create_autocmd({ 'WinEnter', 'BufEnter', 'WinResized' }, {
 --     vim.cmd 'bdelete'
 --   end,
 -- })
+
+-- Fix: lazy.nvim's BufReadPost handler fires before Neovim's filetypedetect
+-- catch-all and poisons the global did_filetype() flag during plugin loading.
+-- The catch-all uses :setf which is a no-op when did_filetype()=1, leaving
+-- filetype blank. Re-running detection in vim.schedule (after event processing
+-- completes and did_filetype resets) resolves it.
+vim.api.nvim_create_autocmd('BufReadPost', {
+  group = vim.api.nvim_create_augroup('kickstart-ft-fix', { clear = true }),
+  callback = function(ev)
+    vim.schedule(function()
+      if vim.api.nvim_buf_is_valid(ev.buf) and vim.bo[ev.buf].filetype == '' and vim.bo[ev.buf].buftype == '' and vim.api.nvim_buf_get_name(ev.buf) ~= '' then
+        vim.cmd 'filetype detect'
+      end
+    end)
+  end,
+})
 
 vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
   pattern = { '*.json', '*.jsonc' },
@@ -749,6 +769,16 @@ require('lazy').setup {
         desc = '[S]earch [F]iles (hidden)',
       },
       {
+        '<leader>sD',
+        function()
+          local dir = vim.fn.input('Directory: ', '~/', 'dir')
+          if dir ~= '' then
+            require('telescope.builtin').find_files { cwd = vim.fn.expand(dir), prompt_title = 'Find Files in ' .. dir }
+          end
+        end,
+        desc = '[S]earch [D]irectory (type a path)',
+      },
+      {
         '<leader>ss',
         function()
           require('telescope.builtin').builtin()
@@ -922,14 +952,27 @@ require('lazy').setup {
       { '<leader>ys', ':Telescope find_files hidden=true no_ignore=true search_dirs=~', desc = '[Y]o [S]earch search_dirs=~' },
       -- Alt/Ctrl shortcuts
       {
+        --- Find files including hidden and ignored, but exclude noisy directories.
+        --- Uses fd --exclude for fast pre-filtering at traversal level (skips dirs entirely).
         '<A-p>',
         function()
           require('telescope.builtin').find_files {
             results_title = 'Find Files (hidden, no_ignore)',
-            prompt_title = '[F]ind [F]iles (hidden, no_ignore)',
-            hidden = true,
-            no_ignore = true,
-            follow = true,
+            prompt_title = '[F]ind [F]iles (hidden, no_ignore, [no vendor,node_modules,.git])',
+            find_command = {
+              'fd',
+              '--type',
+              'f',
+              '--hidden',
+              '--no-ignore',
+              '--follow',
+              '--exclude',
+              'vendor',
+              '--exclude',
+              'node_modules',
+              '--exclude',
+              '.git',
+            },
           }
         end,
         desc = 'Find Files (hidden, no_ignore)',
@@ -1796,7 +1839,7 @@ require('lazy').setup {
   },
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
-    event = 'BufReadPost',
+    event = { 'BufReadPre', 'BufNewFile' },
     build = ':TSUpdate',
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`

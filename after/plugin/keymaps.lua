@@ -608,32 +608,12 @@ vim.keymap.set('n', '<leader>tn', toggle_noice, { desc = 'Toggle Noice enable/di
 -- Initialize the global variable to true when Noice is first loaded
 vim.g.noice_enabled = true
 
-local picker = require 'window-picker'
--- vim.keymap.set('n', ',w', function()
--- comma shortcut
-vim.keymap.set('n', ',w', function()
-  local picked_window_id = picker.pick_window {
-    include_current_win = true,
-  } or vim.api.nvim_get_current_win()
-  vim.api.nvim_set_current_win(picked_window_id)
-end, { desc = '[,] Pick a [w]indow' })
 
-vim.keymap.set('n', '-', function()
-  local picked_window_id = picker.pick_window {
-    include_current_win = true,
-  } or vim.api.nvim_get_current_win()
-  vim.api.nvim_set_current_win(picked_window_id)
-end, { desc = 'Pick a window' })
-
-vim.api.nvim_set_keymap('n', '<leader>sx', '', {
-  noremap = true,
-  callback = function()
-    -- for _, client in ipairs(vim.lsp.buf_get_clients()) do
-    for _, client in ipairs(vim.lsp.get_clients()) do
-      require('workspace-diagnostics').populate_workspace_diagnostics(client, 0)
-    end
-  end,
-})
+vim.keymap.set('n', '<leader>sx', function()
+  for _, client in ipairs(vim.lsp.get_clients()) do
+    require('workspace-diagnostics').populate_workspace_diagnostics(client, 0)
+  end
+end, { desc = '[S]earch workspace diagnostics' })
 
 -- https://vi.stackexchange.com/questions/39947/nvim-vim-o-cmdheight-0-looses-the-recording-a-macro-messages
 vim.cmd [[ autocmd RecordingEnter * set cmdheight=1 ]]
