@@ -1,5 +1,8 @@
 -- ~/.config/nvim/after/ftplugin/markdown.lua
 
+-- Prose mode: soft-wrap word-processor feel (toggle off with <leader>tp)
+require('custom.prose').enable()
+
 -- Treesitter-based folding: folds at heading levels
 vim.opt_local.foldmethod = 'expr'
 vim.opt_local.foldexpr = 'v:lua.vim.treesitter.foldexpr()'

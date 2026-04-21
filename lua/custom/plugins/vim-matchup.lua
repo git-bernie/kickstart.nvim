@@ -10,6 +10,8 @@ return {
   'andymass/vim-matchup',
   event = 'BufReadPost',
   config = function()
+    -- Disable treesitter integration until nvim-treesitter migrates to main branch (nvim 0.12 compat)
+    vim.g.matchup_treesitter_enabled = 0
     vim.g.matchup_matchparen_offscreen = { method = 'popup' }
     vim.g.matchup_treesitter_stopline = 1500
     --- = 1 symbols like () will matched, but words like for and end will not

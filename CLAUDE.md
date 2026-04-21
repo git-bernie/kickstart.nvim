@@ -56,6 +56,10 @@ Lazy.nvim auto-imports all files in `lua/custom/plugins/` via `{ import = 'custo
 
 Files named `.nvim.lua` or `.nvimrc` in project root are automatically sourced at startup for per-project settings.
 
+### Vendored Tools
+
+- **`bin/lc-codec.php`** — standalone LoanConnect ID encoder/decoder (V1 Rijndael-256 + V2 libsodium, auto-detect). Called by `lua/lc-cyber.lua` for `<leader>cd` / `<leader>cy` / `<leader>ce` keymaps. No external repo dependency. Full reference: [`docs/lc-codec.md`](docs/lc-codec.md).
+
 ## Formatting
 
 Uses `.stylua.toml`: 160 char width, 2-space indent, single quotes preferred. GitHub Actions checks formatting on PRs.

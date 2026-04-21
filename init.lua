@@ -741,6 +741,13 @@ require('lazy').setup {
     keys = {
       -- Core search
       {
+        "<leader>s'",
+        function()
+          require('telescope.builtin').marks()
+        end,
+        desc = [[[S]earch [']Marks]],
+      },
+      {
         '<leader>sh',
         function()
           require('telescope.builtin').help_tags()
@@ -1742,6 +1749,17 @@ require('lazy').setup {
           },
         },
         sections = {
+          lualine_a = {
+            {
+              function()
+                local prose = require('custom.prose').mode_label()
+                if prose then
+                  return prose
+                end
+                return require('lualine.utils.mode').get_mode()
+              end,
+            },
+          },
           -- lualine_b = { 'branch', 'diff', 'diagnostics', { max_length = 20 } },
           -- lualine_b = { 'branch', 'diagnostics', { max_length = 20 } },
           lualine_b = { 'branch', { fugitive_rev, color = { fg = '#fabd2f', gui = 'bold' } } },

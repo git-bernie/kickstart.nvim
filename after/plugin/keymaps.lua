@@ -152,28 +152,6 @@ vim.keymap.set('n', '<leader>mR', function()
 end, { desc = '[M]iniSessions [R]ead (cwd/Session.vim)', silent = false })
 
 --
--- Example v2 encoding "QjRpxuZGJKDxLUV1RFh8CPjYEf_t9y_8FYgc2DCXuVc"
-vim.api.nvim_create_user_command('DecodeV2', function(opts)
-  local start_line = opts.line1
-  local end_line = opts.line2
-  local selected_lines = vim.api.nvim_buf_get_lines(0, start_line - 1, end_line, false)
-
-  for _, line in ipairs(selected_lines) do
-    print(line)
-  end
-end, { range = true })
-
-vim.keymap.set('n', '<leader>v2', function()
-  local sqlite = require 'sqlite'
-  local db = sqlite.open '/home/bernie/Downloads-work/id_encodedids.db'
-  if not db then
-    print 'Error opening database'
-    return
-  else
-    print 'Opened the database'
-  end
-end)
-
 -- E.g. "LenderUpdate.1759824438.2ndLoan":
 --  e.g. 1726513513, 1726513523
 vim.keymap.set('n', '<leader>yd', function()
@@ -394,6 +372,9 @@ vim.keymap.set('n', '<leader>Ts', '<cmd>split +term<CR>', { desc = '[T]erminal [
 vim.keymap.set('n', '<leader>Tv', '<cmd>vsplit +term<CR>', { desc = '[T]erminal [v]split' })
 
 vim.keymap.set('n', '<leader>tw', '<cmd>set wrap!<CR>', { desc = '[T]oggle [w]rap', silent = false })
+vim.keymap.set('n', '<leader>tp', function()
+  require('custom.prose').toggle()
+end, { desc = '[T]oggle [p]rose mode' })
 
 -- Convert *.tsv to *.csv and actually convert tabs to commas
 -- : for F in $(ls *.tsv); do echo $F; B=$(basename "$F" .tsv); echo "$B"; csvtool -t TAB -u COMMA col 1- "$F" > "$B.csv"; done
@@ -608,7 +589,6 @@ vim.keymap.set('n', '<leader>tn', toggle_noice, { desc = 'Toggle Noice enable/di
 -- Initialize the global variable to true when Noice is first loaded
 vim.g.noice_enabled = true
 
-
 vim.keymap.set('n', '<leader>sx', function()
   for _, client in ipairs(vim.lsp.get_clients()) do
     require('workspace-diagnostics').populate_workspace_diagnostics(client, 0)
@@ -687,111 +667,12 @@ vim.cmd 'iab <expr> xdt (strftime("%A %B %e, %Y %T %Z"))'
 vim.cmd 'iab funciton function'
 vim.cmd 'iab teh the'
 
---- Lookup a user by encoded ID from the local SQLite database.
----@param db_path string
----@param encoded_id string
-local function lookup_user_by_id(db_path, encoded_id)
-  local sqlite = require 'sqlite'
-  local db = sqlite:open(db_path) -- Open the database file
-  if not db then
-    -- vim.api.nvim_err_writeln 'Failed to open database'
-    vim.api.nvim_echo({ string.format('Failed to open database %s', db_path) }, true, { err = true })
-    return nil
-  end
-
-  local function trim_quotes(s)
-    return (s:gsub('^([\'"])(.-)%1$', '%2'))
-  end
-
-  -- Use db:sql to execute a query and get results as a Lua table
-  -- The plugin handles parsing the results
-  -- local query = string.format('SELECT * FROM users WHERE id = %d', user_id)
-  -- local query = string.format('SELECT * FROM id_encodedids WHERE encoded_idv1 = "%s" or encoded_idv2 = "%s"', encoded_id, encoded_id)
-  print(string.format('looking for %s', encoded_id))
-
-  local query = 'SELECT * FROM id_encodedids WHERE encoded_idv1 = :encoded_id or encoded_idv2 = :encoded_id'
-  -- local query = 'SELECT coalesce(encoded_idv1, encoded_idv2) as found FROM id_encodedids WHERE encoded_idv1 = :encoded_id or encoded_idv2 = :encoded_id'
-  local result = db:eval(query, { encoded_id = encoded_id })
-
-  db:close() -- Close the database connection
-
-  if type(result) == 'table' and #result > 0 then
-    -- Assuming 'users' table has columns like 'id', 'name', 'email'
-    -- if result and #result > 0 then
-    -- Assuming 'users' table has columns like 'id', 'name', 'email'
-    return result[1] -- Returns the first matching row
-  else
-    return nil -- No user found
-  end
-end
-
---- Lookup a user by encoded ID from the local SQLite database.
--- Usage: :LookupUserID [id]
--- If [id] is provided, it is used as the lookup key.
--- If no argument is given, the word under the cursor (<cWORD>) is used.
--- The found ID is saved to register "z" and the input is saved to register "y".
--- Prints a message with the result.
--- Example usage (e.g., mapped to a command)
--- "mZwjmdZwe1S5uhHMdR9CVGqv3gQS1lzvOAd_r_pYRdY" 1000000000
--- "1706b0559e4a8c8b7e1f486b590cbc5e8afef5d250a94c"
--- @param args table: User command arguments (optional, may contain .args as the ID string)
-
-vim.api.nvim_create_user_command('LookupUserID', function(args)
-  local id = (args and args.args) or '' -- args.args is the raw string of all args
-  if not id or id == '' then
-    -- Try cWORD
-    id = tostring(vim.fn.expand '<cWORD>')
-    print 'No user ID provided. Trying <cWORD>'
-    if not id or id == '' then
-      print 'No user ID found in <cWORD> either. Aborting.'
-      return
-    end
-  end
-
-  -- trim matching quotes
-  local function trim_quotes(s)
-    return (s:gsub('^([\'"/,])(.-)%1$', '%2'))
-  end
-
-  id = trim_quotes(id)
-
-  -- trim leading/trailing characters
-  local function trim_quotes_and_slashes(s)
-    return (s:gsub('^[/"\',]+', ''):gsub('[/"\',]+$', ''))
-  end
-
-  id = trim_quotes_and_slashes(id)
-
-  if id then
-    vim.fn.setreg('y', tostring(id), 'c')
-    local user = lookup_user_by_id('/home/bernie/Downloads-work/id_encodedids.db', id)
-    -- local db = sqlite.open '/home/bernie/Downloads-work/id_encodedids.db'
-    if user then
-      -- print(string.format('Found user: ID: %s, Name: %s, Email: %s', user.id, user.name, user.email))
-      vim.fn.setreg('z', tostring(user.id), 'c')
-      print(string.format('Found user ID: %s (saved to "z)', user.id))
-    else
-      print(string.format('User with ID %s not found.', id))
-    end
-  else
-    print 'Invalid user ID provided.'
-  end
-end, { nargs = '?', complete = 'expression' })
-
 --[[ Neovide ]]
 if vim.g.neovide then
   vim.keymap.set({ 'n', 'v' }, '<C-+>', ':lua vim.g.neovide_scale_factor = vim.g.neovide_scale_factor + 0.1<CR>')
   vim.keymap.set({ 'n', 'v' }, '<C-->', ':lua vim.g.neovide_scale_factor = vim.g.neovide_scale_factor - 0.1<CR>')
   vim.keymap.set({ 'n', 'v' }, '<C-0>', ':lua vim.g.neovide_scale_factor = 1<CR>') -- Reset to default
 end
-
--- "mZwjmdZwe1S5uhHMdR9CVGqv3gQS1lzvOAd_r_pYRdY" 1000000000
--- "1706b0559e4a8c8b7e1f486b590cbc5e8afef5d250a94c"
--- https://example.co/path/1706b0559e4a8c8b7e1f486b590cbc5e8afef5d250a94c/query?enc=mZwjmdZwe1S5uhHMdR9CVGqv3gQS1lzvOAd_r_pYRdY&ver=1000000000
-vim.keymap.set('n', '<leader>xd', require('lc-cyber').decode_word, { desc = 'Decode LC ID under cursor' })
-vim.keymap.set('n', '<leader>xy', require('lc-cyber').decode_word_to_clipboard, { desc = 'Decode LC ID to clipboard' })
-vim.keymap.set('v', '<leader>xd', require('lc-cyber').decode_selection, { desc = 'Decode LC ID selection' })
-vim.keymap.set('v', '<leader>cx', require('lc-cyber').decode_selection_to_clipboard, { desc = 'Decode LC ID to clipboard' })
 
 --- Generate a function annotation using Neogen for the function at or under the cursor.
 --- This command uses the 'neogen' plugin to create documentation comments.

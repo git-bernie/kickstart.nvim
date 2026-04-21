@@ -13,11 +13,16 @@
 --   vim.keymap.set('v', '<leader>cd', require('lc-cyber').decode_selection, { desc = 'Decode LC ID selection' })
 --   vim.keymap.set('v', '<leader>cy', require('lc-cyber').decode_selection_to_clipboard, { desc = 'Decode LC ID to clipboard' })
 --   vim.keymap.set('n', '<leader>ce', require('lc-cyber').encode_word, { desc = 'Encode LC ID under cursor' })
+--
+-- Backend: bin/lc-codec.php (vendored alongside this file in ~/.config/nvim)
+-- The codec is fully self-contained — Rijndael-256 (V1) is inlined,
+-- libsodium (V2) comes from the PHP sodium extension. No dependency on the
+-- services or loanconnect repos.
 
 local M = {}
 
--- Path to the lc-cyber script
-local script_path = vim.fn.expand '~/bin/lc-cyber'
+-- Path to the codec script (lives in this Neovim config)
+local script_path = vim.fn.stdpath('config') .. '/bin/lc-codec.php'
 
 ---Run lc-cyber command and return result
 ---@param action string

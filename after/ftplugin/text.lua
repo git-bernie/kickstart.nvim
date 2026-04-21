@@ -1,0 +1,2 @@
+-- Prose mode available via <leader>tp but not auto-enabled
+-- Text filetype includes git diffs and other structured content
