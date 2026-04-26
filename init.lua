@@ -277,6 +277,15 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
+-- Backup and undo directories below.
+-- Cleanup is handled by a weekly cron job (Sundays 04:30) — see:
+--   ~/work/dotfiles/system-fixes/nvim-vim-cleanup/
+-- That fix prevents ~/.backupdir and ~/.undodir from accumulating
+-- indefinitely (which is both a disk-space and a privacy issue, since
+-- undo files contain text snippets of every edit).
+-- Retention: 30 days for backupdir, 90 days for undodir. Tunable via
+-- env vars BACKUP_RETENTION_DAYS / UNDO_RETENTION_DAYS.
+
 if vim.fn.isdirectory(vim.env.HOME .. '/.backupdir') == 0 then
   -- vim.fn.mkdir(vim.env.HOME .. '/.backupdir')
   if vim.fn.mkdir(vim.env.HOME .. '/.backupdir') ~= 1 then
@@ -1489,8 +1498,7 @@ require('lazy').setup {
         blade = { 'blade-formatter' },
         markdown = { 'cbfmt', 'markdown-toc', 'markdownlint', stop_after_first = false },
         -- sql = { 'sqlfmt', 'sqruff' },
-        -- sql = { 'sql_formatter' },
-        sql = { 'sqlfluff' },
+        sql = { 'sql_formatter', 'sqlfluff', stop_after_first = true },
         -- php = { 'pretty-php', 'duster', 'php-cs-fixer' },
         -- php = { 'duster', 'php-cs-fixer' },
         -- php = { 'php-cs-fixer', 'prettierd' },
@@ -1503,6 +1511,9 @@ require('lazy').setup {
       formatters = {
         shfmt = {
           prepend_args = { '-i', '4' }, -- 4 spaces for indentation
+        },
+        sqlfluff = {
+          require_cwd = false,
         },
         ['php-cs-fixer'] = {
           command = 'php-cs-fixer',

@@ -18,7 +18,7 @@ return {
         -- markdown = { 'markdownlint' }, -- stop linting malformed help markdown files!
         php = { 'phpstan' },
         python = { 'ruff' },
-        sql = { 'sqlfluff' },
+        -- sql = { 'sqlfluff' },  -- too noisy without a project .sqlfluff config
       }
 
       -- To allow other plugins to add linters to require('lint').linters_by_ft,
