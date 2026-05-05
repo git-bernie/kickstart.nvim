@@ -2,4 +2,5 @@
 -- right now to go through and understand. I'll just use it as is for now.
 return {
   'marko-cerovac/material.nvim',
+  lazy = true,
 }
