@@ -161,36 +161,12 @@ vim.api.nvim_create_autocmd('BufReadPost', {
   end,
 })
 
-vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
-  pattern = { '*.json', '*.jsonc' },
-  callback = function()
-    -- vim.opt_local.foldmethod = 'indent'
-    vim.opt_local.foldmethod = 'expr'
-    vim.opt_local.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-    vim.opt_local.foldlevelstart = 99
-  end,
-})
-
-vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
-  pattern = { '*.vue' },
-  callback = function()
-    vim.opt_local.foldmethod = 'expr'
-    vim.opt_local.foldlevelstart = 99
-    vim.opt_local.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-    vim.opt_local.shiftwidth = 2
-  end,
-})
-
-vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
-  pattern = { '*.xml' },
-  callback = function()
-    vim.opt_local.foldmethod = 'expr'
-    vim.opt_local.foldlevelstart = 99
-    vim.opt_local.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-  end,
-})
+-- json/jsonc/vue/xml fold settings moved to after/ftplugin/{json,jsonc,vue,xml}.lua
 
 vim.filetype.add {
+  extension = {
+    ctp = 'php', -- CakePHP templates → use PHP ftplugin (was a BufEnter autocmd)
+  },
   pattern = {
     ['%.env[%.%w]*'] = 'config',
   },
@@ -232,33 +208,7 @@ function IsLaravelInComposer()
   return false
 end
 
-vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
-  pattern = { '*.php', '*.ctp' },
-  callback = function()
-    -- vim.opt_local.foldmethod = 'expr'
-    -- vim.opt_local.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-    vim.opt_local.foldmethod = 'expr'
-    vim.opt_local.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-    vim.opt_local.foldlevelstart = 99
-    vim.opt_local.shiftwidth = 4
-    vim.opt_local.foldlevel = 5
-    vim.opt_local.expandtab = true
-    vim.opt_local.tabstop = 4
-    vim.opt_local.iskeyword:append '-' -- lua vim.opt_local.iskeyword:remove '-'
-    vim.opt_local.textwidth = 110 -- NB: 110 works better than 120 on my split screen
-    -- vim.opt.shiftwidth = 2
-    -- vim.opt_local.colorcolumn = { 80, 120 } -- Readability first; ideally 80; soft limit 120
-    vim.opt_local.colorcolumn = { 80, 110 } -- Readability first; ideally 80; soft limit 110
-    -- vim.api.nvim_set_hl(0, 'Comment', { fg = '#6B9DC0' }) -- Muted blue
-    vim.api.nvim_set_hl(0, 'Comment', { fg = '#5F8AA8' }) -- Steel blue
-
-    --[=[ if IsLaravelInComposer() then
-      -- Handle Laravel specific configuration
-      -- For example, set specific linting or formatting options
-      print [[+++ Laravel detected in composer.json!]]
-    end ]=]
-  end,
-})
+-- php/ctp fold + indent + colorcolumn settings moved to after/ftplugin/php.lua
 
 vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
   pattern = { '*.md', '*.log', '*.txt', '*.output', '*.[ct]sv' },
