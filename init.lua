@@ -94,7 +94,9 @@ vim.g.sql_type_default = 'mysql'
 
 -- Use the faster php_only treesitter parser for PHP files (2.5x faster — skips HTML injection overhead)
 -- Pure PHP files (classes, commands, etc.) don't need the HTML-aware parser
-vim.treesitter.language.register('php_only', 'php')
+-- Disabled: breaks nvim-treesitter-textobjects [[/]] function navigation in PHP buffers
+-- (parser:trees() returns empty before move() can query, so the keymap silently no-ops)
+-- vim.treesitter.language.register('php_only', 'php')
 
 -- disable automatic conversion of emoji characters to full-width? Might resolve some issues with
 -- emoji-icon-theme and cmp?
@@ -1554,7 +1556,7 @@ require('lazy').setup {
           copilot = {
             name = 'copilot',
             module = 'blink-cmp-copilot',
-            score_offset = 100,
+            score_offset = 50,
             async = true,
           },
           sshconfig = {

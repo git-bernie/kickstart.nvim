@@ -1,0 +1,81 @@
+-- LoanConnect project-local Neovim config.
+-- ---------------------------------------------------------------------------
+-- WHERE: drop a copy of this file at the LoanConnect repo root as `.nvim.lua`.
+-- GIT:   add `.nvim.lua` and `.nvim/` to that repo's .gitignore.
+-- TRUST: first time you open nvim there you'll be prompted to :trust this
+--        file (kickstart's exrc security mechanism — sha256-hashed allowlist).
+--
+-- This single file wires up:
+--   - lc-lookup picker  (lua/lc-lookup.lua → bin/lc-lookup.php)
+--   - vim-dadbod-ui     (lua/custom/plugins/dadbod.lua) via vim.g.dbs
+-- Both share credentials, so there's only one place to rotate them.
+
+-- ---------------------------------------------------------------------------
+-- 1. Credentials, sourced from `pass` (or any CLI that prints the password).
+-- ---------------------------------------------------------------------------
+-- Switch the `pass` invocation to whatever your secret store is:
+--   gopass:        { 'gopass', 'show', '-o', 'loanconnect/db' }
+--   secret-tool:   { 'secret-tool', 'lookup', 'service', 'loanconnect-db' }
+--   1Password CLI: { 'op', 'read', 'op://Personal/loanconnect-db/password' }
+--
+-- pcall + error notification keeps the file resilient: if your gpg-agent has
+-- timed out and pinentry isn't available, nvim still loads — you just get
+-- clear errors when you try :LcLookupRefresh or :DBUI.
+local password = ''
+do
+  local result = vim.system({ 'pass', 'loanconnect/db' }, { text = true }):wait()
+  if result.code == 0 then
+    password = vim.trim(result.stdout)
+  else
+    vim.notify('lc-lookup: pass loanconnect/db failed (' .. (result.stderr or '') .. ')', vim.log.levels.WARN)
+  end
+end
+
+-- vim.env.X mutates nvim's process environment, so child processes
+-- (vim.system → php) inherit these values. Plain Lua locals would not.
+vim.env.LC_DB_DSN = 'mysql:host=127.0.0.1;port=3306;dbname=loanconnect;charset=utf8mb4'
+vim.env.LC_DB_USER = 'readonly'
+vim.env.LC_DB_PASS = password
+
+-- ---------------------------------------------------------------------------
+-- 2. Project-scoped manifest + cache.
+-- ---------------------------------------------------------------------------
+-- Storing these under <project>/.nvim/ keeps multiple LC-ish projects from
+-- colliding and makes the cache trivial to nuke (just `rm -rf .nvim/`).
+local here = vim.fn.fnamemodify(vim.fn.expand '<sfile>', ':p:h')
+vim.env.LC_LOOKUP_MANIFEST = here .. '/.nvim/lookup-manifest.json'
+vim.env.LC_LOOKUP_CACHE = here .. '/.nvim/lookup-cache'
+vim.fn.mkdir(vim.env.LC_LOOKUP_CACHE, 'p')
+
+-- ---------------------------------------------------------------------------
+-- 3. vim-dadbod-ui — same credentials, no duplication.
+-- ---------------------------------------------------------------------------
+-- Toggle the drawer with <leader>td. Tab-complete to switch DBs in the UI.
+vim.g.dbs = {
+  loanconnect_prod_ro = string.format('mysql://%s:%s@127.0.0.1:3306/loanconnect', vim.env.LC_DB_USER, vim.env.LC_DB_PASS),
+  -- Add others as you need them:
+  -- loanconnect_local = 'mysql://homestead:secret@127.0.0.1:33060/loanconnect',
+}
+
+-- ---------------------------------------------------------------------------
+-- 4. Sample manifest. Write this content to `.nvim/lookup-manifest.json`,
+-- adjusting columns to match LoanConnect's actual schema. The picker
+-- autodetects id/label columns from any of:
+--   id-ish:    id | ID | uuid
+--   label-ish: name | label | title | display_name | company_name
+-- ---------------------------------------------------------------------------
+--[[
+{
+  "tables": {
+    "lenders": {
+      "sql": "SELECT id, name FROM lenders WHERE active = 1 ORDER BY name"
+    },
+    "partners": {
+      "sql": "SELECT id, name FROM partners ORDER BY name"
+    },
+    "products": {
+      "sql": "SELECT id, name, lender_id FROM products ORDER BY name"
+    }
+  }
+}
+--]]
