@@ -26,6 +26,7 @@ local toggle_widen = {
 
 return {
   'stevearc/aerial.nvim',
+  branch = 'nvim-0.11',
   enabled = true,
 
   opts = {

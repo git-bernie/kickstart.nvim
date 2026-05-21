@@ -94,7 +94,9 @@ vim.g.sql_type_default = 'mysql'
 
 -- Use the faster php_only treesitter parser for PHP files (2.5x faster — skips HTML injection overhead)
 -- Pure PHP files (classes, commands, etc.) don't need the HTML-aware parser
-vim.treesitter.language.register('php_only', 'php')
+-- Disabled: breaks nvim-treesitter-textobjects [[/]] function navigation in PHP buffers
+-- (parser:trees() returns empty before move() can query, so the keymap silently no-ops)
+-- vim.treesitter.language.register('php_only', 'php')
 
 -- disable automatic conversion of emoji characters to full-width? Might resolve some issues with
 -- emoji-icon-theme and cmp?
@@ -161,36 +163,12 @@ vim.api.nvim_create_autocmd('BufReadPost', {
   end,
 })
 
-vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
-  pattern = { '*.json', '*.jsonc' },
-  callback = function()
-    -- vim.opt_local.foldmethod = 'indent'
-    vim.opt_local.foldmethod = 'expr'
-    vim.opt_local.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-    vim.opt_local.foldlevelstart = 99
-  end,
-})
-
-vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
-  pattern = { '*.vue' },
-  callback = function()
-    vim.opt_local.foldmethod = 'expr'
-    vim.opt_local.foldlevelstart = 99
-    vim.opt_local.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-    vim.opt_local.shiftwidth = 2
-  end,
-})
-
-vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
-  pattern = { '*.xml' },
-  callback = function()
-    vim.opt_local.foldmethod = 'expr'
-    vim.opt_local.foldlevelstart = 99
-    vim.opt_local.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-  end,
-})
+-- json/jsonc/vue/xml fold settings moved to after/ftplugin/{json,jsonc,vue,xml}.lua
 
 vim.filetype.add {
+  extension = {
+    ctp = 'php', -- CakePHP templates → use PHP ftplugin (was a BufEnter autocmd)
+  },
   pattern = {
     ['%.env[%.%w]*'] = 'config',
   },
@@ -232,33 +210,7 @@ function IsLaravelInComposer()
   return false
 end
 
-vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
-  pattern = { '*.php', '*.ctp' },
-  callback = function()
-    -- vim.opt_local.foldmethod = 'expr'
-    -- vim.opt_local.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-    vim.opt_local.foldmethod = 'expr'
-    vim.opt_local.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-    vim.opt_local.foldlevelstart = 99
-    vim.opt_local.shiftwidth = 4
-    vim.opt_local.foldlevel = 5
-    vim.opt_local.expandtab = true
-    vim.opt_local.tabstop = 4
-    vim.opt_local.iskeyword:append '-' -- lua vim.opt_local.iskeyword:remove '-'
-    vim.opt_local.textwidth = 110 -- NB: 110 works better than 120 on my split screen
-    -- vim.opt.shiftwidth = 2
-    -- vim.opt_local.colorcolumn = { 80, 120 } -- Readability first; ideally 80; soft limit 120
-    vim.opt_local.colorcolumn = { 80, 110 } -- Readability first; ideally 80; soft limit 110
-    -- vim.api.nvim_set_hl(0, 'Comment', { fg = '#6B9DC0' }) -- Muted blue
-    vim.api.nvim_set_hl(0, 'Comment', { fg = '#5F8AA8' }) -- Steel blue
-
-    --[=[ if IsLaravelInComposer() then
-      -- Handle Laravel specific configuration
-      -- For example, set specific linting or formatting options
-      print [[+++ Laravel detected in composer.json!]]
-    end ]=]
-  end,
-})
+-- php/ctp fold + indent + colorcolumn settings moved to after/ftplugin/php.lua
 
 vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
   pattern = { '*.md', '*.log', '*.txt', '*.output', '*.[ct]sv' },
@@ -1110,12 +1062,6 @@ require('lazy').setup {
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
       { 'j-hui/fidget.nvim', opts = {} },
-
-      -- Allows extra capabilities provided by blink.cmp
-      -- 'saghen/blink.cmp',
-
-      -- Allows extra capabilities provided by nvim-cmp
-      -- 'hrsh7th/cmp-nvim-lsp',
     },
     config = function()
       -- Brief aside: **What is LSP?**
@@ -1293,32 +1239,9 @@ require('lazy').setup {
 
       -- LSP servers and clients are able to communicate to each other what features they support.
       --  By default, Neovim doesn't support everything that is in the LSP specification.
-      --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
-      --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
-
+      --  When you add blink.cmp, luasnip, etc. Neovim now has *more* capabilities.
+      --  So, we create new capabilities with blink.cmp, and then broadcast that to the servers.
       local capabilities = require('blink.cmp').get_lsp_capabilities()
-      -- local capabilities = vim.lsp.protocol.make_client_capabilities()
-      -- capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
-
-      -- LSP servers and clients are able to communicate to each other what features they support.
-      --  By default, Neovim doesn't support everything that is in the LSP specification.
-      --  When you add blink.cmp, luasnip, etc. Neovim now has *more* capabilities.
-      --  So, we create new capabilities with blink.cmp, and then broadcast that to the servers.
-      --
-      --[[ local capabilities = {
-        textDocument = {
-          foldingRange = {
-            dynamicRegistration = false,
-            lineFoldingOnly = true,
-          },
-        },
-      }
-      capabilities = require('blink.cmp').get_lsp_capabilities(capabilities) ]]
-      -- local capabilities = require('blink.cmp').get_lsp_capabilities() --- QQQ:
-      --
-      --  When you add blink.cmp, luasnip, etc. Neovim now has *more* capabilities.
-      --  So, we create new capabilities with blink.cmp, and then broadcast that to the servers.
-      -- local capabilities = require('blink.cmp').get_lsp_capabilities() --- QQQ:
 
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -1572,6 +1495,7 @@ require('lazy').setup {
         'rafamadriz/friendly-snippets',
         config = function()
           require('luasnip.loaders.from_vscode').lazy_load()
+          require('luasnip.loaders.from_lua').lazy_load { paths = { vim.fn.stdpath 'config' .. '/luasnippets' } }
         end,
       },
     },
@@ -1615,7 +1539,7 @@ require('lazy').setup {
       completion = {
         -- By default, you may press `<c-space>` to show the documentation.
         -- Optionally, set `auto_show = true` to show the documentation after a delay.
-        documentation = { auto_show = false, auto_show_delay_ms = 500 },
+        documentation = { auto_show = true, auto_show_delay_ms = 500 },
       },
 
       sources = {
@@ -1632,7 +1556,7 @@ require('lazy').setup {
           copilot = {
             name = 'copilot',
             module = 'blink-cmp-copilot',
-            score_offset = 100,
+            score_offset = 50,
             async = true,
           },
           sshconfig = {

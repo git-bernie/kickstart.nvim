@@ -5,6 +5,7 @@ E.g. local api_token = vim.fn.system('op read "op://Vault/Jira API Token/credent
 ]]
 return {
   'letieu/jira.nvim',
+  cmd = 'Jira',
   opts = function()
     -- Read a key from a .env file
     local function read_env_file(path, key)

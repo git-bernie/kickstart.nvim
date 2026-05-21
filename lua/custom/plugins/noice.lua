@@ -11,7 +11,7 @@ how to consistently see the result of :! /bin/bash etc. type comands.
 ]]
 return {
   'folke/noice.nvim',
-  enabled = true,
+  enabled = false,
   event = 'VeryLazy',
   -- add any options here
   --[[ lsp = {

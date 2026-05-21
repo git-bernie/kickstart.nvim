@@ -9,3 +9,8 @@ end
 vim.keymap.set('n', 'y<C-p>', function()
   vim.fn.setreg('+', require('jsonpath').get())
 end, { desc = 'copy json path', buffer = true })
+
+-- treesitter-based folding (was BufEnter autocmd in init.lua)
+vim.opt_local.foldmethod = 'expr'
+vim.opt_local.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+vim.opt_local.foldlevelstart = 99

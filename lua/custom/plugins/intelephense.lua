@@ -18,8 +18,23 @@ return {
     local ok, inspected = pcall(vim.inspect, include_paths)
     -- print('local include_paths now ' .. (ok and inspected or 'error inspecting include_paths'))
 
+    -- Project-local root_markers override.
+    -- Default is { '.git', 'composer.json' }, but some CakePHP 2 projects (e.g.
+    -- loanconnect) have composer.json in app/ — that gets matched FIRST when
+    -- walking up from a buffer in app/Controller/, so intelephense incorrectly
+    -- treats app/ as the workspace root instead of the project root. The result
+    -- is that includePaths like 'lib' resolve to app/lib (doesn't exist) and
+    -- the entire CakePHP framework is invisible to intelephense.
+    -- Set vim.g.local_root_markers = { '.git' } in such projects' .nvim.lua
+    -- to exclude composer.json from root detection.
+    local root_markers = { '.git', 'composer.json' } -- intelephense default
+    if type(vim.g.local_root_markers) == 'table' then
+      root_markers = vim.g.local_root_markers
+    end
+
     vim.lsp.enable('intelephense')
     vim.lsp.config('intelephense', {
+      root_markers = root_markers,
       -- vim.lsp.config().intelephense.setup {
       -- require('lspconfig').intelephense.setup {
       settings = {
