@@ -1790,17 +1790,14 @@ require('lazy').setup {
       })
     end,
   },
-  { -- Highlight, edit, and navigate code
+  { -- Highlight, edit, and navigate code (main branch — Nvim 0.12+)
+    -- Migrated 2026-05-25: master archived, opts-based module system removed.
+    -- highlight/indent/folds are no longer opt switches — enabled via FileType autocmd below.
     'nvim-treesitter/nvim-treesitter',
-    event = { 'BufReadPre', 'BufNewFile' },
+    branch = 'main',
+    lazy = false,
     build = ':TSUpdate',
-    main = 'nvim-treesitter.configs', -- Sets main module to use for opts
-    -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-    dependencies = {
-      'nvim-treesitter/nvim-treesitter-textobjects',
-    },
     opts = {
-      -- ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'php', 'javascript', 'vue' },
       ensure_installed = {
         'bash',
         'c',
@@ -1817,7 +1814,6 @@ require('lazy').setup {
         'python',
         'javascript',
         'vue',
-        -- 'latex',
         'norg',
         'scss',
         'sql',
@@ -1828,60 +1824,60 @@ require('lazy').setup {
         'xml',
         'yaml',
       },
-      -- Autoinstall languages that are not installed
-      auto_install = true,
-      highlight = {
-        enable = true,
-        -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-        --  If you are experiencing weird indenting issues, add the language to
-        --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-        additional_vim_regex_highlighting = { 'ruby' },
-      },
-      indent = { enable = true, disable = { 'ruby' } },
-      textobjects = {
-        select = {
-          enable = true,
-          -- You can map the '%' key to the treesitter function for matching
-          -- This example maps '%' to jump to the next matching node's start or end
-          -- and sets up some other useful mappings for context selection
-          keymaps = {
-            -- Map '%' to jump between the start/end of the current block/function
-            -- Note: This is a custom mapping, not a direct replacement of the default '%'
-            ['%'] = '@block.outer',
-          },
-        },
-        -- This is generally what you want for jumping between definitions or blocks
-        move = {
-          enable = true,
-          set_jumps = true, -- Adds jumps to the jump list
-          goto_next_start = {
-            [']]'] = '@function.outer',
-            [']b'] = '@block.outer',
-            [']e'] = '@class.outer',
-          },
-          goto_next_end = {
-            [']['] = '@function.outer',
-            [']B'] = '@block.outer',
-          },
-          goto_previous_start = {
-            ['[['] = '@function.outer',
-            ['[b'] = '@block.outer',
-            ['[e'] = '@class.outer',
-          },
-          goto_previous_end = {
-            ['[]'] = '@function.outer',
-            ['[B'] = '@block.outer',
-          },
-        },
-      },
     },
+    config = function(_, opts)
+      local TS = require 'nvim-treesitter'
 
-    -- There are additional nvim-treesitter modules that you can use to interact
-    -- with nvim-treesitter. You should go explore a few and see what interests you:
-    --
-    --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-    --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-    --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+      -- Install any missing parsers (main-branch API; no auto_install on opts anymore)
+      if TS.get_installed then
+        local installed = {}
+        for _, p in ipairs(TS.get_installed 'parsers' or {}) do
+          installed[p] = true
+        end
+        local to_install = {}
+        for _, p in ipairs(opts.ensure_installed) do
+          if not installed[p] then
+            table.insert(to_install, p)
+          end
+        end
+        if #to_install > 0 then
+          TS.install(to_install)
+        end
+      end
+
+      -- Filetypes where we explicitly want vim's regex highlighter, not treesitter
+      -- (was `additional_vim_regex_highlighting = { 'ruby' }` on master)
+      local skip_treesitter = { ruby = true }
+
+      vim.api.nvim_create_autocmd('FileType', {
+        group = vim.api.nvim_create_augroup('bernie_treesitter', { clear = true }),
+        callback = function(ev)
+          local ft = ev.match
+          if skip_treesitter[ft] then
+            return
+          end
+          local lang = vim.treesitter.language.get_lang(ft)
+          if not lang then
+            return
+          end
+          if not pcall(vim.treesitter.start, ev.buf, lang) then
+            return
+          end
+          vim.bo[ev.buf].syntax = 'ON' -- vim regex fallback for what TS doesn't cover
+
+          -- Folds (window-local — must use vim.wo, not vim.bo)
+          if vim.treesitter.query.get(lang, 'folds') then
+            vim.wo.foldmethod = 'expr'
+            vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+          end
+
+          -- Indent (buffer-local)
+          if vim.treesitter.query.get(lang, 'indents') then
+            vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          end
+        end,
+      })
+    end,
   },
   --[[ {
     'SergioRibera/cmp-dotenv',

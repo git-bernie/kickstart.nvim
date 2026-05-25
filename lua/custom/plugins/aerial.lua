@@ -26,7 +26,7 @@ local toggle_widen = {
 
 return {
   'stevearc/aerial.nvim',
-  branch = 'nvim-0.11',
+  -- branch = 'nvim-0.11', -- removed 2026-05-25 for Nvim 0.12.2 upgrade; aerial master targets 0.12
   enabled = true,
 
   opts = {
