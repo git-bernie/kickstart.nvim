@@ -3,7 +3,9 @@
 --]]
 return {
   'preservim/nerdcommenter',
-  event = 'BufReadPost',
+  keys = {
+    { '<leader>cs', mode = { 'n', 'x' }, desc = 'NERDCommenter Sexy' },
+  },
   init = function()
     vim.g.NERDCreateDefaultMappings = 1
     vim.g.NERDSpaceDelims = 1
