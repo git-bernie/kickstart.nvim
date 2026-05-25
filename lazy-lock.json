@@ -153,7 +153,7 @@
   "vim-unimpaired": { "branch": "master", "commit": "db65482581a28e4ccf355be297f1864a4e66985c" },
   "vim-wordmotion": { "branch": "master", "commit": "81d9bd298376ab0dc465c85d55afa4cb8d5f47a1" },
   "vimwiki": { "branch": "dev", "commit": "72792615e739d0eb54a9c8f7e0a46a6e2407c9e8" },
-  "vscode-intelephense": { "branch": "master", "commit": "62cbdb04495b0f9b26a94aeeecf6272bb5b366a4" },
+  "vscode-intelephense": { "branch": "master", "commit": "e6fb71ea20754bff5c5c004fef1ec29aaddab56f" },
   "vscode-php-debug": { "branch": "main", "commit": "d938470316dc7be3e5d8b47bed78c1daedb2eea3" },
   "w3m.vim": { "branch": "master", "commit": "228a852b188f1a62ecea55fa48b0ec892fa6bad7" },
   "which-key.nvim": { "branch": "main", "commit": "3aab2147e74890957785941f0c1ad87d0a44c15a" },
