@@ -1814,7 +1814,6 @@ require('lazy').setup {
         'python',
         'javascript',
         'vue',
-        'norg',
         'scss',
         'sql',
         'svelte',
@@ -1827,6 +1826,11 @@ require('lazy').setup {
     },
     config = function(_, opts)
       local TS = require 'nvim-treesitter'
+
+      -- Initialize the plugin: registers :TSInstall/:TSUpdate commands, wires up
+      -- install_dir → runtimepath, and registers parser/query discovery.
+      -- Without this, install() runs async but produces no files; commands don't exist.
+      TS.setup(opts)
 
       -- Install any missing parsers (main-branch API; no auto_install on opts anymore)
       if TS.get_installed then
