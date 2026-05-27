@@ -1768,7 +1768,23 @@ require('lazy').setup {
             verbose = { read = true, write = true, delete = true },
           }
 
-          require('mini.map').setup()
+          local map = require('mini.map')
+          map.setup {
+            integrations = {
+              map.gen_integration.builtin_search(),
+              map.gen_integration.diagnostic({
+                error = 'DiagnosticFloatingError',
+                warn = 'DiagnosticFloatingWarn',
+              }),
+              map.gen_integration.gitsigns(),
+            },
+            symbols = {
+              encode = map.gen_encode_symbols.dot('4x2'),
+              scroll_line = '█',
+              scroll_view = '┃',
+            },
+            window = { width = 8, winblend = 25 },
+          }
 
           -- require('mini.splitjoin').setup()
 
