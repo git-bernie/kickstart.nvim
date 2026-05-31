@@ -1838,6 +1838,7 @@ require('lazy').setup {
         'typst',
         'xml',
         'yaml',
+        'ini',
       },
     },
     config = function(_, opts)
@@ -1877,24 +1878,20 @@ require('lazy').setup {
             return
           end
           local lang = vim.treesitter.language.get_lang(ft)
-          if not lang then
-            return
-          end
-          if not pcall(vim.treesitter.start, ev.buf, lang) then
-            return
-          end
-          vim.bo[ev.buf].syntax = 'ON' -- vim regex fallback for what TS doesn't cover
+          if lang and pcall(vim.treesitter.start, ev.buf, lang) then
+            -- Folds (window-local — must use vim.wo, not vim.bo)
+            if vim.treesitter.query.get(lang, 'folds') then
+              vim.wo.foldmethod = 'expr'
+              vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+            end
 
-          -- Folds (window-local — must use vim.wo, not vim.bo)
-          if vim.treesitter.query.get(lang, 'folds') then
-            vim.wo.foldmethod = 'expr'
-            vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+            -- Indent (buffer-local)
+            if vim.treesitter.query.get(lang, 'indents') then
+              vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+            end
           end
-
-          -- Indent (buffer-local)
-          if vim.treesitter.query.get(lang, 'indents') then
-            vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
-          end
+          -- vim regex highlighter: supplement when TS is active, sole highlighter when no parser
+          vim.bo[ev.buf].syntax = 'ON'
         end,
       })
     end,
