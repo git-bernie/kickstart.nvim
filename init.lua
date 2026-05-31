@@ -92,6 +92,9 @@ vim.opt.spelloptions = 'noplainbuffer,camel'
 
 vim.g.sql_type_default = 'mysql'
 
+-- Experimental built-in messages/cmdline UI (Neovim 0.12+); required by tiny-cmdline.nvim
+require('vim._core.ui2').enable {}
+
 -- Use the faster php_only treesitter parser for PHP files (2.5x faster — skips HTML injection overhead)
 -- Pure PHP files (classes, commands, etc.) don't need the HTML-aware parser
 -- Disabled: breaks nvim-treesitter-textobjects [[/]] function navigation in PHP buffers
@@ -1056,7 +1059,7 @@ require('lazy').setup {
       -- NOTE: `opts = {}` is the same as calling `require('mason').setup({})`
 
       -- { 'mason-org/mason.nvim', opts = {}, config = true }, -- NOTE: Must be loaded before dependants
-      { 'mason-org/mason.nvim', opts = {} }, -- NOTE: Must be loaded before dependants
+      { 'mason-org/mason.nvim', opts = { firewall = { enabled = true } } }, -- NOTE: Must be loaded before dependants
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
       -- Useful status updates for LSP.
@@ -1211,7 +1214,8 @@ require('lazy').setup {
         source = true,
         float = { border = 'rounded', source = 'if_many' },
         virtual_lines = false,
-        jump = { float = true }, -- auto-open float when jumping with [d / ]d
+        -- jump = { float = true }, -- auto-open float when jumping with [d / ]d
+        -- jump = { on_jump = true }, -- see on_jump field. Commenting out will be default.
         underline = { severity = vim.diagnostic.severity.ERROR },
         signs = vim.g.have_nerd_font and {
           text = {
@@ -1768,18 +1772,18 @@ require('lazy').setup {
             verbose = { read = true, write = true, delete = true },
           }
 
-          local map = require('mini.map')
+          local map = require 'mini.map'
           map.setup {
             integrations = {
               map.gen_integration.builtin_search(),
-              map.gen_integration.diagnostic({
+              map.gen_integration.diagnostic {
                 error = 'DiagnosticFloatingError',
                 warn = 'DiagnosticFloatingWarn',
-              }),
+              },
               map.gen_integration.gitsigns(),
             },
             symbols = {
-              encode = map.gen_encode_symbols.dot('4x2'),
+              encode = map.gen_encode_symbols.dot '4x2',
               scroll_line = '█',
               scroll_view = '┃',
             },
