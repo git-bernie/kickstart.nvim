@@ -1703,7 +1703,13 @@ require('lazy').setup {
           -- lualine_b = { 'branch', 'diagnostics', { max_length = 20 } },
           lualine_b = { 'branch', { fugitive_rev, color = { fg = '#fabd2f', gui = 'bold' } } },
           -- lualine_b = {'branch', 'diff', 'diagnostics'},
-          lualine_x = { 'aerial', 'filetype' },
+          lualine_c = {
+            { 'filename', path = 1 }, -- 1 = relative path; 0 = basename only
+          },
+          lualine_x = {
+            { 'aerial', max_depth = 3, dense = true, dense_sep = '.' },
+            'filetype',
+          },
           lualine_z = { 'location', 'selectioncount', 'searchcount' },
         },
         inactive_sections = {
