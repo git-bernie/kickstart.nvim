@@ -11,7 +11,14 @@ return {
     -- your configuration comes here
     -- or leave it empty to use the default settings
     -- refer to the configuration section below
-    bigfile = { enabled = true },
+    bigfile = {
+      enabled = true,
+      -- Default line_length = 1000 was tuned for minified JS bundles.
+      -- Logs (e.g. Laravel with 70K-char stack-trace lines) have avg ~1.5K/line
+      -- and get falsely flagged. Bumping to 10K still catches minified files
+      -- (which typically average tens-to-hundreds of K per line).
+      line_length = 10000,
+    },
     dashboard = { enabled = true },
     explorer = { enabled = false },
     indent = { enabled = true },
