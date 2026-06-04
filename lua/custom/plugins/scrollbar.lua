@@ -38,6 +38,15 @@ return {
         handle = true,
         search = true, -- wired below via scrollbar.handlers.search
       },
+      -- Mute Warn/Info/Hint marks — lua_ls floods init.lua with missing-fields
+      -- and undefined-field findings. Matches the existing diagnostic philosophy
+      -- at init.lua:1214 where underline is also restricted to ERROR severity.
+      -- Warnings remain available via vim.diagnostic.open_float() and :Trouble.
+      marks = {
+        Warn = { text = { '', '' } },
+        Info = { text = { '', '' } },
+        Hint = { text = { '', '' } },
+      },
       show_in_active_only = true, -- hide in inactive splits
       throttle_ms = 100,
     }
