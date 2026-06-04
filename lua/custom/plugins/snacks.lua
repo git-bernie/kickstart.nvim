@@ -3,6 +3,20 @@ return {
   'folke/snacks.nvim',
   priority = 1000,
   lazy = false,
+  init = function()
+    -- Force *.log files to ft='log' with high priority, before Snacks bigfile's
+    -- catch-all `.*` pattern can claim them as ft='bigfile'. log-highlight.nvim
+    -- uses cheap regex patterns that scale O(visible lines) regardless of file
+    -- size, so bigfile's protections aren't needed for logs. Without this,
+    -- Laravel logs that grow past `bigfile.size` (1.5MB) lose highlighting on
+    -- first open until `:e` re-runs detection.
+    vim.filetype.add {
+      pattern = {
+        ['.*%.log'] = { 'log', { priority = 100 } },
+        ['.*%.log%..*'] = { 'log', { priority = 100 } }, -- rotated: foo.log.1, foo.log.2026-06-04
+      },
+    }
+  end,
   ---@class snacks.Config, snacks.lazygit.Config
   ---@type snacks.Config
   ---@class snacks.lazygit.Config
