@@ -1,6 +1,32 @@
 return {
   'zbirenbaum/copilot.lua',
-  lazy = false, -- Load eagerly to avoid RPC errors on startup
+  -- Filetype-gated load: the Node LSP (~750MB per nvim instance) only spawns
+  -- when a code file is opened. Log/markdown/dashboard-only sessions stay lean.
+  -- Was `lazy = false` to dodge an RPC race on startup; ft-load triggers after
+  -- vim startup completes, so the race no longer applies.
+  ft = {
+    'lua',
+    'php',
+    'vue',
+    'typescript',
+    'javascript',
+    'tsx',
+    'jsx',
+    'python',
+    'sh',
+    'bash',
+    'zsh',
+    'json',
+    'yaml',
+    'toml',
+    'go',
+    'rust',
+    'ruby',
+    'sql',
+    'html',
+    'css',
+    'scss',
+  },
   config = function()
     require('copilot').setup {
       -- Inline ghost text disabled: blink-cmp-copilot handles completions via
