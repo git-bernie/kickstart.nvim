@@ -12,7 +12,7 @@ return {
   -- here — dadbod is single-digit ms to source.
   event = 'VeryLazy',
   keys = {
-    { '<leader>td', '<cmd>DBUIToggle<cr>', desc = '[t]oggle [d]B UI' },
+    { '<leader>td', '<cmd>DBUIToggle<cr>', desc = '[T]oggle [d]B UIi (dadbod)' },
   },
   init = function()
     vim.g.db_ui_use_nerd_fonts = 1
