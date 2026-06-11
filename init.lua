@@ -177,6 +177,13 @@ vim.filetype.add {
   },
 }
 
+vim.filetype.add {
+  extension = {
+    bru = 'bruno',
+  },
+}
+
+
 -- In init.lua
 vim.api.nvim_create_autocmd('FileType', {
   pattern = { 'sh', 'bash', 'zsh' },
@@ -1710,6 +1717,19 @@ require('lazy').setup {
             { 'aerial', max_depth = 3, dense = true, dense_sep = '.' },
             'filetype',
           },
+          lualine_y = {
+            {
+              function()
+                return vim.wo.wrap and '↵' or ''
+              end,
+              color = function()
+                if vim.wo.wrap then
+                  return { fg = '#fe8019', gui = 'bold' }
+                end
+              end,
+              padding = { left = 1, right = 1 },
+            },
+          },
           lualine_z = { 'location', 'selectioncount', 'searchcount' },
         },
         inactive_sections = {
@@ -1849,9 +1869,26 @@ require('lazy').setup {
         'xml',
         'yaml',
         'ini',
+        'bruno',
       },
     },
     config = function(_, opts)
+      -- Register bruno parser (not in upstream nvim-treesitter registry).
+      -- Uses the already-downloaded lazy plugin dir so nothing extra is downloaded.
+      -- Must re-register in TSUpdate because reload_parsers() wipes the table.
+      local function register_bruno()
+        require('nvim-treesitter.parsers').bruno = {
+          install_info = {
+            path = vim.fn.stdpath 'data' .. '/lazy/tree-sitter-bruno',
+            files = { 'src/parser.c', 'src/scanner.c' },
+            queries = 'queries',
+          },
+          filetype = 'bruno',
+        }
+      end
+      register_bruno()
+      vim.api.nvim_create_autocmd('User', { pattern = 'TSUpdate', callback = register_bruno })
+
       local TS = require 'nvim-treesitter'
 
       -- Initialize the plugin: registers :TSInstall/:TSUpdate commands, wires up
