@@ -20,6 +20,8 @@ end, { noremap = true, silent = true })
 vim.keymap.set('n', '<Space>gv', '<cmd>Gvdiffsplit | normal! zi<CR>', { desc = '[G][V]diffsplit Open a vertical diffsplit' })
 vim.keymap.set('n', '<Space>cd', '<cmd>cd %:p:h<CR>', { desc = '[C]hange [D]irectory to the current file' })
 vim.keymap.set('n', '<Space>lcd', '<cmd>lcd %:p:h<CR>', { desc = '[L]ocal [C]hange [D]irectory to the current file' })
+-- Open the Working-With-Claude collaboration guidelines
+vim.keymap.set('n', '<leader>??', '<cmd>edit ~/.claude/playbook/best-practices/working-with-claude.md<CR>', { desc = 'Open Working-With-Claude guidelines' })
 --- Let me have "oo" and "OO" do what I want
 -- Problem: oo and OO slow down "o" and "O" so find a better mapping
 -- map ]<Space> o<esc>
