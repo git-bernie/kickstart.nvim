@@ -1718,6 +1718,7 @@ require('lazy').setup {
             'filetype',
           },
           lualine_y = {
+            'progress',
             {
               function()
                 return vim.wo.wrap and '↵' or ''
