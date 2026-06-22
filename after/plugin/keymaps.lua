@@ -321,7 +321,7 @@ if (vim.fn.executable 'jq') == 1 then
 
     local width = math.min(math.max(40, #(formatted[1] or '') + 4), math.floor(vim.o.columns * 0.8))
     local height = math.min(#formatted, math.floor(vim.o.lines * 0.7))
-    vim.api.nvim_open_win(buf, true, {
+    local win = vim.api.nvim_open_win(buf, true, {
       relative = 'cursor',
       width = width,
       height = height,
@@ -329,11 +329,126 @@ if (vim.fn.executable 'jq') == 1 then
       row = 1,
       style = 'minimal',
       border = 'rounded',
-      title = ' JSON from log line (q to close) ',
+      title = ' JSON from log line (q/<Esc> to close) ',
       title_pos = 'center',
     })
-    vim.keymap.set('n', 'q', '<cmd>close<CR>', { buffer = buf, silent = true })
+    local function close_win()
+      if vim.api.nvim_win_is_valid(win) then
+        vim.api.nvim_win_close(win, true)
+      end
+    end
+    vim.keymap.set('n', 'q', close_win, { buffer = buf, silent = true })
+    vim.keymap.set('n', '<Esc>', close_win, { buffer = buf, silent = true })
+    vim.api.nvim_create_autocmd('WinLeave', {
+      buffer = buf,
+      once = true,
+      callback = close_win,
+    })
   end, { desc = 'E[x]tract JSON from log line' })
+
+  -- Show the CSV/TSV row under the cursor as JSON in a float (independent of csvview)
+  vim.keymap.set('n', '<leader>jc', function()
+    local data_line = vim.api.nvim_get_current_line()
+    if data_line:match '^%s*$' then
+      vim.notify('No CSV data on this line', vim.log.levels.WARN)
+      return
+    end
+
+    -- Delimiter: tab for tsv, else comma
+    local is_tsv = vim.bo.filetype == 'tsv' or vim.fn.expand '%:e' == 'tsv'
+    local delim = is_tsv and '\t' or ','
+
+    -- RFC-4180-aware single-line splitter
+    local function csv_split(line, d)
+      local fields = {}
+      local field = {}
+      local in_quotes = false
+      local i = 1
+      local n = #line
+      while i <= n do
+        local c = line:sub(i, i)
+        if in_quotes then
+          if c == '"' then
+            if line:sub(i + 1, i + 1) == '"' then
+              field[#field + 1] = '"'
+              i = i + 1
+            else
+              in_quotes = false
+            end
+          else
+            field[#field + 1] = c
+          end
+        else
+          if c == '"' and #field == 0 then
+            in_quotes = true
+          elseif c == d then
+            fields[#fields + 1] = table.concat(field)
+            field = {}
+          else
+            field[#field + 1] = c
+          end
+        end
+        i = i + 1
+      end
+      fields[#fields + 1] = table.concat(field)
+      return fields
+    end
+
+    local headers = csv_split(vim.api.nvim_buf_get_lines(0, 0, 1, false)[1] or '', delim)
+    local values = csv_split(data_line, delim)
+
+    -- Build JSON in column order; keys/values escaped via json_encode
+    local parts = {}
+    local count = math.max(#headers, #values)
+    for idx = 1, count do
+      local key = headers[idx]
+      if key == nil or key == '' then
+        key = 'field_' .. idx
+      end
+      local val = values[idx] or ''
+      parts[#parts + 1] = vim.fn.json_encode(key) .. ': ' .. vim.fn.json_encode(val)
+    end
+    local compact = '{' .. table.concat(parts, ',') .. '}'
+
+    -- Pretty-print preserving order (jq . — NOT --sort-keys); raw fallback
+    local formatted = vim.fn.systemlist('echo ' .. vim.fn.shellescape(compact) .. ' | jq .')
+    if vim.v.shell_error ~= 0 then
+      formatted = { compact }
+    end
+
+    -- Float (duplicated from jx recipe, intentionally not shared)
+    local buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, formatted)
+    vim.bo[buf].filetype = 'json'
+    vim.bo[buf].bufhidden = 'wipe'
+    vim.bo[buf].modifiable = false
+
+    local width = math.min(math.max(40, #(formatted[1] or '') + 4), math.floor(vim.o.columns * 0.8))
+    local height = math.min(#formatted, math.floor(vim.o.lines * 0.7))
+    local win = vim.api.nvim_open_win(buf, true, {
+      relative = 'cursor',
+      width = width,
+      height = height,
+      col = 2,
+      row = 1,
+      style = 'minimal',
+      border = 'rounded',
+      title = ' CSV row as JSON (q/<Esc> to close) ',
+      title_pos = 'center',
+    })
+    local function close_win()
+      if vim.api.nvim_win_is_valid(win) then
+        vim.api.nvim_win_close(win, true)
+      end
+    end
+    vim.keymap.set('n', 'q', close_win, { buffer = buf, silent = true })
+    vim.keymap.set('n', '<Esc>', close_win, { buffer = buf, silent = true })
+    vim.api.nvim_create_autocmd('WinLeave', {
+      buffer = buf,
+      once = true,
+      callback = close_win,
+    })
+  end, { desc = '[j]son from [c]sv row' })
 end
 
 -- Not as useful as jq but sometimes needed, if just to remember how to use yq
