@@ -13,4 +13,27 @@ return {
   init = function()
     vim.treesitter.language.register('markdown', 'vimwiki')
   end,
+  config = function(_, opts)
+    require('render-markdown').setup(opts)
+
+    -- Soften the inline `code` highlight. The tokyonight default is a loud
+    -- blue block (fg #7aa2f7 on bg #414868). Reassert on ColorScheme so it
+    -- survives theme reloads and render-markdown's own highlight setup
+    -- (this autocmd is registered after setup, so it runs last and wins).
+    local function inline_code_hl()
+      -- Tokyonight inline-`code` styling. fg-only (no block) reads calmly for
+      -- something this frequent; magenta harmonizes with the cool palette.
+      --   magenta #bb9af7 (current) · cyan #7dcfff · blue #7aa2f7 · orange #ff9e64
+      --   faint block alt: fg = '#c0caf5', bg = '#24283b'
+      local style = { fg = '#bb9af7', bg = 'NONE' }
+      -- render-markdown's overlay group...
+      vim.api.nvim_set_hl(0, 'RenderMarkdownCodeInline', style)
+      -- ...and the treesitter group beneath it, which tokyonight gives a blue
+      -- block (bg #414868). Without clearing this too, the block shows through
+      -- whenever the overlay has no background of its own.
+      vim.api.nvim_set_hl(0, '@markup.raw.markdown_inline', style)
+    end
+    vim.api.nvim_create_autocmd('ColorScheme', { callback = inline_code_hl })
+    inline_code_hl()
+  end,
 }
