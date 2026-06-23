@@ -286,7 +286,9 @@ vim.api.nvim_create_autocmd('QuickFixCmdPost', {
   end,
 })
 
-vim.opt.backupdir = { vim.env.HOME .. '/.backupdir', vim.fn.expand '~/tmp', '/tmp/' }
+-- Trailing // encodes each file's full path into the backup name, so same-named
+-- files from different projects don't collide.
+vim.opt.backupdir = { vim.env.HOME .. '/.backupdir//', vim.fn.expand '~/tmp' .. '//', '/tmp//' }
 
 vim.opt.backupskip = { '*.csv', '.env', 'envvars' }
 
@@ -324,7 +326,9 @@ if vim.fn.isdirectory(vim.env.HOME .. '/.undodir') == 0 then
     vim.fn.mkdir(vim.fn.expand '~/tmp/.undodir')
   end
 end
-vim.opt.undodir = vim.env.HOME .. '/.undodir'
+-- Trailing // encodes the full path into the undo file name (avoids collisions
+-- between same-named files in different directories).
+vim.opt.undodir = vim.env.HOME .. '/.undodir//'
 vim.opt.undofile = true
 
 -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
