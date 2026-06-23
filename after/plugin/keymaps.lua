@@ -493,6 +493,9 @@ vim.keymap.set('n', '<leader>tp', function()
   require('custom.prose').toggle()
 end, { desc = '[T]oggle [p]rose mode' })
 
+vim.keymap.set('n', '<leader>Z', function()
+  require('zen-mode').toggle()
+end, { desc = '[Z]enMode Toggle' })
 -- Convert *.tsv to *.csv and actually convert tabs to commas
 -- : for F in $(ls *.tsv); do echo $F; B=$(basename "$F" .tsv); echo "$B"; csvtool -t TAB -u COMMA col 1- "$F" > "$B.csv"; done
 -- TODO: this is best put ins csvview.lua
