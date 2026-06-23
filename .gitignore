@@ -6,6 +6,9 @@ nvim
 .env
 spell/
 *~
+# nvim timestamped backups: backupext is ~%Y-%m-%d-%H%M%S (see init.lua
+# BufWritePre), so the bare *~ above misses them (~ is mid-name, not trailing).
+*~[0-9]*
 Session.vim
 db_ui_queries/
 # lazy-lock.json
