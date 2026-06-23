@@ -183,7 +183,6 @@ vim.filetype.add {
   },
 }
 
-
 -- In init.lua
 vim.api.nvim_create_autocmd('FileType', {
   pattern = { 'sh', 'bash', 'zsh' },
@@ -196,6 +195,15 @@ vim.api.nvim_create_autocmd('FileType', {
     -- Test with :highlight Comment guifg=#5F8AA8
   end,
 })
+
+vim.filetype.add {
+  extension = {
+    caddy = 'caddy',
+  },
+  filename = {
+    Caddyfile = 'caddy',
+  },
+}
 vim.g.lazyvim_php_lsp = 'intelephense'
 
 -- set to `true` to follow the main branch
@@ -1439,6 +1447,7 @@ require('lazy').setup {
         php = { 'php-cs-fixer' },
         html = { 'prettierd', 'htmlhint' },
         sh = { 'shfmt' },
+        caddy = { 'caddy' },
 
         -- yaml = { 'ymlfmt', stop_after_first = false },
       },
@@ -1871,6 +1880,7 @@ require('lazy').setup {
         'yaml',
         'ini',
         'bruno',
+        'caddy',
       },
     },
     config = function(_, opts)
