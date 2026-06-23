@@ -1689,7 +1689,7 @@ require('lazy').setup {
 
       return {
         options = {
-          theme = 'gruvbox',
+          theme = 'auto',
           disabled_filetypes = {
             statusline = { 'qf' },
           },
