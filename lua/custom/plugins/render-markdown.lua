@@ -1,5 +1,9 @@
 return {
   'MeanderingProgrammer/render-markdown.nvim',
+  -- Disabled: markview.nvim + markview-smart-tables is the active renderer (it
+  -- wraps wide tables). Kept as a one-line fallback — set this to true and
+  -- disable markview.lua to switch back. Two in-buffer renderers must not both run.
+  enabled = false,
   dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.nvim' }, -- if you use the mini.nvim suite
   -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' }, -- if you use standalone mini plugins
   -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons

@@ -204,8 +204,24 @@ Final decision after implementation + live testing:
   Additionally, emoji in cells drift only when the plugin *wraps* them
   (render-markdown renders emoji fine), but emoji were not the deciding factor.
 
-**Net result:** nvim is unchanged from before this work (render-markdown tables,
-emoji, prose-wrap all intact). Wide tables are mitigated at the source (Pillar 1)
-and in PDF (Pillar 3). If nvim wide-table reading becomes painful again, the next
-option is `markview.nvim` + `markview-smart-tables` (a larger switch), not this
-plugin.
+## Update (2026-06-26) — Pillar 2 solved via markview
+
+After rejecting `markdown-table-wrap.nvim`, the fallback option was trialed and
+**adopted**: `OXY2DEV/markview.nvim` + `gunasekar/markview-smart-tables.nvim`.
+Tested live on the real stress doc `billing-and-commissions.md` (which combines
+`:-:` separators, emoji, and wide tables). It cleared all four walls that beat
+the standalone plugin:
+
+- **`:-:` center-align separators render** — markview parses via treesitter
+  (spec-compliant), so the tables that gave "no valid separator" now render.
+- **Emoji columns stay aligned** when wrapped (✅/⚠️ vs `—` line up).
+- **Prose soft-wrap and wrapped tables coexist** — `wrap` stays on; with wrap on,
+  smart-tables fits every table to the window while prose still wraps.
+- **No double-draw** — markview is the sole in-buffer renderer.
+
+`hybrid_modes = {n,v,V,i}` reveals raw markdown under the cursor for editing.
+render-markdown is kept **installed but `enabled = false`** as a one-line
+fallback. Config: `lua/custom/plugins/markview.lua`,
+`markview-smart-tables.lua`, and `render-markdown.lua` (disabled). Wide-data
+authoring rules (Pillar 1) still apply — markview makes wide tables *readable*,
+the rules keep them *rare*.
