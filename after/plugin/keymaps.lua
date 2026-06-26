@@ -480,6 +480,7 @@ vim.keymap.set('n', '#', '#``', { noremap = true, silent = true, desc = '(#) sea
 
 vim.keymap.set('n', '||', '<cmd>lua MiniFiles.open()<CR>', { desc = '[||] Open MiniFiles' })
 vim.keymap.set('n', '<C-w>V', '<cmd>vertical new<CR>', { desc = '[C-w] [V]ertical split new' })
+vim.keymap.set('n', '<C-w>F', '<cmd>vertical wincmd F<CR>', { desc = '[C-w] open [F]ile under cursor to vsplit' })
 vim.keymap.set('n', '<C-w>Q', 'ZQ<CR>', { desc = '[C-w] [Q]uit without saving!' })
 
 vim.keymap.set('n', 'gcp', ':norm yygccp<CR>', { silent = true, expr = false, desc = 'Copy and comment current line and paste below' })
@@ -496,6 +497,11 @@ end, { desc = '[T]oggle [p]rose mode' })
 vim.keymap.set('n', '<leader>Z', function()
   require('zen-mode').toggle()
 end, { desc = '[Z]enMode Toggle' })
+
+-- This follows my general toggles start with 't' approach
+vim.keymap.set('n', '<leader>tZ', function()
+  require('zen-mode').toggle()
+end, { desc = '[T]oggle [Z]enMode' })
 -- Convert *.tsv to *.csv and actually convert tabs to commas
 -- : for F in $(ls *.tsv); do echo $F; B=$(basename "$F" .tsv); echo "$B"; csvtool -t TAB -u COMMA col 1- "$F" > "$B.csv"; done
 -- TODO: this is best put ins csvview.lua

@@ -14,7 +14,7 @@ local function toggle_maximize()
   end
 end
 
-vim.keymap.set('n', '<leader>z', toggle_maximize, { desc = 'Maximi[Z]er (Use tz)', silent = true })
-vim.keymap.set('n', '<leader>tz', toggle_maximize, { desc = '[T]oggle Maximi[Z]er', silent = true })
+vim.keymap.set('n', '<leader>z', toggle_maximize, { desc = 'Maximi[z]er (Use tz)', silent = true })
+vim.keymap.set('n', '<leader>tz', toggle_maximize, { desc = '[T]oggle Maximi[z]er', silent = true })
 
 return {}
