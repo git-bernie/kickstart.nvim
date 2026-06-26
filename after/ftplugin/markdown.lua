@@ -36,10 +36,6 @@ end, { buffer = true, silent = true, desc = 'Follow markdown link' })
 -- Go back with <BS>
 vim.keymap.set('n', '<BS>', ':edit #<CR>', { buffer = true, silent = true, desc = 'Go back' })
 
--- Toggle wide-table wrapping (markdown-table-wrap.nvim). Buffer-local because
--- the :MarkdownTableTogglePreview command only exists in markdown buffers.
-vim.keymap.set('n', '<leader>tt', '<cmd>MarkdownTableTogglePreview<CR>', { buffer = true, desc = '[T]oggle [t]able wrap', silent = true })
-
 -- NOTE: This does not work!
 -- Function to select the treesitter text object
 local select_ts_textobject = function(query_string)

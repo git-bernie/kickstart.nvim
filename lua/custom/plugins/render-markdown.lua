@@ -9,9 +9,6 @@ return {
     latex = { enabled = false },
     file_types = { 'markdown', 'vimwiki' },
     only_render_image_at_cursor = true,
-    -- markdown-table-wrap.nvim owns pipe tables; disable this renderer so the
-    -- two do not double-draw the same lines.
-    pipe_table = { enabled = false },
   },
   init = function()
     vim.treesitter.language.register('markdown', 'vimwiki')

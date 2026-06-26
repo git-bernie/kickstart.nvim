@@ -178,3 +178,34 @@ anti-pattern called out. Pillar 1's rules reference this as the PDF escalation;
   wide data comes back as record layout.
 - PDF path continues to wrap (already true via `md2pdf`).
 - No existing keymaps or markdown rendering regress.
+
+---
+
+## Outcome (2026-06-26)
+
+Final decision after implementation + live testing:
+
+- **Pillar 1 — SHIPPED.** Authoring rules added to global `~/.claude/CLAUDE.md`
+  ("Markdown Width & Tables"). This is the high-leverage win and applies to both
+  work and personal sessions (both resolve to `~/.claude/CLAUDE.md`).
+- **Pillar 3 — pre-existing.** `md2pdf` already wraps wide tables; no change.
+- **Pillar 2 — REJECTED.** `ice345/markdown-table-wrap.nvim` was implemented,
+  then removed. It fought real content at every turn:
+  1. `auto_preview` mode glitches the header and forces window `nowrap`, which
+     kills prose-mode soft-wrap (`inline.lua` sets `wrap=false`).
+  2. With `inline_disable_wrap = false` (to keep prose wrap), the soft-wrapped
+     source rows nudge the overlay → header-row misalignment.
+  3. Re-enabling render-markdown's `pipe_table` for a nice default view →
+     double-draw fragments when toggling the wrap overlay.
+  4. Float mode avoided the double-draw, but the parser rejects valid GFM
+     center-align separators: `is_separator_cell` strips colons then requires
+     `>= 3` dashes, so `:-:` (one dash) → "no valid Markdown table separator
+     row found." Real docs (e.g. `billing-and-commissions.md`) use `:-:`.
+  Additionally, emoji in cells drift only when the plugin *wraps* them
+  (render-markdown renders emoji fine), but emoji were not the deciding factor.
+
+**Net result:** nvim is unchanged from before this work (render-markdown tables,
+emoji, prose-wrap all intact). Wide tables are mitigated at the source (Pillar 1)
+and in PDF (Pillar 3). If nvim wide-table reading becomes painful again, the next
+option is `markview.nvim` + `markview-smart-tables` (a larger switch), not this
+plugin.

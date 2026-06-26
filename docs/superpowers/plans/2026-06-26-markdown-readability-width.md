@@ -1,5 +1,12 @@
 # Markdown Readability & Width Implementation Plan
 
+> **STATUS (2026-06-26): Task 1 (Pillar 2) was implemented and then REVERTED.**
+> The `markdown-table-wrap.nvim` approach was abandoned after live testing —
+> see the **Outcome** section of the design spec
+> (`2026-06-26-markdown-readability-width-design.md`) for the four reasons.
+> Pillar 1 (authoring rules) shipped to `~/.claude/CLAUDE.md`; Pillar 3 (PDF)
+> pre-existing. Task 1 below is retained as a record, not as work to do.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Make wide markdown tables readable in Neovim (and keep them readable in PDF) by fixing how Claude authors markdown and by adding an in-editor wide-table wrapping fallback.
