@@ -1570,6 +1570,12 @@ require('lazy').setup {
         default = { 'lsp', 'path', 'snippets', 'lazydev', 'buffer', 'copilot', 'sshconfig', 'emoji' },
         per_filetype = {
           lua = { inherit_defaults = true, 'lazydev' },
+          -- vim-dadbod-completion: the `dadbod` provider is defined below, but
+          -- blink only queries providers listed here (or in `default`). Activate
+          -- it for SQL buffers so table/column/keyword completion works.
+          sql = { inherit_defaults = true, 'dadbod' },
+          mysql = { inherit_defaults = true, 'dadbod' },
+          plsql = { inherit_defaults = true, 'dadbod' },
         },
         providers = {
           lazydev = {
@@ -1599,6 +1605,7 @@ require('lazy').setup {
             min_keyword_length = 2,
             opts = { insert = true }, -- insert emoji (not :name:)
           },
+          dadbod = { name = 'Dadbod', module = 'vim_dadbod_completion.blink' },
         },
       },
 
