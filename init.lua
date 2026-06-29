@@ -759,14 +759,50 @@ require('lazy').setup {
         desc = '[S]earch [F]iles (hidden)',
       },
       {
-        '<leader>sD',
+        '<leader>sp',
         function()
           local dir = vim.fn.input('Directory: ', '~/', 'dir')
-          if dir ~= '' then
-            require('telescope.builtin').find_files { cwd = vim.fn.expand(dir), prompt_title = 'Find Files in ' .. dir }
+          if dir == '' then
+            return
           end
+          local path = vim.fn.expand(dir)
+          local actions = require 'telescope.actions'
+
+          -- Prune giant cache/build trees so searching big roots (e.g. ~) stays fast.
+          -- NB: no --follow / --no-ignore here; over ~ those re-walk ~1M cache files
+          -- and chase symlink loops, which is what made this hang.
+          local prune = { '.cache', '.local', '.npm', '.cargo', '.rustup', 'go', 'node_modules', '.git' }
+          local function find_command(hidden)
+            local c = { 'fd', '--type', 'f' }
+            if hidden then
+              table.insert(c, '--hidden')
+            end
+            for _, p in ipairs(prune) do
+              table.insert(c, '--exclude')
+              table.insert(c, p)
+            end
+            return c
+          end
+
+          local open
+          open = function(hidden)
+            require('telescope.builtin').find_files {
+              cwd = path,
+              find_command = find_command(hidden),
+              prompt_title = ('Find Files in %s  [%s]'):format(dir, hidden and 'hidden:on' or 'hidden:off'),
+              attach_mappings = function(_, map)
+                map({ 'i', 'n' }, '<C-h>', function(prompt_bufnr)
+                  actions.close(prompt_bufnr)
+                  open(not hidden)
+                end)
+                return true
+              end,
+            }
+          end
+
+          open(false) -- start with dotfiles hidden; <C-h> toggles them on/off
         end,
-        desc = '[S]earch [D]irectory (type a path)',
+        desc = '[S]earch [P]ath (fuzzy find files in a typed dir; <C-h> toggles hidden)',
       },
       {
         '<leader>ss',
@@ -970,9 +1006,25 @@ require('lazy').setup {
       {
         '<C-p>',
         function()
-          require('telescope.builtin').find_files { follow = true }
+          local actions = require 'telescope.actions'
+          local open
+          open = function(hidden)
+            require('telescope.builtin').find_files {
+              follow = true,
+              hidden = hidden,
+              prompt_title = ('Find Files (Fuzzy)  [%s]'):format(hidden and 'hidden:on' or 'hidden:off'),
+              attach_mappings = function(_, map)
+                map({ 'i', 'n' }, '<C-h>', function(prompt_bufnr)
+                  actions.close(prompt_bufnr)
+                  open(not hidden)
+                end)
+                return true
+              end,
+            }
+          end
+          open(false) -- start with dotfiles hidden; <C-h> toggles them on/off
         end,
-        desc = '[S]earch [F]iles (Fuzzy) (<C-p> or <leader>sf)',
+        desc = '[S]earch [F]iles (Fuzzy) (<C-p> or <leader>sf; <C-h> toggles hidden)',
       },
       -- Buffer fuzzy find
       {
