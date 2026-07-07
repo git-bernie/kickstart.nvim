@@ -9,9 +9,10 @@ vim.keymap.set('n', '<leader>xd', lc.decode_word, { desc = 'Decode LC ID under c
 vim.keymap.set('n', '<leader>xy', lc.decode_word_to_clipboard, { desc = 'Decode LC ID to clipboard' })
 vim.keymap.set('n', '<leader>xe', lc.encode_word, { desc = 'Encode LC ID under cursor' })
 
--- Visual-mode decode
+-- Visual-mode decode/encode
 vim.keymap.set('v', '<leader>xd', lc.decode_selection, { desc = 'Decode LC ID selection' })
 vim.keymap.set('v', '<leader>cx', lc.decode_selection_to_clipboard, { desc = 'Decode LC ID selection to clipboard' })
+vim.keymap.set('v', '<leader>xe', lc.encode_selection, { desc = 'Encode LC ID selection (V1 + V2)' })
 
 --- Decode a LoanConnect encoded ID to its numeric user ID via lc-codec.php.
 -- Usage: :LookupUserID [encoded_id]

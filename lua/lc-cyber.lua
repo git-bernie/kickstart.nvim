@@ -27,10 +27,16 @@ local script_path = vim.fn.stdpath('config') .. '/bin/lc-codec.php'
 ---Run lc-cyber command and return result
 ---@param action string
 ---@param value string
+---@param version string|nil Optional encode version: '1' (V1/base64url) or '2' (V2/hex). Ignored for decode (auto-detected).
 ---@return string|nil result
 ---@return string|nil error
-local function run_lc_cyber(action, value)
-  local cmd = string.format('%s %s %q 2>&1', script_path, action, value)
+local function run_lc_cyber(action, value, version)
+  local cmd
+  if version then
+    cmd = string.format('%s %s %q %q 2>&1', script_path, action, value, version)
+  else
+    cmd = string.format('%s %s %q 2>&1', script_path, action, value)
+  end
   local handle = io.popen(cmd)
   if not handle then
     return nil, 'Failed to run lc-cyber'
@@ -44,6 +50,36 @@ local function run_lc_cyber(action, value)
   else
     return nil, result or 'Unknown error'
   end
+end
+
+---Encode a value in BOTH schemes, store in registers, and echo both labeled.
+---Shared by encode_word (<leader>xe) and encode_selection (visual mode).
+---Registers: @c = V2 (hex, current default), @v = V1 (base64url, legacy).
+---@param value string The raw ID to encode
+---@return string|nil primary The V2 encoding (falls back to V1 if V2 failed), for callers
+local function encode_both(value)
+  local v2 = run_lc_cyber('encode', value, '2')
+  local v1 = run_lc_cyber('encode', value, '1')
+
+  if not (v1 or v2) then
+    vim.api.nvim_echo({ { 'Could not encode: ' .. value, 'ErrorMsg' } }, true, {})
+    return nil
+  end
+
+  if v2 then
+    vim.fn.setreg('c', v2)
+  end
+  if v1 then
+    vim.fn.setreg('v', v1)
+  end
+
+  vim.api.nvim_echo({
+    { 'Encoded ' .. value .. ':\n', 'Title' },
+    { '  V2 (hex):       ' .. (v2 or '(failed)') .. '  (@c)\n', v2 and 'MoreMsg' or 'ErrorMsg' },
+    { '  V1 (base64url):  ' .. (v1 or '(failed)') .. '  (@v)', v1 and 'MoreMsg' or 'ErrorMsg' },
+  }, true, {})
+
+  return v2 or v1
 end
 
 ---Get base64url-encoded ID under cursor
@@ -185,14 +221,14 @@ function M.decode_selection_to_clipboard()
   end
 end
 
----Encode the visual selection and show result
+---Encode the visual selection and show result (both V1 and V2 — see encode_both)
 function M.encode_selection()
   local selection = get_visual_selection()
   if selection == '' then
     print 'No selection'
     return
   end
-  M.encode(selection)
+  return encode_both(selection)
 end
 
 ---Decode and replace the visual selection
@@ -283,16 +319,7 @@ end
 ---Encode word under cursor - show result in command line
 function M.encode_word()
   local word = vim.fn.expand '<cword>'
-  local result, err = run_lc_cyber('encode', word)
-  if result then
-    -- Store in register c for easy pasting
-    vim.fn.setreg('c', result)
-    vim.api.nvim_echo({ { 'Encoded: ' .. result .. ' (stored in @c)', 'MoreMsg' } }, true, {})
-    return result
-  else
-    vim.api.nvim_echo({ { 'Could not encode: ' .. word, 'ErrorMsg' } }, true, {})
-    return nil
-  end
+  return encode_both(word)
 end
 
 return M
