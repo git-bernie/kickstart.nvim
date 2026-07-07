@@ -24,6 +24,10 @@ return {
     -- blue block (fg #7aa2f7 on bg #414868). Reassert on ColorScheme so it
     -- survives theme reloads and render-markdown's own highlight setup
     -- (this autocmd is registered after setup, so it runs last and wins).
+    --
+    -- NOTE: this whole plugin is disabled, so the styling below is dormant. The
+    -- LIVE inline-code softening for the active renderer is in markview.lua
+    -- (MarkviewInlineCode). Keep the two in sync if you change the magenta.
     local function inline_code_hl()
       -- Tokyonight inline-`code` styling. fg-only (no block) reads calmly for
       -- something this frequent; magenta harmonizes with the cool palette.

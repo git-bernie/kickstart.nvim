@@ -23,4 +23,39 @@ return {
       end,
     },
   },
+  config = function(_, opts)
+    require('markview').setup(opts)
+
+    -- Soften the inline `code` highlight. markview's default is a loud chip: a
+    -- blended background block for something this frequent. We want fg-only
+    -- (calmer) in a muted purple that still reads as "code" but harmonizes with
+    -- the cool tokyonight palette — the same intent as the render-markdown.lua
+    -- fallback's inline_code_hl (that file is disabled, so its version is
+    -- dormant; this is the live one for the active renderer).
+    --
+    -- Two groups matter, and BOTH must lose their background or a chip remains:
+    --   1. MarkviewInlineCode — markview's overlay group.
+    --   2. @markup.raw.markdown_inline — the treesitter group BENEATH it, which
+    --      tokyonight paints as a blue block (bg #414868). markview renders with
+    --      hl_mode 'combine', so without clearing this the block bleeds through
+    --      even when the overlay has bg = NONE.
+    --
+    -- markview recomputes these on VimEnter/ColorScheme via highlights.setup(),
+    -- so a one-shot set would be clobbered on the next theme event. Re-assert on
+    -- those events. vim.schedule defers our set to after markview's synchronous
+    -- highlight creation, so ours wins regardless of autocmd registration order.
+    --   muted purple #9d7cd8 (current) · magenta #bb9af7 (louder) · cyan #7dcfff
+    --   faint-chip alt: fg = '#c0caf5', bg = '#24283b'
+    local function soften_inline_code()
+      local style = { fg = '#9d7cd8', bg = 'NONE' }
+      vim.api.nvim_set_hl(0, 'MarkviewInlineCode', style)
+      vim.api.nvim_set_hl(0, '@markup.raw.markdown_inline', style)
+    end
+    vim.api.nvim_create_autocmd({ 'ColorScheme', 'VimEnter' }, {
+      callback = function()
+        vim.schedule(soften_inline_code)
+      end,
+    })
+    vim.schedule(soften_inline_code)
+  end,
 }

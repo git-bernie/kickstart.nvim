@@ -47,6 +47,12 @@ function M.enable()
   vim.opt_local.relativenumber = false
   vim.opt_local.number = true
 
+  -- Cursorline location cue via the gutter number only. With wrap on, the
+  -- default full-line cursorline paints CursorLine across every wrapped row of
+  -- the current paragraph — a big, obtrusive full-width block. 'number' keeps
+  -- the "where am I" cue (highlighted line number) without the background slab.
+  vim.opt_local.cursorlineopt = 'number'
+
   -- j/k move by display line so navigation feels natural on wrapped text
   local opts = { buffer = buf, silent = true }
   vim.keymap.set('n', 'j', 'gj', opts)
@@ -81,6 +87,7 @@ function M.disable()
   vim.opt_local.breakindent = false
   vim.opt_local.colorcolumn = '120'
   vim.opt_local.relativenumber = true
+  vim.opt_local.cursorlineopt = 'both' -- restore full-line cursorline for code
 
   -- Remove buffer-local j/k overrides
   pcall(vim.keymap.del, 'n', 'j', { buffer = buf })
