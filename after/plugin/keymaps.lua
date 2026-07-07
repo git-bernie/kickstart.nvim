@@ -204,20 +204,37 @@ if (vim.fn.executable 'jq') == 1 then
     local line = vim.api.nvim_get_current_line()
     local col = vim.api.nvim_win_get_cursor(0)[2] + 1 -- 1-indexed
 
-    -- Helper: find matching closer scanning forward from an opener
+    -- Helper: find matching closer scanning forward from an opener.
+    -- String-aware: braces inside JSON string literals are skipped, so a log
+    -- payload whose values contain stray '{' (e.g. a stringified `json_log`
+    -- field holding truncated/serialized data) still matches correctly. Honors
+    -- backslash escapes so escaped quotes (\") inside JSON-in-JSON don't end the
+    -- string early.
     local function find_matching_close(pos)
       local open = line:sub(pos, pos)
       local close = open == '{' and '}' or ']'
       local depth = 0
+      local in_string = false
+      local escaped = false
       for k = pos, #line do
         local c = line:sub(k, k)
-        if c == open then
+        if in_string then
+          if escaped then
+            escaped = false
+          elseif c == '\\' then
+            escaped = true
+          elseif c == '"' then
+            in_string = false
+          end
+        elseif c == '"' then
+          in_string = true
+        elseif c == open then
           depth = depth + 1
         elseif c == close then
           depth = depth - 1
-        end
-        if depth == 0 then
-          return k
+          if depth == 0 then
+            return k
+          end
         end
       end
       return nil
