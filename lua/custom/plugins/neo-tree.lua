@@ -14,7 +14,11 @@ return {
   branch = 'v3.x',
   -- version = '*',
   dependencies = {
-    -- '3rd/image.nvim', -- Disabled: causes preview errors with PDFs
+    -- image.nvim previews raster images (png/jpg/gif/webp/avif) inline via
+    -- kitty's graphics protocol. Config + PDF-safety notes live in image.lua.
+    -- PDFs are excluded from image.nvim's hijack patterns, so they fall through
+    -- to the custom pdf_safe_preview below (no more PDF preview errors).
+    '3rd/image.nvim',
     'nvim-lua/plenary.nvim',
     'nvim-tree/nvim-web-devicons', -- not strictly required, but recommended
     'MunifTanjim/nui.nvim',
@@ -32,8 +36,8 @@ return {
     close_if_last_window = true, -- misspelled in lua/kickstart/plugins/neo-tree.lua
     window = {
       mappings = {
-        -- Disable image.nvim for preview - causes errors with PDFs
-        ['P'] = { 'pdf_safe_preview', desc = 'Preview (PDFs as text)' },
+        -- Images preview via image.nvim; PDFs route to pdf_safe_preview (text).
+        ['P'] = { 'pdf_safe_preview', desc = 'Preview (images inline, PDFs as text)' },
       },
     },
     -- Custom preview for PDFs - convert to text instead of opening external viewer
@@ -100,7 +104,19 @@ return {
           -- Press q to close
           vim.api.nvim_buf_set_keymap(buf, 'n', 'q', ':close<CR>', { noremap = true, silent = true })
         else
-          -- Use normal preview for non-PDFs
+          -- Non-PDF: turn on the image.nvim hijack for this preview. neo-tree
+          -- normally carries use_image_nvim/use_float on the native
+          -- toggle_preview mapping's `config` block, and preview.config is
+          -- copied from state.config (preview.lua). Because we intercept P with
+          -- this custom command, we must set those flags on state.config
+          -- ourselves — otherwise preview.config.use_image_nvim is nil and
+          -- images render as plain text (preview.lua:366 never hijacks).
+          -- use_float matches neo-tree's own image-preview default (kitty
+          -- graphics position cleanly in a float).
+          state.config = vim.tbl_extend('force', state.config or {}, {
+            use_image_nvim = true,
+            use_float = true,
+          })
           require('neo-tree.sources.common.preview').toggle(state)
         end
       end,
