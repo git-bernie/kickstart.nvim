@@ -8,6 +8,42 @@ FIX: Custom 'filter_and_refresh' command auto-refreshes after filtering (was: ha
 Remember that C-x is for clearing the filter.
 
 ]]
+
+-- Shared PDF-preview helpers, used by both the file_open_requested handler and
+-- the pdf_safe_preview command below (previously duplicated in each).
+--
+-- Uses pdftotext (poppler-utils). The command is passed as a LIST to systemlist
+-- so no shell is involved — paths with spaces, quotes or $ are safe.
+local function pdf_to_text_lines(path)
+  if vim.fn.executable 'pdftotext' ~= 1 then
+    return { 'pdftotext not found — install poppler-utils to preview PDFs as text.' }
+  end
+  local output = vim.fn.systemlist { 'pdftotext', '-layout', path, '-' }
+  if vim.v.shell_error ~= 0 then
+    -- Encrypted / malformed PDF, etc. Show the reason instead of dumping raw
+    -- shell noise or an empty buffer.
+    local msg = (#output > 0) and table.concat(output, ' ') or 'unknown error'
+    return { 'Could not read PDF (pdftotext exit ' .. vim.v.shell_error .. '): ' .. msg }
+  end
+  if #output == 0 then
+    return { '(PDF produced no extractable text — it may be image-only/scanned.)' }
+  end
+  return output
+end
+
+-- Build a read-only scratch buffer holding the PDF's extracted text.
+local function make_pdf_text_buffer(path, name_prefix)
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.bo[buf].buftype = 'nofile'
+  vim.bo[buf].bufhidden = 'wipe'
+  -- bufhidden=wipe frees the name on hide, but a second live preview of the
+  -- same file would collide (E95); pcall keeps that cosmetic failure harmless.
+  pcall(vim.api.nvim_buf_set_name, buf, name_prefix .. vim.fn.fnamemodify(path, ':t'))
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, pdf_to_text_lines(path))
+  vim.bo[buf].modifiable = false
+  return buf
+end
+
 return {
   'nvim-neo-tree/neo-tree.nvim',
   enabled = true,
@@ -58,13 +94,7 @@ return {
           local ext = path:match '%.(%w+)$'
           if ext and ext:lower() == 'pdf' then
             -- For preview, convert PDF to text in a scratch buffer
-            local buf = vim.api.nvim_create_buf(false, true)
-            vim.api.nvim_buf_set_option(buf, 'buftype', 'nofile')
-            vim.api.nvim_buf_set_option(buf, 'bufhidden', 'wipe')
-            vim.api.nvim_buf_set_name(buf, 'PDF Preview: ' .. vim.fn.fnamemodify(path, ':t'))
-            local output = vim.fn.systemlist('pdftotext -layout "' .. path .. '" -')
-            vim.api.nvim_buf_set_lines(buf, 0, -1, false, output)
-            vim.api.nvim_buf_set_option(buf, 'modifiable', false)
+            local buf = make_pdf_text_buffer(path, 'PDF Preview: ')
             vim.cmd 'vsplit'
             vim.api.nvim_win_set_buf(0, buf)
             return { handled = true }
@@ -80,13 +110,7 @@ return {
         local ext = path:match '%.(%w+)$'
         if ext and ext:lower() == 'pdf' then
           -- Convert PDF to text and show in a float window
-          local buf = vim.api.nvim_create_buf(false, true)
-          vim.api.nvim_buf_set_option(buf, 'buftype', 'nofile')
-          vim.api.nvim_buf_set_option(buf, 'bufhidden', 'wipe')
-          vim.api.nvim_buf_set_name(buf, 'PDF: ' .. vim.fn.fnamemodify(path, ':t'))
-          local output = vim.fn.systemlist('pdftotext -layout "' .. path .. '" -')
-          vim.api.nvim_buf_set_lines(buf, 0, -1, false, output)
-          vim.api.nvim_buf_set_option(buf, 'modifiable', false)
+          local buf = make_pdf_text_buffer(path, 'PDF: ')
           -- Open in a float window
           local width = math.floor(vim.o.columns * 0.6)
           local height = math.floor(vim.o.lines * 0.8)
@@ -98,11 +122,17 @@ return {
             row = math.floor((vim.o.lines - height) / 2),
             style = 'minimal',
             border = 'rounded',
-            title = ' PDF Preview (q to close) ',
+            title = ' PDF Preview (q/<Esc> to close) ',
             title_pos = 'center',
           })
-          -- Press q to close
-          vim.api.nvim_buf_set_keymap(buf, 'n', 'q', ':close<CR>', { noremap = true, silent = true })
+          -- Press q or <Esc> to close (matches the other custom floats)
+          local function close_win()
+            if vim.api.nvim_win_is_valid(win) then
+              vim.api.nvim_win_close(win, true)
+            end
+          end
+          vim.keymap.set('n', 'q', close_win, { buffer = buf, silent = true })
+          vim.keymap.set('n', '<Esc>', close_win, { buffer = buf, silent = true })
         else
           -- Non-PDF: turn on the image.nvim hijack for this preview. neo-tree
           -- normally carries use_image_nvim/use_float on the native
