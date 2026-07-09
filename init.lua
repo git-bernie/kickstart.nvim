@@ -1907,6 +1907,11 @@ require('lazy').setup {
 
           require('mini.animate').setup {
             resize = { enable = false },
+            -- Cursor animation is handled by smear-cursor.nvim (the trailing
+            -- "smear" effect). Disable it here so the cursor isn't animated
+            -- twice on every CursorMoved. mini.animate still owns scroll /
+            -- open / close. See lua/custom/plugins/smear-cursor.lua.
+            cursor = { enable = false },
           }
 
           require('mini.bufremove').setup()
