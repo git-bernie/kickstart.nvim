@@ -516,6 +516,33 @@ vim.opt.completeopt = { 'menu', 'menuone', 'noinsert', 'popup' }
 --  To update plugins you can run
 --    :Lazy update
 
+-- Git-branches picker with a live remote toggle. <leader>gb opens it
+-- local-only, <leader>gB opens it with remotes; inside the picker <C-r>
+-- flips remote on/off without leaving — it closes and reopens with the other
+-- setting, carrying your typed filter across via default_text. `local function`
+-- (not `local x = function`) so the toggle can recurse into itself. The <C-r>
+-- map is scoped to this picker only, so it never shadows register-paste
+-- elsewhere.
+local function telescope_git_branches(show_remote, query)
+  local actions = require 'telescope.actions'
+  local action_state = require 'telescope.actions.state'
+  require('telescope.builtin').git_branches {
+    show_remote_tracking_branches = show_remote,
+    default_text = query,
+    attach_mappings = function(_, map)
+      -- Describe what the toggle will DO from the current state, so telescope's
+      -- `?` help (and which-key) shows it instead of "<anonymous>".
+      local toggle_desc = show_remote and 'Hide remote branches' or 'Show remote branches'
+      map({ 'i', 'n' }, '<C-r>', function(prompt_bufnr)
+        local q = action_state.get_current_line()
+        actions.close(prompt_bufnr)
+        telescope_git_branches(not show_remote, q)
+      end, { desc = toggle_desc })
+      return true -- keep telescope's default mappings
+    end,
+  }
+end
+
 require('lazy').setup {
   defaults = { lazy = true },
   ui = {
@@ -928,9 +955,18 @@ require('lazy').setup {
       {
         '<leader>gb',
         function()
-          require('telescope.builtin').git_branches()
+          -- Local branches only — the everyday branch-switch. Press <C-r> in
+          -- the picker to toggle remotes on. See telescope_git_branches above.
+          telescope_git_branches(false)
         end,
-        desc = '[G]it [B]ranches',
+        desc = '[G]it [B]ranches (local; <C-r> toggles remote)',
+      },
+      {
+        '<leader>gB',
+        function()
+          telescope_git_branches(true)
+        end,
+        desc = '[G]it [B]ranches (all; <C-r> toggles remote)',
       },
       {
         '<leader>gs',
