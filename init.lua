@@ -1780,13 +1780,25 @@ require('lazy').setup {
           },
           -- lualine_b = { 'branch', 'diff', 'diagnostics', { max_length = 20 } },
           -- lualine_b = { 'branch', 'diagnostics', { max_length = 20 } },
-          lualine_b = { 'branch', { fugitive_rev, color = { fg = '#fabd2f', gui = 'bold' } } },
+          -- Filename lives in section b (with branch), which lualine never
+          -- truncates — Vim's `%<` truncation marker is placed at the start of
+          -- section c. shorting_target abbreviates the dir parts (keeping the
+          -- basename) if b itself gets tight, so the filename is always visible.
+          lualine_b = {
+            'branch',
+            { 'filename', path = 1, shorting_target = 40 },
+            { fugitive_rev, color = { fg = '#fabd2f', gui = 'bold' } },
+          },
           -- lualine_b = {'branch', 'diff', 'diagnostics'},
+          -- Aerial breadcrumb owns section c. Because `%<` sits at the start of
+          -- c, Vim left-trims the breadcrumb when the line overflows — dropping
+          -- the top levels and KEEPING the current/deepest section. It shows the
+          -- full path whenever there's room. No fmt: the component embeds
+          -- highlight codes, so string-slicing it would corrupt the output.
           lualine_c = {
-            { 'filename', path = 1 }, -- 1 = relative path; 0 = basename only
+            { 'aerial', dense = true, dense_sep = '.' },
           },
           lualine_x = {
-            { 'aerial', max_depth = 3, dense = true, dense_sep = '.' },
             'filetype',
           },
           lualine_y = {
