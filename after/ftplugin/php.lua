@@ -14,3 +14,9 @@ vim.opt_local.textwidth = 110 -- NB: 110 works better than 120 on my split scree
 vim.opt_local.colorcolumn = { 80, 110 } -- Readability first; ideally 80; soft limit 110
 vim.opt_local.commentstring = '// %s' -- nvim runtime switched to /* %s */ in 2024; restore preferred style
 vim.api.nvim_set_hl(0, 'Comment', { fg = '#5F8AA8' }) -- Steel blue
+
+-- <leader>cv: generate a `/** @var Type $x */` for the variable on this line
+-- (intelephense-backed; shortens the type + adds a `use`). See lua/phpdoc-var.lua.
+vim.keymap.set('n', '<leader>cv', function()
+  require('phpdoc-var').annotate()
+end, { buffer = true, desc = 'PHPDoc @var for variable' })
