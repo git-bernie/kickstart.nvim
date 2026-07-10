@@ -55,7 +55,8 @@ vim.keymap.set('n', '<a-k>', '<cmd>cprevious<cr>', { desc = ':cprevious' })
 -- vim.keymap.set('n', 's', '<cmd>WhichKey<cr>', { desc = '[s]how which key mappings for cmd mode' })
 vim.keymap.set('n', '<Leader>wk', '<cmd>WhichKey<cr>', { desc = 'Sho[W] [W]hich key mappings for cmd mode' })
 vim.keymap.set('i', 'jk', '<esc>', { desc = '[jk] to escape' })
-vim.keymap.set('i', 'jK', '<esc>:write<cr>', { desc = '[jK] to escape and save', silent = false })
+-- never used
+-- vim.keymap.set('i', 'jK', '<esc>:write<cr>', { desc = '[jK] to escape and save', silent = false })
 
 --  [[ normal mode: ripgrep with args ]]
 vim.keymap.set('n', '<leader>sa', function()

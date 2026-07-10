@@ -762,7 +762,14 @@ require('lazy').setup {
         function()
           require('telescope.builtin').help_tags()
         end,
-        desc = '[S]earch [H]elp',
+        desc = '[S]earch [h]elp',
+      },
+      {
+        '<leader>sH',
+        function()
+          require('telescope.builtin').search_history()
+        end,
+        desc = '[S]earch [H]istory',
       },
       {
         '<leader>sk',

@@ -8,11 +8,11 @@ return {
   },
   keys = {
     {
-      '<leader>sE',
+      '<leader>sJ', -- sE conflicted with a telescope explore folder
       function()
         require('telescope').load_extension('emoji').emoji()
       end,
-      desc = '[S]earch [E]moji',
+      desc = '[S]earch emo[J]i',
     },
   },
   opts = {},
