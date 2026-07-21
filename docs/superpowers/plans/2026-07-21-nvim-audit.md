@@ -38,7 +38,7 @@ The script has no dependency on the command file. The command file depends only 
 - Create: `bin/nvim-audit-evidence.sh`
 
 **Interfaces:**
-- Produces: executable script taking optional `$1` = output dir; echoes the resolved output dir on the last line of stdout. Creates `startup.txt` and `startup-median.txt` in that dir.
+- Produces: executable script taking optional `$1` = output dir; echoes the resolved output dir on the last line of stdout. Creates `startup-1..5.txt`, `startup-runs.txt`, `startup-median.txt`, and `startup-slowest.txt` in that dir.
 
 - [ ] **Step 1: Create the script with skeleton and startup measurement**
 
@@ -58,7 +58,9 @@ run_nvim() { timeout 120 "$NVIM" --headless "$@" -c 'qa!' 2>&1 || true; }
 : > "$OUT/startup-runs.txt"
 for i in 1 2 3 4 5; do
   timeout 120 "$NVIM" --headless --startuptime "$OUT/startup-$i.txt" -c 'qa!' >/dev/null 2>&1 || true
-  tail -1 "$OUT/startup-$i.txt" | awk '{print $1}' >> "$OUT/startup-runs.txt"
+  # Match the STARTED line, not `tail -1` — nvim writes a trailing blank line,
+  # so tail silently yields an empty median. Verified 2026-07-21.
+  awk '/NVIM STARTED/{print $1}' "$OUT/startup-$i.txt" >> "$OUT/startup-runs.txt"
 done
 sort -n "$OUT/startup-runs.txt" | awk 'NR==3 {print $1}' > "$OUT/startup-median.txt"
 
