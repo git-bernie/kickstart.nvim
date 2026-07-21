@@ -50,7 +50,41 @@ run_nvim -c 'lua
 ' > "$OUT/lazy-plugins.json"
 
 # --- Hot autocmds: fire constantly, so they are where in-editor lag lives. ---
-run_nvim -c 'lua
+# Many hot autocmds (notably CursorHold work — see biscuits.lua / commit
+# 07dc16a) register lazily on FileType or on plugin load, not at nvim
+# startup. Enumerating them against a headless nvim with no buffer open
+# misses those entirely. So before enumerating, open a real, substantial
+# source file of a filetype this config targets (php/lua/py/sh/md) to
+# trigger that lazy registration. The path is discovered at runtime — never
+# hardcoded to this machine — by searching common project roots, skipping
+# vendor/generated noise and picking the largest candidate in a sane size
+# band; falls back to this repo's own init.lua if nothing is found. The
+# chosen file is recorded for reproducibility. It is only ever *read*: -n
+# disables swapfile creation and no :write is ever issued.
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SAMPLE_FILE=""
+SAMPLE_SIZE=0
+for root in "$HOME/work" "$HOME/code" "$HOME/projects"; do
+  [ -d "$root" ] || continue
+  while read -r size path; do
+    if [ "$size" -gt "$SAMPLE_SIZE" ]; then
+      SAMPLE_SIZE="$size"
+      SAMPLE_FILE="$path"
+    fi
+  done < <(find "$root" -maxdepth 5 \
+      \( -name .git -o -name node_modules -o -name vendor -o -name .cache \
+         -o -name storage -o -name dist -o -name build \) -prune -o \
+      -type f \( -iname '*.php' -o -iname '*.lua' -o -iname '*.py' \
+                 -o -iname '*.sh' -o -iname '*.md' \) \
+      -printf '%s %p\n' 2>/dev/null \
+    | grep -viE '_ide_helper|/\.[^/]*$' \
+    | awk '$1 > 800 && $1 < 150000')
+done
+SAMPLE_FILE="${SAMPLE_FILE:-$REPO_ROOT/init.lua}"
+echo "$SAMPLE_FILE" > "$OUT/hot-autocmds-sample.txt"
+
+run_nvim -n "$SAMPLE_FILE" -c 'lua
+  vim.wait(2000)
   local a = vim.api.nvim_get_autocmds({
     event = { "CursorMoved", "CursorMovedI", "CursorHold", "CursorHoldI",
               "TextChanged", "TextChangedI", "BufEnter" },
