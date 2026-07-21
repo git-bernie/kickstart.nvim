@@ -97,6 +97,7 @@ An editable block inside the command file, since the config records what tooling
 - Markdown-heavy documentation
 - Python (learning)
 - Lua config work
+- Bash / shell scripting — eternal and omnipresent; the one that never drops off
 - Multi-repo git
 
 Coverage is checked in both directions: gaps in tooling for work actually done, and plugins serving work no longer done. The profile is then cross-checked against the `:oldfiles` filetype histogram, and drift is flagged — so it self-corrects rather than quietly going stale, which is the usual death of a hardcoded list.
