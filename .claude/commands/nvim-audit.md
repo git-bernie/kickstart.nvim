@@ -83,7 +83,11 @@ Guards against the config being good on its own terms while years behind.
   Anything you cannot source is stated as "worth checking", never asserted.
   An uncited claim in this section is a bug in this audit.
 - If the installed nvim version and the last report's researched version
-  match and that report is recent, say so and skip the external work.
+  match AND the last report's ecosystem-research date is within 30 days of
+  today, say so and skip the external work — print both the prior report's
+  date and the nvim version it relied on so the reader can verify the skip
+  was justified, not asserted. If either check fails (version moved, or the
+  prior report is 30+ days old), do the external work.
 
 ## Report
 
