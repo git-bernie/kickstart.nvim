@@ -60,6 +60,7 @@ Files named `.nvim.lua` or `.nvimrc` in project root are automatically sourced a
 
 - **`bin/lc-codec.php`** — standalone LoanConnect ID encoder/decoder (V1 Rijndael-256 + V2 libsodium, auto-detect). Called by `lua/lc-cyber.lua` for `<leader>xd` / `<leader>xy` / `<leader>xe` keymaps. No external repo dependency. Full reference: [`docs/lc-codec.md`](docs/lc-codec.md).
 - **`bin/lc-lookup.php`** — standalone PDO dumper for LoanConnect lookup tables (lenders, partners, products...). Reads a manifest of SQL queries and writes JSON to `~/.cache/lc-lookup/`. Called by `lua/lc-lookup.lua` for `<leader>xL` / `<leader>xll` / `<leader>xlp` / `<leader>xlr` picker keymaps and `:LcLookup` / `:LcLookupRefresh` / `:LcLookupCheck` commands. No Laravel dependency. Full reference: [`docs/lc-lookup.md`](docs/lc-lookup.md).
+- **`bin/nvim-audit-evidence.sh`** — read-only measurement pass for the config health audit (startup timing, lazy stats, hot autocmds, keymap dump, tool liveness, health, oldfiles drift). Writes raw output to `~/.cache/nvim-audit/<date>` by default. Driven by the `/nvim-audit` slash command. Full reference: [`docs/nvim-audit.md`](docs/nvim-audit.md).
 
 ## Formatting
 
