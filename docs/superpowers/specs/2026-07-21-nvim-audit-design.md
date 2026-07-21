@@ -58,12 +58,14 @@ Guards against the config being good on its own terms while three years behind. 
 **Then external:**
 - **Version currency** — is 0.12.2 still current; what landed since.
 - **Built-ins that may obsolete plugins** — `vim.pack` vs lazy.nvim, `vim.lsp.config`/`enable` vs mason-lspconfig wiring, native commenting, `vim.lsp.completion`, native snippets. For each, ask whether the built-in covers *this config's actual usage*. A built-in existing is not by itself an argument for switching.
-- **Plugin health sweep** — GitHub API across the ~95 active plugins for archived status and last-commit date. Purely factual; this is the check that would have caught nvim-treesitter's archival in advance.
+- **Plugin health sweep — load-bearing plugins only.** Roughly 15, not all ~95: the LSP stack, treesitter, completion (`blink.cmp`), the pickers (telescope, snacks), lazy.nvim itself, and anything else whose failure would stop work. Abandonment only really hurts where the plugin is load-bearing; a stale colorscheme is not a finding. This is the check that would have caught nvim-treesitter's archival in advance.
 - **Kickstart upstream drift** — what upstream changed since the fork that would be worth adopting.
 
 **Sourcing requirement.** This is the phase most prone to confident, plausible, wrong claims — asserting a built-in exists, or misdescribing what `vim.pack` does. Every ecosystem claim must cite a fetched primary source (release notes, `news.txt`, the plugin's own repo) with the URL in the report. Anything unsourceable is stated as "worth checking", never asserted. **An uncited claim in this section is a bug in the audit.**
 
-**Cost.** This is the slow phase — ~95 API calls plus web fetches. The report records the nvim version and research date so a subsequent run can skip the sweep if nothing changed. Appropriate quarterly; too slow to run monthly.
+**Cost discipline.** Metadata only — the repo endpoint's `archived` flag and `pushed_at`, nothing more. Never clone a repo, never fetch repository contents, never walk a tree or issue list. A "has this been abandoned" question is answerable from two fields; anything beyond that is the audit wandering. With the sweep scoped to ~15 load-bearing plugins this phase is a handful of fetches, not a crawl.
+
+The report records the nvim version and research date so a subsequent run can skip the ecosystem work entirely if nothing has moved.
 
 ## Report structure
 
@@ -96,7 +98,7 @@ An editable block inside the command file, since the config records what tooling
 - SQL / dadbod
 - Markdown-heavy documentation
 - Python (learning)
-- Lua config work
+- Lua — this config, and increasingly as a general embedded/scripting language elsewhere
 - Bash / shell scripting — eternal and omnipresent; the one that never drops off
 - Multi-repo git
 
@@ -113,5 +115,7 @@ Coverage is checked in both directions: gaps in tooling for work actually done, 
 ## Out of scope
 
 - Applying any fix automatically.
+- Cloning or scanning plugin repository contents. Health checks are metadata-only.
+- Health-checking non-load-bearing plugins.
 - Interactive interviewing at runtime — re-answering the same questions quarterly is the friction that would stop the audit being run.
 - Refactoring the config as part of the audit.
