@@ -186,7 +186,11 @@ run_nvim -c 'lua
   end
 
   pcall(require, "lspconfig")
-  for name in pairs(vim.lsp._enabled_configs or {}) do
+  local enabled_configs = vim.lsp._enabled_configs or {}
+  if next(enabled_configs) == nil then
+    io.stderr:write("WARNING: LSP introspection returned no enabled configs (vim.lsp._enabled_configs is empty). The tool liveness check may be incomplete.\n")
+  end
+  for name in pairs(enabled_configs) do
     local ok_cfg, cfg = pcall(function() return vim.lsp.config[name] end)
     local cmd = ok_cfg and cfg and cfg.cmd
     if type(cmd) == "table" and type(cmd[1]) == "string" then
