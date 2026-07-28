@@ -469,6 +469,54 @@ if (vim.fn.executable 'jq') == 1 then
   end, { desc = '[j]son from [c]sv row' })
 end
 
+-- Convert a selected PHP array literal to JSON / YAML, in place.
+--
+-- Backed by bin/php-array-convert.php, which tokenises the snippet with PHP's
+-- own lexer and rejects anything that could execute before evaluating it. Only
+-- literal values convert: constants, variables, function calls (env(), config())
+-- and interpolation are refused, because they have no JSON/YAML equivalent.
+-- Full reference: docs/php-array-convert.md
+if (vim.fn.executable 'php') == 1 then
+  local converter = vim.fn.stdpath 'config' .. '/bin/php-array-convert.php'
+
+  local function php_array_convert(format)
+    -- Leave visual mode first: '< and '> describe the *previous* selection
+    -- until the current one ends.
+    vim.cmd [[execute "normal! \<Esc>"]]
+
+    local first = vim.fn.line "'<"
+    local last = vim.fn.line "'>"
+    if first == 0 or last == 0 then
+      vim.notify('No selection to convert', vim.log.levels.WARN)
+      return
+    end
+
+    local lines = vim.api.nvim_buf_get_lines(0, first - 1, last, false)
+    local result = vim.system({ 'php', converter, '--' .. format }, { stdin = table.concat(lines, '\n') }):wait()
+
+    -- Deliberately not a `:'<,'>!cmd` filter (unlike the jq/yq maps above): a
+    -- filter replaces the selection with whatever the command emitted, so a
+    -- rejected snippet would be silently deleted. Rewrite only on exit 0.
+    if result.code ~= 0 then
+      local msg = vim.trim(result.stderr or '')
+      vim.notify(msg ~= '' and msg or ('php-array-convert exited ' .. result.code), vim.log.levels.ERROR)
+      return
+    end
+
+    local stdout = result.stdout or ''
+    stdout = stdout:gsub('\n+$', '')
+    vim.api.nvim_buf_set_lines(0, first - 1, last, false, vim.split(stdout, '\n'))
+  end
+
+  vim.keymap.set('x', '<leader>jp', function()
+    php_array_convert 'json'
+  end, { desc = '[j]son from [p]hp array (replaces selection)' })
+
+  vim.keymap.set('x', '<leader>jy', function()
+    php_array_convert 'yaml'
+  end, { desc = '[j] php array to [y]aml (replaces selection)' })
+end
+
 -- Not as useful as jq but sometimes needed, if just to remember how to use yq
 if (vim.fn.executable 'yq') == 1 then
   -- E15: Invalid expression: "<80><fd>h. ! jq --sort-keys^M "

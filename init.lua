@@ -703,6 +703,7 @@ require('lazy').setup {
         { '<leader>g', group = '[G]it' },
         { '<leader>h', group = '[H] (harpoon)', mode = { 'n', 'v' } },
         { '<leader>i', group = 'G[I]tsigns (gitsigns)', mode = { 'n', 'v' } },
+        { '<leader>j', group = '[J]son / convert', mode = { 'n', 'x' } },
         { '<leader>n', group = '[N]oice' },
         { '<leader>r', group = '[R]ename' },
         { '<leader>s', group = '[S]earch' },
