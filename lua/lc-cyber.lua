@@ -22,7 +22,7 @@
 local M = {}
 
 -- Path to the codec script (lives in this Neovim config)
-local script_path = vim.fn.stdpath('config') .. '/bin/lc-codec.php'
+local script_path = vim.fn.stdpath 'config' .. '/bin/lc-codec.php'
 
 ---Run lc-cyber command and return result
 ---@param action string

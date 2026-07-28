@@ -14,8 +14,7 @@ return {
     {
       '-',
       function()
-        local picked = require('window-picker').pick_window { include_current_win = true }
-          or vim.api.nvim_get_current_win()
+        local picked = require('window-picker').pick_window { include_current_win = true } or vim.api.nvim_get_current_win()
         vim.api.nvim_set_current_win(picked)
       end,
       desc = 'Pick a window',
@@ -23,8 +22,7 @@ return {
     {
       ',w',
       function()
-        local picked = require('window-picker').pick_window { include_current_win = true }
-          or vim.api.nvim_get_current_win()
+        local picked = require('window-picker').pick_window { include_current_win = true } or vim.api.nvim_get_current_win()
         vim.api.nvim_set_current_win(picked)
       end,
       desc = '[,] Pick a [w]indow',

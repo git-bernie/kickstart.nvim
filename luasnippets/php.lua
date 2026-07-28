@@ -82,7 +82,7 @@ function bootstrap_db(): \Illuminate\Database\Connection
 }}
 ]],
       {
-        db_env     = i(1, 'DB_DATABASE'),
+        db_env = i(1, 'DB_DATABASE'),
         db_default = i(2, 'my_db'),
       }
     )
@@ -114,10 +114,10 @@ function bootstrap_db(): \Illuminate\Database\Connection
 }}
 ]],
       {
-        db_env     = i(1, 'DB_DATABASE'),
+        db_env = i(1, 'DB_DATABASE'),
         db_default = i(2, 'my_db'),
-        schema     = i(3, 'public'),
-        sslmode    = c(4, { t 'prefer', t 'require', t 'disable' }),
+        schema = i(3, 'public'),
+        sslmode = c(4, { t 'prefer', t 'require', t 'disable' }),
       }
     )
   ),
@@ -135,14 +135,14 @@ $lookup = ${conn}->table('{table}')
     ->keyBy('{key3}');
 ]],
       {
-        conn      = i(1, 'db'),
-        table     = i(2, 'table_name'),
-        key       = i(3, 'key_col'),
-        source    = i(4, 'rows'),
+        conn = i(1, 'db'),
+        table = i(2, 'table_name'),
+        key = i(3, 'key_col'),
+        source = i(4, 'rows'),
         input_key = i(5, 'input_key'),
-        key2      = rep(3),
-        cols      = i(6, 'other_col'),
-        key3      = rep(3),
+        key2 = rep(3),
+        cols = i(6, 'other_col'),
+        key3 = rep(3),
       }
     )
   ),

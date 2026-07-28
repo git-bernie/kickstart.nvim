@@ -32,7 +32,7 @@ return {
       root_markers = vim.g.local_root_markers
     end
 
-    vim.lsp.enable('intelephense')
+    vim.lsp.enable 'intelephense'
     vim.lsp.config('intelephense', {
       root_markers = root_markers,
       -- vim.lsp.config().intelephense.setup {
