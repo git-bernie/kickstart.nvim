@@ -23,6 +23,7 @@ When starting a task, ask Claude:
 |---------|----------|
 | [add-telescope-hidden-variant](runbooks/add-telescope-hidden-variant.md) | Adding a hidden-files variant of a Telescope picker |
 | [debug-keymap-conflict](runbooks/debug-keymap-conflict.md) | Two keymaps fighting for the same key |
+| [test-keymap-headlessly](runbooks/test-keymap-headlessly.md) | Proving a keymap actually transforms text, against the real config |
 
 ## Knowledge (How things work)
 

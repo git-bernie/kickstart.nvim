@@ -10,10 +10,12 @@ This is a heavily customized fork of **kickstart.nvim** - a Neovim configuration
 
 ```bash
 # Format Lua code (required before commits)
-stylua .
+# NOTE: stylua is installed by Mason and is NOT on PATH. Use the full path,
+# or add ~/.local/share/nvim/mason/bin to PATH in your shell profile.
+~/.local/share/nvim/mason/bin/stylua .
 
 # Check formatting (CI runs this)
-stylua --check .
+~/.local/share/nvim/mason/bin/stylua --check .
 
 # In Neovim - check plugin status
 :Lazy
