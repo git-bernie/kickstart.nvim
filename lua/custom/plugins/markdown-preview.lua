@@ -15,6 +15,11 @@ return {
   build = 'cd app && yarn install',
   init = function()
     vim.g.mkdp_filetypes = { 'markdown' }
+
+    -- Default is 1: a BufHidden autocmd closes the browser preview the moment
+    -- you leave the markdown buffer. Keep the page open so it stays readable
+    -- while you work elsewhere; :MarkdownPreviewStop (or <leader>tm) closes it.
+    vim.g.mkdp_auto_close = 0
   end,
   ft = { 'markdown' },
 }
