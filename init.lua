@@ -747,7 +747,11 @@ require('lazy').setup {
       },
       { 'nvim-telescope/telescope-ui-select.nvim' },
       { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
-      { 'nvim-telescope/telescope-live-grep-args.nvim', version = '^1.0.0' },
+      -- Pinned to a master commit, not a tag: the newest tag (v1.1.0, 2024-06) still calls
+      -- vim.tbl_flatten, which Nvim 0.13 removes. The fix landed on master 2026-04-08 but was
+      -- never tagged, so a semver `version` pin can never reach it. Master is only 6 commits
+      -- ahead of v1.1.0 (11 lines of code), so tracking it here is low-risk.
+      { 'nvim-telescope/telescope-live-grep-args.nvim', commit = '53e9df55b3651dd7cf77e172f1e8c9a17407acca' },
     },
     keys = {
       -- Core search

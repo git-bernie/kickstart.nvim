@@ -59,9 +59,13 @@ vim.keymap.set('i', 'jk', '<esc>', { desc = '[jk] to escape' })
 -- vim.keymap.set('i', 'jK', '<esc>:write<cr>', { desc = '[jK] to escape and save', silent = false })
 
 --  [[ normal mode: ripgrep with args ]]
+-- Filter syntax is `-g <glob>` or `-t<type>`, NOT `-- <glob>`. Telescope passes argv
+-- straight to rg with no shell, so a glob is never expanded: after `--` rg reads
+-- `*.php` as a literal *path*, which doesn't exist, and the search silently returns
+-- nothing. `-- *.php` only appears to work in a terminal because bash expands it first.
 vim.keymap.set('n', '<leader>sa', function()
-  require('telescope').extensions.live_grep_args.live_grep_args { prompt_title = '[S]earch with [a]rgs ("word" -- *.php)' }
-end, { desc = '[S]earch with [a]rgs (Telescope live_grep_args)' })
+  require('telescope').extensions.live_grep_args.live_grep_args { prompt_title = '[S]earch with rg [a]rgs ("word" -g *.php)' }
+end, { desc = '[S]earch with rg [a]rgs (Telescope live_grep_args) "word" -g *.php' })
 
 -- [[  commandline: ripgrep with args ]]
 -- NOTE: every time I press rg quickly in command mode, this would trigger the command.
@@ -69,7 +73,7 @@ end, { desc = '[S]earch with [a]rgs (Telescope live_grep_args)' })
 --[[ vim.keymap.set(
   'c',
   'rg',
-  ":lua require('telescope').extensions.live_grep_args.live_grep_args({prompt_title = '[R]ip[G]rep using live_grep_args (\"word\" -tpphp)'})<cr>",
+  ":lua require('telescope').extensions.live_grep_args.live_grep_args({prompt_title = '[R]ip[G]rep using live_grep_args (\"word\" -tphp)'})<cr>",
   {}
 ) ]]
 
@@ -522,8 +526,13 @@ if (vim.fn.executable 'yq') == 1 then
   -- E15: Invalid expression: "<80><fd>h. ! jq --sort-keys^M "
   -- NOTE: -p, --input-format string [auto|a|yaml|y|json|j|props|p|csv|c|tsv|t|xml|x|base64|uri|toml|lua|l|ini|i] parse format for input. (default "auto")
   -- NOTE: -P is --prettyPrint
-  vim.keymap.set('n', '<leader>yq', "<cmd>. ! yq -pjson -P 'sort_keys(..)'<cr>", { desc = "[y] [q] -pjson -P 'sort_keys(..)' ..." })
-  vim.keymap.set('v', '<leader>yq', "<cmd>'<,'> ! yq -pjson -P 'sort_keys(..)'<cr>", { buffer = true, desc = "[y] [q] -pjson -P 'sort_keys(..)' ..." })
+  vim.keymap.set('n', '<leader>yq', "<cmd>. ! yq -pjson -P 'sort_keys(..)'<cr>", { desc = "[y]aml to json [q] -pjson -P 'sort_keys(..)' ..." })
+  vim.keymap.set(
+    'v',
+    '<leader>yq',
+    "<cmd>'<,'> ! yq -pjson -P 'sort_keys(..)'<cr>",
+    { buffer = true, desc = "[y]aml to json [q] -pjson -P 'sort_keys(..)' ..." }
+  )
   -- Assuming we have yq available
   -- E.g. command! JsonToYaml %!yq -P
   -- command! JsonToYaml setf yaml
