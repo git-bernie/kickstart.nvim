@@ -49,9 +49,22 @@ stale orphaned runtime behind. See below.
 
 ### What Claude Code recommends (and has done before — 0.12.2 upgrade)
 
-Neovim finds its runtime files relative to wherever its binary resolves to, so
-the binary and the runtime must always be replaced together. That's the one
-rule this approach is built around.
+Neovim finds its support files relative to wherever its binary resolves to, so
+the binary and everything it resolves to must always be replaced together.
+That's the one rule this approach is built around.
+
+A release ships **three** such parts, not two:
+
+- `bin/nvim` — the binary
+- `share/nvim/runtime/` — the runtime (Lua stdlib, queries, syntax, docs)
+- `lib/nvim/parser/` — the 7 treesitter parsers Neovim bundles for its own
+  help, Lua and Markdown highlighting (`c`, `lua`, `markdown`,
+  `markdown_inline`, `query`, `vim`, `vimdoc`)
+
+`lib/` is easy to miss because it is often unchanged between releases (it was
+byte-identical across 0.12.2 → 0.12.5). When it *does* change, skipping it
+pairs stale parsers with fresh runtime queries, which surfaces later as a
+query error on one filetype — not as an install failure.
 
 Install the new version alongside the old one first, and only swap once it's
 been smoke-tested:
@@ -67,13 +80,15 @@ tar xzf nvim.tar.gz -C ~/.local/share/nvim-X.Y.Z --strip-components=1
 ~/.local/share/nvim-X.Y.Z/bin/nvim --version
 ```
 
-Once happy, back up the old install and copy **both** halves into place:
+Once happy, back up the old install and copy all **three** parts into place:
 
 ```bash
-sudo cp /usr/local/bin/nvim /usr/local/bin/nvim-OLD-backup
+sudo cp /usr/local/bin/nvim   /usr/local/bin/nvim-OLD-backup
 sudo mv /usr/local/share/nvim /usr/local/share/nvim-OLD-backup
-sudo cp ~/.local/share/nvim-X.Y.Z/bin/nvim /usr/local/bin/nvim
+sudo mv /usr/local/lib/nvim   /usr/local/lib/nvim-OLD-backup
+sudo cp    ~/.local/share/nvim-X.Y.Z/bin/nvim   /usr/local/bin/nvim
 sudo cp -r ~/.local/share/nvim-X.Y.Z/share/nvim /usr/local/share/
+sudo cp -r ~/.local/share/nvim-X.Y.Z/lib/nvim   /usr/local/lib/
 
 # Verify the binary and runtime are the same version
 md5sum /usr/local/share/nvim/runtime/lua/vim/treesitter/languagetree.lua \

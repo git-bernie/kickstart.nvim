@@ -105,18 +105,33 @@ git diff --stat
 git commit -am "feat: upgrade to Neovim X.Y.Z"
 ```
 
-### Phase 8 — Install new binary AND runtime (both required)
+### Phase 8 — Install new binary AND runtime AND lib (all three required)
 
 ```bash
-sudo cp /usr/local/bin/nvim /usr/local/bin/nvim-OLD-backup
+sudo cp /usr/local/bin/nvim   /usr/local/bin/nvim-OLD-backup
 sudo mv /usr/local/share/nvim /usr/local/share/nvim-OLD-backup
-sudo cp ~/.local/share/nvim-X.Y.Z/bin/nvim /usr/local/bin/nvim
+sudo mv /usr/local/lib/nvim   /usr/local/lib/nvim-OLD-backup
+sudo cp    ~/.local/share/nvim-X.Y.Z/bin/nvim   /usr/local/bin/nvim
 sudo cp -r ~/.local/share/nvim-X.Y.Z/share/nvim /usr/local/share/
+sudo cp -r ~/.local/share/nvim-X.Y.Z/lib/nvim   /usr/local/lib/
 
 # Verify version match between binary and runtime
 md5sum /usr/local/share/nvim/runtime/lua/vim/treesitter/languagetree.lua \
        ~/.local/share/nvim-X.Y.Z/share/nvim/runtime/lua/vim/treesitter/languagetree.lua
 # Hashes MUST match — see Troubleshooting if they don't.
+```
+
+`lib/nvim/parser/` holds the 7 treesitter parsers Neovim bundles for its own
+help, Lua and Markdown highlighting. It is often byte-identical between
+releases (it was across 0.12.2 → 0.12.5), which is exactly why it gets
+forgotten — and why a release that *does* change it pairs stale parsers with
+fresh runtime queries. That shows up later as a query error on one filetype,
+never as an install failure. Verify with:
+
+```bash
+for f in ~/.local/share/nvim-X.Y.Z/lib/nvim/parser/*.so; do
+  cmp -s "$f" /usr/local/lib/nvim/parser/"$(basename $f)" || echo "DIFFERS: $f"
+done
 ```
 
 The tarball ships **four** things under `share/`, not just `nvim` — copying
@@ -190,6 +205,7 @@ Open a representative real file (e.g. a 5000-line PHP file from work) and check:
 | Problem | Cause | Solution |
 |---------|-------|----------|
 | `attempt to call method 'set_timeout' (a nil value)` after replacing binary | Replaced `/usr/local/bin/nvim` but not `/usr/local/share/nvim/runtime/` — version mismatch between binary and runtime | Phase 8 step two: also copy the runtime |
+| Query error on one filetype (help, Lua, Markdown) after an otherwise clean upgrade | Stale `/usr/local/lib/nvim/parser/*.so` paired with the new runtime's queries — `lib/` was not copied | Phase 8: also copy `lib/nvim`, then re-run the `cmp` loop |
 | `:TSInstall <lang>` reports success but no `.so` files appear | `TS.setup(opts)` not called — plugin is half-initialized | Add `TS.setup(opts)` as first line of `config = function(_, opts)` in treesitter spec |
 | `:Lazy restore` after branch swap leaves plugin on old branch | Lazy lock pins commit hash, not branch — checkout follows commit regardless of branch field | `:Lazy update <plugin>` to force-fetch latest of new branch; updates lockfile too |
 | `dlopen: ... No such file or directory` for an existing parser | Either parser file deleted OR missing shared library dependency (misleading ENOENT) | Verify with `ls -la` first. If file exists, `ldd <parser>.so` shows real dependency |
