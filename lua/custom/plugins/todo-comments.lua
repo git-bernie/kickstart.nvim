@@ -22,9 +22,23 @@ return {
       TEST = {},
       NOTE = {
         alt = {
-          'COMMENT', 'E.G.', 'EG', 'EX', 'EXPLANATION', 'FYI',
-          'I.E.', 'IE', 'INFO', 'NB', 'NEW', 'OLD',
-          'PAGE', 'SAFER', 'STEP', 'STEPS', 'feat', 'fix',
+          'COMMENT',
+          'E.G.',
+          'EG',
+          'EX',
+          'EXPLANATION',
+          'FYI',
+          'I.E.',
+          'IE',
+          'INFO',
+          'NB',
+          'NEW',
+          'OLD',
+          'PAGE',
+          'SAFER',
+          'STEP',
+          'STEPS',
+          'feat',
         },
       },
     },
@@ -32,7 +46,19 @@ return {
 
   -- ]w / [w to jump (avoids ]t/[t conflict with tag jumping)
   keys = {
-    { ']w', function() require('todo-comments').jump_next() end, desc = 'Next todo comment' },
-    { '[w', function() require('todo-comments').jump_prev() end, desc = 'Previous todo comment' },
+    {
+      ']w',
+      function()
+        require('todo-comments').jump_next()
+      end,
+      desc = 'Next todo comment',
+    },
+    {
+      '[w',
+      function()
+        require('todo-comments').jump_prev()
+      end,
+      desc = 'Previous todo comment',
+    },
   },
 }
