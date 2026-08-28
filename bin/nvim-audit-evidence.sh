@@ -321,11 +321,33 @@ if run_nvim -c 'lua
     end
   end
 
+  -- Mason installs into a directory that is NOT on the shell PATH (verified:
+  -- zero mason entries in $PATH) -- it is prepended to vim.env.PATH by mason
+  -- when it loads. In a bare headless run nothing may have triggered that, so
+  -- executable() would report every Mason-installed tool as missing purely
+  -- because of load order. Prepend it explicitly so the check measures whether
+  -- the tool EXISTS, not whether a plugin happened to load first.
+  local mason_bin = vim.fn.stdpath("data") .. "/mason/bin"
+  if vim.fn.isdirectory(mason_bin) == 1 and not string.find(vim.env.PATH or "", mason_bin, 1, true) then
+    vim.env.PATH = mason_bin .. ":" .. (vim.env.PATH or "")
+  end
+
+  -- names[n] = { srcs = {...}, command = "<resolved binary>" }
+  --
+  -- The distinction matters. conform and nvim-lint identify tools by an
+  -- INTERNAL NAME that is frequently not the binary: conform calls the SQL
+  -- formatter "sql_formatter" while the executable is "sql-formatter". Testing
+  -- executable() on the internal name reports a perfectly working tool as
+  -- missing. The 2026-08-28 audit shipped exactly that false positive, and it
+  -- cost a round of chasing a bug that did not exist.
   local names = {}
-  local function add(n, src)
+  local function add(n, src, cmd)
     if type(n) == "string" and #n > 0 then
-      names[n] = names[n] or {}
-      names[n][src] = true
+      names[n] = names[n] or { srcs = {} }
+      names[n].srcs[src] = true
+      if type(cmd) == "string" and #cmd > 0 then
+        names[n].command = cmd
+      end
     end
   end
 
@@ -346,7 +368,13 @@ if run_nvim -c 'lua
     for _, fts in pairs(conform.formatters_by_ft or {}) do
       if type(fts) == "table" then
         for _, f in ipairs(fts) do
-          if type(f) == "string" then add(f, "conform") end
+          if type(f) == "string" then
+            -- Ask conform for the real command rather than assuming the
+            -- formatter name is the binary. See the note on add() above.
+            local ok_info, info = pcall(conform.get_formatter_info, f)
+            local cmd = ok_info and info and info.command or nil
+            add(f, "conform", cmd)
+          end
         end
       end
     end
@@ -357,7 +385,12 @@ if run_nvim -c 'lua
     for _, ls in pairs(lint.linters_by_ft or {}) do
       if type(ls) == "table" then
         for _, l in ipairs(ls) do
-          if type(l) == "string" then add(l, "lint") end
+          if type(l) == "string" then
+            -- Same identifier-vs-binary problem as conform.
+            local ok_l, linter = pcall(function() return lint.linters[l] end)
+            local cmd = ok_l and type(linter) == "table" and type(linter.cmd) == "string" and linter.cmd or nil
+            add(l, "lint", cmd)
+          end
         end
       end
     end
@@ -379,13 +412,16 @@ if run_nvim -c 'lua
   end
 
   local out = {}
-  for n, srcs in pairs(names) do
+  for n, entry in pairs(names) do
     local src_list = {}
-    for s in pairs(srcs) do table.insert(src_list, s) end
+    for s in pairs(entry.srcs) do table.insert(src_list, s) end
     table.sort(src_list)
+    -- Test the resolved command when we have one; fall back to the name.
+    local probe = entry.command or n
     table.insert(out, {
       name = n,
-      executable = vim.fn.executable(n) == 1,
+      command = entry.command,
+      executable = vim.fn.executable(probe) == 1,
       source = table.concat(src_list, ","),
     })
   end

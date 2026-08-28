@@ -4,7 +4,7 @@
 - **Ecosystem research date:** 2026-08-28 (this run — no prior report existed)
 - **Evidence:** `~/.cache/nvim-audit/2026-08-28/` (from `./bin/nvim-audit-evidence.sh`)
 - **Prior art referenced:** `docs/search-keymaps-audit.md`
-- **Caveats:** none. The evidence script produced no LSP-introspection warning, so tool liveness is complete for this run — both the Mason half and the `lsp:<name>` half.
+- **Caveats:** the evidence script produced no LSP-introspection warning, so tool liveness is complete for this run — both the Mason half and the `lsp:<name>` half. **However**, this run's `tools.json` was produced *before* the identifier-vs-binary fix to `bin/nvim-audit-evidence.sh`, so its `executable` field is unreliable for `conform`- and `lint`-sourced entries. See the correction in V4.
 
 Findings are tiered by **how much they should be trusted**, not by topic. A measured fact and a reasoned opinion look identical on the page unless they are kept apart, and mixing them makes the measurements look like opinions too.
 
@@ -98,18 +98,43 @@ It works today because git follows the redirect and lazy keys on the directory n
 +    'mason-org/mason.nvim',
 ```
 
-## V4 — Four referenced tools are not executable
+## V4 — Three referenced tools are missing (corrected)
 
-From `tools.json`, with the `source` field showing why each is expected to exist:
+> **Correction, same day.** This finding originally listed **four** tools including `sql_formatter`, and claimed the April 2026 conform/Mason issue was unresolved. That was wrong, and it was an artifact of the audit instrument rather than a fact about the config. Corrected below; the measurement bug is fixed in `bin/nvim-audit-evidence.sh`.
 
-| Tool | Expected by | Status |
+`sql_formatter` **works.** Proven end to end by formatting a real buffer through conform:
+
+```sql
+-- before
+select a,b from t where x=1 and y=2;
+-- after
+select
+  a,
+  b
+from
+  t
+where
+  x = 1
+  and y = 2;
+```
+
+`conform.get_formatter_info("sql_formatter")` returns `command=sql-formatter, available=true`, resolving to `~/.local/share/nvim/mason/bin/sql-formatter`.
+
+**Why the audit got it wrong.** The evidence script collected names from `conform.formatters_by_ft` and called `executable()` on them directly. But `sql_formatter` is conform's *internal identifier*; the binary is `sql-formatter`. It tested the wrong string — while `sql-formatter` sat in the same `tools.json` marked executable, the same tool reported twice with opposite verdicts.
+
+**A second effect, and the one that explains the April note.** The same check returns opposite answers depending on context: `available=true` with a `.sql` buffer open, `available=false` in a bare headless nvim. Mason prepends its bin directory to `vim.env.PATH` *when it loads*; with no relevant buffer, nothing triggers that, and every Mason tool looks missing. Mason appears **zero times** in the shell PATH — which is also why `stylua` needs its full path in `CLAUDE.md`.
+
+The script now prepends Mason's bin explicitly and resolves identifiers to commands before probing, so it measures whether a tool *exists* rather than whether a plugin loaded first.
+
+**The genuinely missing tools**, re-measured after the fix:
+
+| Tool | Expected by | Resolved command |
 |---|---|---|
-| `sql_formatter` | `conform` | **missing** |
-| `isort` | `conform` | **missing** |
-| `ruff` | `lint` | **missing** |
-| `caddy` | `conform` | **missing** |
+| `ruff` | `lint` | `ruff` |
+| `isort` | `conform` | `isort` |
+| `caddy` | `conform` | `caddy` |
 
-`sql_formatter` is the interesting one: Mason **has** `sql-formatter` installed and executable, but conform is asking for `sql_formatter` (underscore). This is a name-translation mismatch, not a missing install — and it matches the April 2026 note in memory about Mason formatters being unavailable to conform. **That issue was never actually resolved.** The other three are genuinely not installed.
+Absent from Mason's bin directory *and* the system PATH. `ruff` and `isort` are the Python pair — the same profile drift noted above: Python is in the profile, zero `.py` files in oldfiles, tooling half-installed. `caddy` matters only if Caddyfiles get edited in nvim.
 
 ## V5 — Snacks is configured but two integrations are unwired
 
@@ -279,7 +304,7 @@ Roughly by value-per-minute. All diffs above are **unapplied**.
 2. **X1** — fix the leader groups in `CLAUDE.md`. Documentation only.
 3. **V3** — two Mason URL updates.
 4. **V10** — disable netrw.
-5. **V4** — resolve `sql_formatter` naming; decide about `ruff`/`isort`/`caddy`.
+5. **V4** — nothing to fix for SQL. Decide whether `ruff`/`isort`/`caddy` are wanted.
 6. **V7 / V8** — resolve `<leader>b`; add `desc` to the five table-mode maps.
 7. **V9 / J3** — clean up `colorscheme.lua`.
 8. **V5 / V6 / J2** — decide on snacks vs telescope-ui-select, and on image.nvim.

@@ -37,6 +37,8 @@ Quarterly is about right. The ecosystem phase is the slow part and is skipped wh
 ## Running the measurement alone
 
     ./bin/nvim-audit-evidence.sh /tmp/audit-check
-    jq -r '.[] | select(.executable==false) | .name' /tmp/audit-check/tools.json
+    jq -r '.[] | select(.executable==false) | "\(.name)\t\(.command // .name)"' /tmp/audit-check/tools.json
 
-That second command answers "is anything I have configured actually missing from PATH" without involving Claude at all.
+That second command answers "is anything I have configured actually missing" without involving Claude at all. It prints two columns because they are often different: `conform` and `nvim-lint` identify tools by an internal name that is frequently not the binary — conform calls the SQL formatter `sql_formatter` while the executable is `sql-formatter`. `tools.json` carries both, and `executable` is tested against the resolved `command`.
+
+Probing the internal name instead is not a hypothetical mistake: the 2026-08-28 audit reported a working `sql_formatter` as missing and spent a round chasing it. The script also prepends Mason's bin directory to `PATH` before probing, because Mason only does that itself when it loads — so in a bare headless run every Mason-installed tool would otherwise look absent.
