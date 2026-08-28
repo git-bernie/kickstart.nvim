@@ -164,7 +164,9 @@ Two independent blockers. Meanwhile image.nvim registers **five `BufEnter` autoc
 
 The `norg` treesitter parser is also reported missing (`checkhealth.txt:277`) — for a filetype that isn't used.
 
-## V7 — `<leader>b` prefix collision
+## V7 — `<leader>b` prefix collision (resolved same day)
+
+> **Resolved 2026-08-28.** The breakpoint keys moved to `<F4>` / `<F6>` in `lua/kickstart/plugins/debug.lua`, rather than being deleted — the debugger is unused here, but stepping keys with no way to set a breakpoint would be worse than either keeping or removing the stack. Verified in a live session: bare `<leader>b` no longer exists, `<leader>bn` / `<leader>bp` are intact.
 
 From `keymaps.json`, all normal mode, all global:
 

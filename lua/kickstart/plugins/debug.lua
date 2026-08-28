@@ -55,19 +55,45 @@ return {
       end,
       desc = 'Debug: Step Out',
     },
+    -- BREAKPOINT KEYS: moved off <leader>b/<leader>B onto F4/F6 (2026-08-28).
+    --
+    -- Upstream kickstart puts these on <leader>b and <leader>B. That collided
+    -- with the buffer maps <leader>bn / <leader>bp, and it was the only real
+    -- keymap collision in this config's 482 mappings.
+    --
+    -- Why a bare prefix plus a group is a genuine problem, not a style nit:
+    -- when both `<leader>b` and `<leader>b{n,p}` exist, Neovim cannot know at
+    -- the moment you press `b` whether you are done typing. So it waits out
+    -- `timeoutlen` on EVERY press -- the bare map is delayed waiting to see if
+    -- a longer one follows, and the longer maps are delayed behind the same
+    -- ambiguity. Both sides get slower; nothing errors; nothing is logged.
+    -- That silence is why it survived this long.
+    --
+    -- Why F4/F6 rather than deleting outright: the debugger is not used here
+    -- (nvim-dap and its UI stay lazy and unloaded -- see the audit), but a
+    -- debugger with no breakpoint toggle is not a debugger. Deleting these
+    -- would leave F1/F2/F3 stepping through code you have no way to stop in.
+    -- F4 keeps the DAP keys contiguous with the existing F1/F2/F3/F5 cluster;
+    -- F6 takes the conditional variant. Both were unmapped.
+    --
+    -- To restore upstream behaviour, swap the lhs values back to '<leader>b'
+    -- and '<leader>B' -- and rebind or drop <leader>bn / <leader>bp first, or
+    -- the collision comes straight back.
+    --
+    -- Context: docs/nvim-audit-2026-08-28.md, finding V7.
     {
-      '<leader>b',
+      '<F4>',
       function()
         require('dap').toggle_breakpoint()
       end,
       desc = 'Debug: Toggle Breakpoint',
     },
     {
-      '<leader>B',
+      '<F6>',
       function()
         require('dap').set_breakpoint(vim.fn.input 'Breakpoint condition: ')
       end,
-      desc = 'Debug: Set Breakpoint',
+      desc = 'Debug: Set Breakpoint (conditional)',
     },
     -- Toggle to see last session result. Without this, you can't see session output in case of unhandled exception.
     {
