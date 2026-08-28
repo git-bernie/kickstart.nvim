@@ -125,6 +125,13 @@ vim.opt.backup = true
 -- https://github.com/andymass/vim-matchup?tab=readme-ov-file#interoperability
 vim.g.loaded_matchit = 1
 
+-- Disable netrw. neo-tree, mini.files, ranger.nvim and snacks.explorer all
+-- cover file browsing; netrw was still sourcing its plugin file and installing
+-- a `BufEnter *` handler (group FileExplorer) on every buffer for nothing.
+-- Must be set before plugins load.
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
 -- Append backup files with timestamp
 --https://toddknutson.bio/posts/how-to-enable-neovim-undo-backup-and-swap-files-when-switching-linux-groups/
 vim.api.nvim_create_autocmd('BufWritePre', {

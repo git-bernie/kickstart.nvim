@@ -55,7 +55,18 @@ Lazy.nvim auto-imports all files in `lua/custom/plugins/` via `{ import = 'custo
 ### Key Mapping Conventions
 
 - **Leader:** `<space>`
-- **Leader groups:** `<leader>c` (code), `<leader>d` (document), `<leader>f` (file/fzf), `<leader>g` (git), `<leader>s` (search), `<leader>t` (toggle), `<leader>w` (workspace)
+- **Leader groups** (map counts measured 2026-08-28, see `docs/nvim-audit-2026-08-28.md`):
+  - `<leader>s` (search) — 30 maps, the most consistent group; copy its style
+  - `<leader>t` (toggle) — 20
+  - `<leader>g` (git) — 17
+  - `<leader>y` (yank & convert) — 16
+  - `<leader>f` (fzf-lua) — 16
+  - `<leader>x` (LoanConnect codec + lookup) — 14
+  - `<leader>c` (code) — 13
+  - `<leader>m` (sessions, minimap, MCP hub) — 10
+  - `<leader>j` (JSON/YAML conversion) — 7
+  - `<leader>T` (terminal) — 2
+  - `<leader>w` — 1 map only (`wk`); not a workspace group despite the name
 - **Window navigation:** `<C-hjkl>`
 
 ### Project-Local Config
