@@ -119,6 +119,31 @@ md5sum /usr/local/share/nvim/runtime/lua/vim/treesitter/languagetree.lua \
 # Hashes MUST match — see Troubleshooting if they don't.
 ```
 
+The tarball ships **four** things under `share/`, not just `nvim` — copying
+only the runtime leaves the desktop entry, icon, and man page pinned at
+whatever version last touched them:
+
+```bash
+sudo cp ~/.local/share/nvim-X.Y.Z/share/applications/nvim.desktop /usr/local/share/applications/
+sudo cp ~/.local/share/nvim-X.Y.Z/share/man/man1/nvim.1          /usr/local/share/man/man1/
+sudo cp ~/.local/share/nvim-X.Y.Z/share/icons/hicolor/128x128/apps/nvim.png \
+        /usr/local/share/icons/hicolor/128x128/apps/
+
+# Refresh the caches that index them
+sudo mandb -q
+sudo update-desktop-database /usr/local/share/applications 2>/dev/null || true
+```
+
+Nothing breaks if you skip this — the drift is cosmetic (a launcher category,
+a man page a version behind). But it's silent and cumulative, so it's easier to
+do here than to notice later. Verify with:
+
+```bash
+diff /usr/local/share/applications/nvim.desktop ~/.local/share/nvim-X.Y.Z/share/applications/nvim.desktop
+diff /usr/local/share/man/man1/nvim.1          ~/.local/share/nvim-X.Y.Z/share/man/man1/nvim.1
+man -w nvim   # should resolve under /usr/local (note: /usr/local/man is a symlink to share/man)
+```
+
 ### Phase 9 — Sync live data dir against sandbox
 
 If the live install's nvim-treesitter `install()` fails silently (no `.so` files appear despite "installed N/N languages" messages), copy parsers and queries from the sandbox where they verifiably work:
