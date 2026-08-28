@@ -1468,6 +1468,13 @@ require('lazy').setup {
         'yaml-language-server',
         -- Formatters & linters
         'stylua',
+        -- Python. conform runs `python = { 'isort', 'black' }` and nvim-lint
+        -- runs `python = { 'ruff' }`, but none of the three were pinned here,
+        -- so isort and ruff were simply absent (black happened to exist at
+        -- /usr/bin/black, from the system, not from this config). Listing them
+        -- is what makes the Python setup reproducible on a fresh machine.
+        'isort',
+        'ruff',
       }
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
