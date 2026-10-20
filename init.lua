@@ -190,6 +190,42 @@ vim.filetype.add {
   },
 }
 
+-- systemd unit files outside a */systemd/* path (e.g. ~/work/dotfiles/system-fixes/)
+-- get no filetype from Neovim's built-in rule, so systemd_lsp never starts. Sniff the
+-- content for a unit section header rather than trusting the extension alone:
+-- D-Bus activation files are also *.service but start with [D-BUS Service].
+do
+  local unit_sections = {
+    Unit = true,
+    Install = true,
+    Service = true,
+    Socket = true,
+    Timer = true,
+    Mount = true,
+    Automount = true,
+    Swap = true,
+    Path = true,
+    Slice = true,
+    Scope = true,
+  }
+  local function systemd_unit(_, bufnr)
+    if not bufnr then
+      return
+    end
+    for _, line in ipairs(vim.api.nvim_buf_get_lines(bufnr, 0, 30, false)) do
+      local section = line:match '^%s*%[([%w ]+)%]'
+      if section then
+        return unit_sections[section] and 'systemd' or nil
+      end
+    end
+  end
+  local ext = {}
+  for _, e in ipairs { 'service', 'socket', 'timer', 'target', 'mount', 'automount', 'swap', 'path', 'slice' } do
+    ext[e] = systemd_unit
+  end
+  vim.filetype.add { extension = ext }
+end
+
 -- In init.lua
 vim.api.nvim_create_autocmd('FileType', {
   pattern = { 'sh', 'bash', 'zsh' },
@@ -1432,6 +1468,7 @@ require('lazy').setup {
         }, -- }}}
         -- vue_ls = {},
         ansiblels = {},
+        systemd_lsp = {}, -- JFryy/systemd-lsp (Rust): unit files, ft=systemd
         yamlls = {
           settings = {
             yaml = {
@@ -1465,6 +1502,7 @@ require('lazy').setup {
         'lua-language-server',
         'marksman',
         'pyright',
+        'systemd-lsp',
         'yaml-language-server',
         -- Formatters & linters
         'stylua',
