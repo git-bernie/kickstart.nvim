@@ -1,62 +1,59 @@
 -- Thin scrollbar column with diagnostic / git / search marks.
 -- https://github.com/petertriho/nvim-scrollbar
--- Bridges to nvim-hlslens so search matches appear as marks in the scrollbar.
+-- v2 config. Search marks come from the native `/` `?` search, so the v1
+-- nvim-hlslens bridge is gone (hlslens.lua still owns the inline lens).
 return {
   'petertriho/nvim-scrollbar',
+  -- v2 lands on main 2026-11-16; drop this line after the cutover.
+  branch = 'refactor/v2',
   event = { 'BufReadPost', 'BufNewFile' },
   dependencies = {
-    'kevinhwang91/nvim-hlslens',
     'lewis6991/gitsigns.nvim',
   },
   config = function()
     require('scrollbar').setup {
-      handle = {
-        hide_if_all_visible = true, -- no handle when whole buffer fits on screen
-        blend = 30, -- transparency: 0 opaque, 100 invisible
+      -- Keyed tables add to v2's defaults (a list would replace them).
+      exclude = {
+        buftypes = { terminal = true, nofile = true, prompt = true, quickfix = true },
+        filetypes = {
+          help = true,
+          dashboard = true,
+          ['neo-tree'] = true,
+          NvimTree = true,
+          lazy = true,
+          mason = true,
+          TelescopePrompt = true,
+          snacks_picker_list = true,
+          aerial = true,
+          fugitive = true,
+          qf = true,
+          noice = true,
+          minimap = true,
+          trouble = true,
+        },
       },
-      excluded_buftypes = { 'terminal', 'nofile', 'prompt', 'quickfix' },
-      excluded_filetypes = {
-        'help',
-        'dashboard',
-        'neo-tree',
-        'NvimTree',
-        'lazy',
-        'mason',
-        'TelescopePrompt',
-        'snacks_picker_list',
-        'aerial',
-        'fugitive',
-        'qf',
-        'noice',
-        'minimap',
-        'trouble',
-      },
-      handlers = {
-        cursor = false, -- the handle already shows position; second cursor mark is noise
+      providers = {
+        cursor = false, -- the thumb already shows position; second cursor mark is noise
         diagnostic = true,
         gitsigns = true,
-        handle = true,
-        search = true, -- wired below via scrollbar.handlers.search
+        search = true,
       },
-      -- Mute Warn/Info/Hint marks — lua_ls floods init.lua with missing-fields
+      -- Hide Warn/Info/Hint marks — lua_ls floods init.lua with missing-fields
       -- and undefined-field findings. Matches the existing diagnostic philosophy
       -- at init.lua:1214 where underline is also restricted to ERROR severity.
       -- Warnings remain available via vim.diagnostic.open_float() and :Trouble.
       marks = {
-        Warn = { text = { '', '' } },
-        Info = { text = { '', '' } },
-        Hint = { text = { '', '' } },
+        Warn = false,
+        Info = false,
+        Hint = false,
       },
-      show_in_active_only = true, -- hide in inactive splits
-      throttle_ms = 100,
-    }
-
-    -- Wire hlslens → scrollbar. Re-passes the hlslens options so scrollbar's
-    -- internal hlslens.setup() doesn't wipe nearest_only / calm_down.
-    require('scrollbar.handlers.search').setup {
-      nearest_only = true,
-      calm_down = true,
-      nearest_float_when = 'never',
+      scrollbar = {
+        visibility = 'active', -- hide in inactive splits
+        thumb = {
+          hide_if_all_visible = true, -- no thumb when whole buffer fits on screen
+          blend = 30, -- transparency: 0 opaque, 100 invisible
+        },
+      },
     }
   end,
 }
