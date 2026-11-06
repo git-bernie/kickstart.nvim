@@ -2,7 +2,7 @@
 -- wraps wide tables to fit the window (handles GFM `:-:` separators and emoji
 -- cleanly, where markdown-table-wrap.nvim failed). render-markdown.nvim is kept
 -- disabled as a one-line fallback (see render-markdown.lua). hybrid_modes reveals
--- raw markdown under the cursor so editing still works.
+-- raw markdown under the cursor while editing (Insert/Visual only, not Normal).
 return {
   'OXY2DEV/markview.nvim',
   lazy = false,
@@ -12,9 +12,21 @@ return {
   },
   opts = {
     preview = {
-      -- render the whole buffer, but show raw markdown on the line/block under
-      -- the cursor in these modes (so you can read AND edit in place)
-      hybrid_modes = { 'n', 'v', 'V', 'i' },
+      -- "Hybrid mode" renders the whole buffer but shows raw markdown for the
+      -- block under the cursor, so it can be edited in place.
+      --
+      -- Normal mode ('n') is deliberately NOT in this list (2026-11-06). A table
+      -- is one block, so with 'n' included, merely resting the cursor on any
+      -- row collapsed the whole table back to pipes - e.g. the work-log "Open
+      -- Threads" table could not be read with the cursor inside it.
+      --
+      -- Now: Normal mode = reading, always rendered. Press i / v / V to see the
+      -- raw markdown and edit it. To see raw text without leaving Normal mode:
+      --   :Markview hybridToggle     this buffer (run again to undo)
+      --   :Markview HybridToggle     all buffers
+      -- To reveal only the cursor LINE instead of the whole table, add
+      -- `linewise_hybrid_mode = true` here (try live: :Markview linewiseToggle).
+      hybrid_modes = { 'v', 'V', 'i' },
     },
     -- hand pipe-table rendering to smart-tables so wide tables wrap to fit
     renderers = {
