@@ -62,7 +62,7 @@ Lazy.nvim auto-imports all files in `lua/custom/plugins/` via `{ import = 'custo
   - `<leader>y` (yank & convert) — 16
   - `<leader>f` (fzf-lua) — 16
   - `<leader>x` (LoanConnect codec + lookup) — 14
-  - `<leader>c` (code) — 13
+  - `<leader>c` (code + CopilotChat) — 16 (13 at audit + `ce`/`cf`/`cr` CopilotChat explain/fix/review, added 2026-11-10; several are buffer-local: `ca` LSP, `cv` php)
   - `<leader>m` (sessions, minimap, MCP hub) — 10
   - `<leader>j` (JSON/YAML conversion) — 7
   - `<leader>T` (terminal) — 2
