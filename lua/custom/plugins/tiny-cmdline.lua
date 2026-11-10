@@ -1,5 +1,6 @@
 return {
   'rachartier/tiny-cmdline.nvim',
+  enabled = true,
   event = 'VeryLazy',
   init = function()
     vim.o.cmdheight = 0
