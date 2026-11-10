@@ -105,5 +105,5 @@ Uses `.stylua.toml`: 160 char width, 2-space indent, single quotes preferred. Gi
 
 ## Branch Info
 
-- Current branch: `jan-2026`
+- Work happens directly on `master` (personal config; no feature branches)
 - Main branch for PRs: `master`
