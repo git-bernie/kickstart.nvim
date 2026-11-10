@@ -1702,6 +1702,10 @@ require('lazy').setup {
         --
         -- See :h blink-cmp-config-keymap for defining your own keymap
         preset = 'default',
+        -- Free insert-mode <c-k> for native digraphs (:h i_CTRL-K); signature
+        -- toggle moves to <c-s>, matching Neovim's built-in i_CTRL-S.
+        ['<C-k>'] = false,
+        ['<C-s>'] = { 'show_signature', 'hide_signature', 'fallback' },
 
         -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
         --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
