@@ -66,7 +66,7 @@ Lazy.nvim auto-imports all files in `lua/custom/plugins/` via `{ import = 'custo
   - `<leader>m` (sessions, minimap, MCP hub) — 10
   - `<leader>j` (JSON/YAML conversion) — 7
   - `<leader>T` (terminal) — 2
-  - `<leader>b` (buffers) — 2; keep this prefix free of a bare `<leader>b` map
+  - `<leader>b` (buffers + bookmarks.nvim) — 13 (`bn`/`bp` buffers in init.lua, 11 bookmark maps in `lua/custom/plugins/bookmarks.lua`, added 2026-11-10); keep this prefix free of a bare `<leader>b` map
   - `<leader>w` — 1 map only (`wk`); not a workspace group despite the name
 - **Window navigation:** `<C-hjkl>`
 

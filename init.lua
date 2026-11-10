@@ -740,6 +740,7 @@ require('lazy').setup {
 
       -- Document existing key chains
       spec = {
+        { '<leader>b', group = '[B]uffer / [B]ookmarks', mode = { 'n', 'x' } },
         { '<leader>c', group = '[C]ode', mode = { 'n', 'x' } },
         { '<leader>d', group = '[D]ocument' },
         { '<leader>f', group = '[F]ile or [F]zf' },
